@@ -9,16 +9,29 @@ package api
 import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"os"
 )
 
 // Injectors from wire.go:
 
 func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	queries := db.New(dbPool)
-	userService := service.NewUserService(queries)
-	userHandler := handler.NewUserHandler(userService)
-	server := NewServer(dbPool, userHandler)
+	jwtManager := provideJWTManager()
+	authService := service.NewAuthService(queries, jwtManager)
+	authHandler := handler.NewAuthHandler(authService)
+	server := NewServer(dbPool, authHandler)
 	return server
+}
+
+// wire.go:
+
+func provideJWTManager() *token.JWTManager {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "dev-secret-change-in-production"
+	}
+	return token.NewJWTManager(secret)
 }

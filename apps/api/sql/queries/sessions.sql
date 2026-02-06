@@ -22,3 +22,8 @@ DELETE FROM sessions WHERE user_id = $1;
 
 -- name: DeleteExpiredSessions :exec
 DELETE FROM sessions WHERE expires_at < NOW();
+
+
+-- name: DeleteSessionByRefreshToken :exec
+DELETE FROM sessions
+WHERE refresh_token = $1;

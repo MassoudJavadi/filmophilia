@@ -66,6 +66,16 @@ func (q *Queries) DeleteSession(ctx context.Context, id string) error {
 	return err
 }
 
+const deleteSessionByRefreshToken = `-- name: DeleteSessionByRefreshToken :exec
+DELETE FROM sessions
+WHERE refresh_token = $1
+`
+
+func (q *Queries) DeleteSessionByRefreshToken(ctx context.Context, refreshToken pgtype.Text) error {
+	_, err := q.db.Exec(ctx, deleteSessionByRefreshToken, refreshToken)
+	return err
+}
+
 const deleteUserSessions = `-- name: DeleteUserSessions :exec
 DELETE FROM sessions WHERE user_id = $1
 `

@@ -21,14 +21,12 @@ type UserResponse struct {
     DisplayName string `json:"display_name"`
 }
 
-
 // AuthResponse is the response for successful authentication
 type AuthResponse struct {
     AccessToken  string       `json:"access_token"`
     RefreshToken string       `json:"refresh_token"`
     User         UserResponse `json:"user"`
 }
-
 
 type RefreshRequest struct {
     RefreshToken string `json:"refresh_token" binding:"required"`
