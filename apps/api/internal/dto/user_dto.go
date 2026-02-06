@@ -15,3 +15,16 @@ type UserResponse struct {
 	Username    string `json:"username"`
 	DisplayName string `json:"display_name"`
 }
+
+// LoginRequest is what we expect for login
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+// AuthResponse is the response for successful authentication
+type AuthResponse struct {
+	AccessToken  string       `json:"access_token"`
+	RefreshToken string       `json:"refresh_token"`
+	User         UserResponse `json:"user"`
+}
