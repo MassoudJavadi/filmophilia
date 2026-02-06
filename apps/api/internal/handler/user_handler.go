@@ -9,35 +9,42 @@ import (
 )
 
 type UserHandler struct {
-	userService *service.UserService
+    userSvc *service.UserService
 }
 
-func NewUserHandler(us *service.UserService) *UserHandler {
-	return &UserHandler{userService: us}
+func NewUserHandler(svc *service.UserService) *UserHandler {
+    return &UserHandler{userSvc: svc}
 }
 
 func (h *UserHandler) Signup(c *gin.Context) {
-	var req dto.SignupRequest
+    var req dto.SignupRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	// 1. Bind JSON and Validate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    user, err := h.userSvc.Register(c.Request.Context(), req)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create user"})
+        return
+    }
 
-	// 2. Call Service
-	user, err := h.userService.Register(c.Request.Context(), req)
-	if err != nil {
-	
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create user"})
-		return
-	}
+    c.JSON(http.StatusCreated, user)
+}
 
-	// 3. Return Success (Using a Map or DTO to hide password)
-	c.JSON(http.StatusCreated, dto.UserResponse{
-		ID:          user.ID,
-		Email:       user.Email,
-		Username:    user.Username,
-		DisplayName: user.DisplayName.String,
-	})
+func (h *UserHandler) Login(c *gin.Context) {
+    var req dto.LoginRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    resp, err := h.userSvc.Login(c.Request.Context(), req)
+    if err != nil {
+        // Here you can check for specific errors like ErrUserBanned
+        c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, resp)
 }
