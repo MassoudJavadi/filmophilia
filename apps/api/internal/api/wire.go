@@ -8,6 +8,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/google/wire"
@@ -27,7 +28,9 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 		wire.Bind(new(db.DBTX), new(*pgxpool.Pool)),
 		db.New,
 		provideJWTManager,
+		oauth.NewGoogleManager,
 		service.NewAuthService,
+		service.NewOAuthService,
 		handler.NewAuthHandler,
 		NewServer,
 	)

@@ -9,6 +9,7 @@ package api
 import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -21,7 +22,9 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	queries := db.New(dbPool)
 	jwtManager := provideJWTManager()
 	authService := service.NewAuthService(queries, jwtManager)
-	authHandler := handler.NewAuthHandler(authService)
+	googleManager := oauth.NewGoogleManager()
+	oAuthService := service.NewOAuthService(queries, authService, googleManager)
+	authHandler := handler.NewAuthHandler(authService, oAuthService)
 	server := NewServer(dbPool, authHandler, jwtManager)
 	return server
 }

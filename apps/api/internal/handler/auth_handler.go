@@ -12,12 +12,15 @@ import (
 )
 
 type AuthHandler struct {
-	authSvc *service.AuthService
+	authSvc  *service.AuthService
+	oauthSvc *service.OAuthService
 }
 
-func NewAuthHandler(svc *service.AuthService) *AuthHandler {
-	return &AuthHandler{authSvc: svc}
+
+func NewAuthHandler(as *service.AuthService, os *service.OAuthService) *AuthHandler {
+	return &AuthHandler{authSvc: as, oauthSvc: os}
 }
+
 
 func (h *AuthHandler) Signup(c *gin.Context) {
 	var req dto.SignupRequest
@@ -106,4 +109,26 @@ func (h *AuthHandler) GetMe(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, mapper.ToUserResponse(user))
+}
+
+func (h *AuthHandler) GoogleRedirect(c *gin.Context) {
+	state := "random-secure-state" // TODO: Use cookies for real state
+	url := h.oauthSvc.GetGoogleAuthURL(state)
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (h *AuthHandler) GoogleCallback(c *gin.Context) {
+	code := c.Query("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "code not found"})
+		return
+	}
+
+	resp, err := h.oauthSvc.HandleGoogleCallback(c.Request.Context(), code)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
 }

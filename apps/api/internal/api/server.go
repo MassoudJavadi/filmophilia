@@ -41,6 +41,9 @@ func (s *Server) setupRoutes() {
 		auth.POST("/login", s.authH.Login)
 		auth.POST("/refresh", s.authH.Refresh)
 		auth.POST("/logout", s.authH.Logout)
+
+		auth.GET("/google", s.authH.GoogleRedirect)
+        auth.GET("/google/callback", s.authH.GoogleCallback)
 	}
 
 	// Protected routes
