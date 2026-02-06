@@ -4,47 +4,54 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
+	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/MassoudJavadi/filmophilia/api/internal/api"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	// 1. Load .env file
+	// 1. Load environment variables
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables")
+		log.Println("Note: No .env file found, relying on system environment variables")
 	}
 
-	// 2. Connect to Database using a connection pool
-	// Context is used for managing timeouts and cancellations
+	// 2. Setup Database Connection with Context
+	// We use a timeout context to ensure we don't wait forever for the DB
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	dbURL := os.Getenv("DATABASE_URL")
-	dbPool, err := pgxpool.New(context.Background(), dbURL)
+	if dbURL == "" {
+		log.Fatal("DATABASE_URL is not set in environment")
+	}
+
+	dbPool, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
+		log.Fatalf("Unable to connect to database: %v", err)
 	}
 	defer dbPool.Close()
 
-	// Check if the connection is actually alive
-	if err := dbPool.Ping(context.Background()); err != nil {
-		log.Fatalf("Database unreachable: %v\n", err)
+	// Ping the database to ensure connection is live
+	if err := dbPool.Ping(ctx); err != nil {
+		log.Fatalf("Database unreachable: %v", err)
 	}
-	fmt.Println("Successfully connected to PostgreSQL!")
+	fmt.Println("✅ Successfully connected to PostgreSQL (Filmophilia DB)")
 
-	// 3. Setup Gin
-	router := gin.Default()
+	// 3. Initialize Server using Google Wire
+	// This magically wires up all dependencies: DB -> Queries -> Services -> Handlers -> Server
+	server := api.InitializeServer(dbPool)
 
-	router.GET("/api/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "connected to db",
-		})
-	})
-
+	// 4. Start the Engine
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
-	router.Run(":" + port)
+
+	fmt.Printf("🚀 Filmophilia API starting on port %s\n", port)
+	if err := server.Start(":" + port); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }
