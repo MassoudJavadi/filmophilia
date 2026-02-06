@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/api"
@@ -13,13 +17,10 @@ import (
 )
 
 func main() {
-	// 1. Load environment variables
 	if err := godotenv.Load(); err != nil {
 		log.Println("Note: No .env file found, relying on system environment variables")
 	}
 
-	// 2. Setup Database Connection with Context
-	// We use a timeout context to ensure we don't wait forever for the DB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -34,24 +35,40 @@ func main() {
 	}
 	defer dbPool.Close()
 
-	// Ping the database to ensure connection is live
 	if err := dbPool.Ping(ctx); err != nil {
 		log.Fatalf("Database unreachable: %v", err)
 	}
-	fmt.Println("✅ Successfully connected to PostgreSQL (Filmophilia DB)")
+	fmt.Println("Connected to PostgreSQL")
 
-	// 3. Initialize Server using Google Wire
-	// This magically wires up all dependencies: DB -> Queries -> Services -> Handlers -> Server
 	server := api.InitializeServer(dbPool)
 
-	// 4. Start the Engine
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
 
-	fmt.Printf("🚀 Filmophilia API starting on port %s\n", port)
-	if err := server.Start(":" + port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	// Start server in goroutine
+	go func() {
+		fmt.Printf("Filmophilia API starting on port %s\n", port)
+		if err := server.Start(":" + port); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	// Wait for interrupt signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	fmt.Println("\nShutting down server...")
+
+	// Give outstanding requests 10 seconds to complete
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
 	}
+
+	fmt.Println("Server exited")
 }

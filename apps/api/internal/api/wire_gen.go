@@ -22,7 +22,7 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	jwtManager := provideJWTManager()
 	authService := service.NewAuthService(queries, jwtManager)
 	authHandler := handler.NewAuthHandler(authService)
-	server := NewServer(dbPool, authHandler)
+	server := NewServer(dbPool, authHandler, jwtManager)
 	return server
 }
 

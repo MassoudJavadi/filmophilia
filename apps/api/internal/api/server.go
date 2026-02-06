@@ -1,23 +1,30 @@
 package api
 
 import (
+	"context"
+	"net/http"
+
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
 	"github.com/MassoudJavadi/filmophilia/api/internal/middleware"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Server struct {
-	router *gin.Engine
-	db     *pgxpool.Pool
-	authH  *handler.AuthHandler
+	httpServer *http.Server
+	router     *gin.Engine
+	db         *pgxpool.Pool
+	authH      *handler.AuthHandler
+	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
 		router: gin.Default(),
 		db:     db,
 		authH:  authH,
+		jwt:    jwt,
 	}
 
 	s.setupRoutes()
@@ -33,16 +40,25 @@ func (s *Server) setupRoutes() {
 		auth.POST("/signup", s.authH.Signup)
 		auth.POST("/login", s.authH.Login)
 		auth.POST("/refresh", s.authH.Refresh)
+		auth.POST("/logout", s.authH.Logout)
 	}
 
 	// Protected routes
 	protected := v1.Group("/")
-	protected.Use(middleware.AuthMiddleware())
+	protected.Use(middleware.AuthMiddleware(s.jwt))
 	{
 		protected.GET("/me", s.authH.GetMe)
 	}
 }
 
 func (s *Server) Start(addr string) error {
-	return s.router.Run(addr)
+	s.httpServer = &http.Server{
+		Addr:    addr,
+		Handler: s.router,
+	}
+	return s.httpServer.ListenAndServe()
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.httpServer.Shutdown(ctx)
 }

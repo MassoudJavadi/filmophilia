@@ -7,6 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+const (
+	AccessTokenDuration  = 15 * time.Minute
+	RefreshTokenDuration = 7 * 24 * time.Hour
+)
+
 type JWTManager struct {
 	secretKey string
 	issuer    string
