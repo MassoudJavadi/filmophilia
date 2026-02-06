@@ -120,3 +120,17 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	)
 	return i, err
 }
+
+const updateUserStatus = `-- name: UpdateUserStatus :exec
+UPDATE users SET status = $2 WHERE id = $1
+`
+
+type UpdateUserStatusParams struct {
+	ID     int32      `json:"id"`
+	Status UserStatus `json:"status"`
+}
+
+func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) error {
+	_, err := q.db.Exec(ctx, updateUserStatus, arg.ID, arg.Status)
+	return err
+}

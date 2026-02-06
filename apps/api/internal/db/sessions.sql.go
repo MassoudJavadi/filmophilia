@@ -95,7 +95,7 @@ func (q *Queries) GetSessionByID(ctx context.Context, id string) (Session, error
 }
 
 const getSessionByRefreshToken = `-- name: GetSessionByRefreshToken :one
-SELECT id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at FROM sessions WHERE refresh_token = $1
+SELECT id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at FROM sessions WHERE refresh_token = $1 LIMIT 1
 `
 
 func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken pgtype.Text) (Session, error) {
@@ -111,4 +111,21 @@ func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken pgt
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const updateSession = `-- name: UpdateSession :exec
+UPDATE sessions 
+SET refresh_token = $2, expires_at = $3 
+WHERE id = $1
+`
+
+type UpdateSessionParams struct {
+	ID           string             `json:"id"`
+	RefreshToken pgtype.Text        `json:"refresh_token"`
+	ExpiresAt    pgtype.Timestamptz `json:"expires_at"`
+}
+
+func (q *Queries) UpdateSession(ctx context.Context, arg UpdateSessionParams) error {
+	_, err := q.db.Exec(ctx, updateSession, arg.ID, arg.RefreshToken, arg.ExpiresAt)
+	return err
 }

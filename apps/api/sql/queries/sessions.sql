@@ -7,7 +7,12 @@ RETURNING *;
 SELECT * FROM sessions WHERE id = $1;
 
 -- name: GetSessionByRefreshToken :one
-SELECT * FROM sessions WHERE refresh_token = $1;
+SELECT * FROM sessions WHERE refresh_token = $1 LIMIT 1;
+
+-- name: UpdateSession :exec
+UPDATE sessions 
+SET refresh_token = $2, expires_at = $3 
+WHERE id = $1;
 
 -- name: DeleteSession :exec
 DELETE FROM sessions WHERE id = $1;

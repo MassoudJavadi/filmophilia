@@ -11,3 +11,6 @@ SELECT * FROM users WHERE email = $1;
 
 -- name: GetUserByUsername :one
 SELECT * FROM users WHERE username = $1;
+
+-- name: UpdateUserStatus :exec
+UPDATE users SET status = $2 WHERE id = $1;
