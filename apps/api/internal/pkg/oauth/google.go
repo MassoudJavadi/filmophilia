@@ -2,6 +2,8 @@ package oauth
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -32,6 +34,14 @@ type GoogleUser struct {
 
 type GoogleManager struct {
 	config *oauth2.Config
+}
+
+func GenerateState(n int) (string, error) {
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
 }
 
 func NewGoogleManager() *GoogleManager {

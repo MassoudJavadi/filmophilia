@@ -7,6 +7,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -115,18 +116,40 @@ func (h *AuthHandler) GetMe(c *gin.Context) {
 }
 
 func (h *AuthHandler) GoogleRedirect(c *gin.Context) {
-	state := "random-secure-state" // TODO: Use cookies for real state
+	state, err := oauth.GenerateState(32)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate state"})
+		return
+	}
+
+	// ذخیره استیت در کوکی برای ۱۵ دقیقه
+	// Domain رو اگه روی لوکال هستی خالی بذار یا localhost بذار
+	c.SetCookie("oauth_state", state, 900, "/", "", false, true)
+
 	url := h.oauthSvc.GetGoogleAuthURL(state)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
-	code := c.Query("code")
-	if code == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "code not found"})
+
+	cookieState, err := c.Cookie("oauth_state")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "state cookie not found"})
 		return
 	}
 
+	queryState := c.Query("state")
+
+	
+	if cookieState != queryState {
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid oauth state (CSRF detected!)"})
+		return
+	}
+
+    //Remove cookie after use
+	c.SetCookie("oauth_state", "", -1, "/", "", false, true)
+
+	code := c.Query("code")
 	resp, err := h.oauthSvc.HandleGoogleCallback(c.Request.Context(), code)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
