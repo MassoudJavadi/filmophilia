@@ -17,6 +17,13 @@
         "command": "go build -o ../../dist/apps/api ./cmd/api/main.go",
         "cwd": "apps/api"
       }
+    },
+    "migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "migrate -path ./sql/schema -database \"$DATABASE_URL\" -verbose up",
+        "cwd": "apps/api"
+      }
     }
   }
 }
