@@ -86,29 +86,32 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	var req dto.RefreshRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    var req dto.RefreshRequest //Get refresh token from body to invalidate it.
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "refresh token required"})
+        return
+    }
 
-	if err := h.authSvc.Logout(c.Request.Context(), req.RefreshToken); err != nil {
-		log.Printf("logout error: %v", err)
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+    if err := h.authSvc.Logout(c.Request.Context(), req.RefreshToken); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to logout"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
 func (h *AuthHandler) GetMe(c *gin.Context) {
-	userID := c.MustGet("user_id").(int32)
 
-	user, err := h.authSvc.GetUser(c.Request.Context(), userID)
-	if err != nil {
-		log.Printf("get user error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
+    userID := c.MustGet("user_id").(int32)
+    
 
-	c.JSON(http.StatusOK, mapper.ToUserResponse(user))
+    user, err := h.authSvc.GetUser(c.Request.Context(), userID)
+    if err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+        return
+    }
+
+    c.JSON(http.StatusOK, mapper.ToUserResponse(user))
 }
 
 func (h *AuthHandler) GoogleRedirect(c *gin.Context) {

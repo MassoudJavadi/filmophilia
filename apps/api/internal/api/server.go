@@ -3,13 +3,16 @@ package api
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
 	"github.com/MassoudJavadi/filmophilia/api/internal/middleware"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
 
 type Server struct {
 	httpServer *http.Server
@@ -27,6 +30,13 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, jwt *token.JWTManag
 		jwt:    jwt,
 	}
 
+	s.router.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"http://localhost:3000"}, //Client(Next.js) url
+        AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+        AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
+        AllowCredentials: true,
+        MaxAge:           12 * time.Hour,
+    }))
 	s.setupRoutes()
 	return s
 }
