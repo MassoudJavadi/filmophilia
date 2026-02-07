@@ -1,0 +1,2 @@
+# Build output (flattened migrations for golang-migrate)
+.build/
