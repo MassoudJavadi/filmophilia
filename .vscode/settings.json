@@ -1,0 +1,28 @@
+{
+  "makefile.makefilePath": "/Users/hajmasoud/Desktop/filmophilia/apps/api/Makefile",
+  "makefile.makeDirectory": "/Users/hajmasoud/Desktop/filmophilia/apps/api",
+  "makefile.buildLog": "/Users/hajmasoud/Desktop/filmophilia/.vscode/makefile-build.log",
+  "makefile.extensionOutputFolder": "./.vscode",
+  "makefile.launchConfigurations": [
+    {
+      "cwd": "/Users/hajmasoud/Desktop/filmophilia/apps/api",
+      "binaryPath": "/Users/hajmasoud/Desktop/filmophilia/apps/api/bin/api",
+      "binaryArgs": []
+    }
+  ],
+  "makefile.defaultLaunchConfiguration": {
+    "cwd": "/Users/hajmasoud/Desktop/filmophilia/apps/api",
+    "binaryPath": "/Users/hajmasoud/Desktop/filmophilia/apps/api/bin/api",
+    "binaryArgs": []
+  },
+  "makefile.configurations": [
+    {
+      "name": "Default",
+      "makefilePath": "/Users/hajmasoud/Desktop/filmophilia/apps/api/Makefile",
+      "makeDirectory": "/Users/hajmasoud/Desktop/filmophilia/apps/api"
+    }
+  ],
+  "makefile.buildBeforeLaunch": true,
+  "makefile.clearOutputBeforeBuild": true,
+  "makefile.configureOnOpen": false
+}

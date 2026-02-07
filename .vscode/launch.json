@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch API",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/apps/api/cmd/api",
+      "env": {
+        "PORT": "8080"
+      },
+      "cwd": "${workspaceFolder}/apps/api"
+    },
+    {
+      "name": "Debug API",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/apps/api/cmd/api",
+      "env": {
+        "PORT": "8080"
+      },
+      "cwd": "${workspaceFolder}/apps/api"
+    }
+  ]
+}

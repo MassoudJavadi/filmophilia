@@ -1,0 +1,50 @@
+# Filmophilia Auth Testing Context
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. Signup a new user
+POST {{baseUrl}}/api/v1/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "email": "seyed@example.com",
+  "username": "seyed",
+  "password": "SecurePassword123"
+}
+
+### 2. Login
+# @name login
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "seyed@example.com",
+  "password": "SecurePassword123"
+}
+
+### Capture the Access Token from Login Response
+@accessToken = {{login.response.body.access_token}}
+@refreshToken = {{login.response.body.refresh_token}}
+
+### 3. Test Protected Route (Get Profile)
+GET {{baseUrl}}/api/v1/me
+Authorization: Bearer {{accessToken}}
+
+### 4. Refresh Token
+# @name refresh
+POST {{baseUrl}}/api/v1/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refresh_token": "{{refreshToken}}"
+}
+
+### 5. Logout
+POST {{baseUrl}}/api/v1/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "refresh_token": "{{refreshToken}}"
+}

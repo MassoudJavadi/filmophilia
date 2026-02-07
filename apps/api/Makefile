@@ -1,8 +1,20 @@
-.PHONY: dev build test generate wire sqlc lint clean help
+.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop
 
-# Run the API in development mode
+# Run the API in development mode on port 8080
 dev:
-	go run ./cmd/api
+	PORT=8080 go run ./cmd/api
+
+# Stop the API server
+dev-stop:
+	@lsof -ti:8080 | xargs kill -9 2>/dev/null || echo "No server running on port 8080"
+
+# Enter PostgreSQL interactive shell
+db:
+	docker exec -it filmophilia_db psql -U user -d filmophilia
+
+# Stop PostgreSQL container
+db-stop:
+	docker stop filmophilia_db
 
 # Build the binary
 build:
@@ -42,7 +54,10 @@ clean:
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  dev        - Run the API in development mode"
+	@echo "  dev        - Run the API on port 8080"
+	@echo "  dev-stop   - Stop the API server"
+	@echo "  db         - Enter PostgreSQL shell"
+	@echo "  db-stop    - Stop PostgreSQL container"
 	@echo "  build      - Build the binary to bin/api"
 	@echo "  test       - Run tests"
 	@echo "  test-cover - Run tests with coverage"
