@@ -55,29 +55,17 @@ clean:
 # MIGRATIONS (using golang-migrate)
 # ============================================================
 
-DB_DIR = ../../db
+# Use current directory to avoid relative path hell
+PWD = $(shell pwd)
+DB_DIR = $(PWD)/db
 MIGRATIONS_SRC = $(DB_DIR)/migrations
 MIGRATIONS_BUILD = $(DB_DIR)/.build
 DATABASE_URL ?= postgres://user:password@localhost:5432/filmophilia?sslmode=disable
 
-# Build migrations (flatten year/month structure)
+# Build migrations (ensure the script uses absolute paths if needed)
 migrate-build:
+	@mkdir -p $(MIGRATIONS_BUILD)
 	@$(DB_DIR)/scripts/build-migrations.sh
-
-# Create a new migration (usage: make migrate-create name=add_feature)
-migrate-create:
-ifndef name
-	$(error name is required. Usage: make migrate-create name=add_feature)
-endif
-	@YEAR=$$(date +%Y); \
-	MONTH=$$(date +%m); \
-	TIMESTAMP=$$(date +%Y%m%d%H%M%S); \
-	mkdir -p $(MIGRATIONS_SRC)/$$YEAR/$$MONTH; \
-	touch $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).up.sql; \
-	touch $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).down.sql; \
-	echo "Created:"; \
-	echo "  $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).up.sql"; \
-	echo "  $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).down.sql"
 
 # Run all pending migrations
 migrate-up: migrate-build

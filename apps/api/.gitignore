@@ -5,6 +5,7 @@ bin/
 # Environment
 .env
 .env.local
+.env.*
 
 # IDE
 .idea/
@@ -12,6 +13,27 @@ bin/
 
 # OS
 .DS_Store
+Thumbs.db
 
 # Test coverage
 coverage.out
+coverage.html
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Import data files
+*.csv
+
+# SSL/TLS certificates
+*.pem
+*.key
+
+# Go workspace (if using multi-module)
+go.work
+go.work.sum
