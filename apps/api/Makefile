@@ -1,4 +1,4 @@
-.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop
+.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop migrate-build migrate-up migrate-down migrate-create migrate-version migrate-force
 
 # Run the API in development mode on port 8080
 dev:
@@ -32,7 +32,7 @@ test-cover:
 generate: sqlc wire
 
 # Generate SQLC code
-sqlc:
+sqlc: migrate-build
 	cd $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) && go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate
 
 # Generate Wire dependency injection
@@ -51,19 +51,83 @@ tidy:
 clean:
 	rm -rf bin/
 
+# ============================================================
+# MIGRATIONS (using golang-migrate)
+# ============================================================
+
+DB_DIR = ../../db
+MIGRATIONS_SRC = $(DB_DIR)/migrations
+MIGRATIONS_BUILD = $(DB_DIR)/.build
+DATABASE_URL ?= postgres://user:password@localhost:5432/filmophilia?sslmode=disable
+
+# Build migrations (flatten year/month structure)
+migrate-build:
+	@$(DB_DIR)/scripts/build-migrations.sh
+
+# Create a new migration (usage: make migrate-create name=add_feature)
+migrate-create:
+ifndef name
+	$(error name is required. Usage: make migrate-create name=add_feature)
+endif
+	@YEAR=$$(date +%Y); \
+	MONTH=$$(date +%m); \
+	TIMESTAMP=$$(date +%Y%m%d%H%M%S); \
+	mkdir -p $(MIGRATIONS_SRC)/$$YEAR/$$MONTH; \
+	touch $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).up.sql; \
+	touch $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).down.sql; \
+	echo "Created:"; \
+	echo "  $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).up.sql"; \
+	echo "  $(MIGRATIONS_SRC)/$$YEAR/$$MONTH/$${TIMESTAMP}_$(name).down.sql"
+
+# Run all pending migrations
+migrate-up: migrate-build
+	migrate -path $(MIGRATIONS_BUILD) -database "$(DATABASE_URL)" up
+
+# Rollback last migration
+migrate-down: migrate-build
+	migrate -path $(MIGRATIONS_BUILD) -database "$(DATABASE_URL)" down 1
+
+# Show current migration version
+migrate-version: migrate-build
+	migrate -path $(MIGRATIONS_BUILD) -database "$(DATABASE_URL)" version
+
+# Force set migration version (for fixing dirty state)
+migrate-force: migrate-build
+ifndef version
+	$(error version is required. Usage: make migrate-force version=20260101000000)
+endif
+	migrate -path $(MIGRATIONS_BUILD) -database "$(DATABASE_URL)" force $(version)
+
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  dev        - Run the API on port 8080"
-	@echo "  dev-stop   - Stop the API server"
-	@echo "  db         - Enter PostgreSQL shell"
-	@echo "  db-stop    - Stop PostgreSQL container"
-	@echo "  build      - Build the binary to bin/api"
-	@echo "  test       - Run tests"
-	@echo "  test-cover - Run tests with coverage"
-	@echo "  generate   - Generate all (sqlc + wire)"
-	@echo "  sqlc       - Generate SQLC code"
-	@echo "  wire       - Generate Wire DI code"
-	@echo "  lint       - Run go vet"
-	@echo "  tidy       - Run go mod tidy"
-	@echo "  clean      - Remove build artifacts"
+	@echo ""
+	@echo "  Development:"
+	@echo "    dev           - Run the API on port 8080"
+	@echo "    dev-stop      - Stop the API server"
+	@echo ""
+	@echo "  Database:"
+	@echo "    db            - Enter PostgreSQL shell"
+	@echo "    db-stop       - Stop PostgreSQL container"
+	@echo ""
+	@echo "  Migrations:"
+	@echo "    migrate-create name=X  - Create new migration in YYYY/MM/"
+	@echo "    migrate-up             - Apply all pending migrations"
+	@echo "    migrate-down           - Rollback last migration"
+	@echo "    migrate-version        - Show current version"
+	@echo "    migrate-build          - Build flat structure for migrate"
+	@echo ""
+	@echo "  Build & Test:"
+	@echo "    build         - Build the binary to bin/api"
+	@echo "    test          - Run tests"
+	@echo "    test-cover    - Run tests with coverage"
+	@echo ""
+	@echo "  Code Generation:"
+	@echo "    generate      - Generate all (sqlc + wire)"
+	@echo "    sqlc          - Generate SQLC code"
+	@echo "    wire          - Generate Wire DI code"
+	@echo ""
+	@echo "  Other:"
+	@echo "    lint          - Run go vet"
+	@echo "    tidy          - Run go mod tidy"
+	@echo "    clean         - Remove build artifacts"

@@ -354,10 +354,14 @@ type Movie struct {
 	Country          pgtype.Text        `json:"country"`
 	ImdbID           pgtype.Text        `json:"imdb_id"`
 	TmdbID           pgtype.Int4        `json:"tmdb_id"`
-	AverageRating    pgtype.Float4      `json:"average_rating"`
-	RatingCount      pgtype.Int4        `json:"rating_count"`
+	UserAvgRating    pgtype.Float4      `json:"user_avg_rating"`
+	UserRatingCount  pgtype.Int4        `json:"user_rating_count"`
 	CreatedAt        pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt        pgtype.Timestamptz `json:"updated_at"`
+	ImdbRating       pgtype.Numeric     `json:"imdb_rating"`
+	RottenTomatoes   pgtype.Int4        `json:"rotten_tomatoes"`
+	MetacriticScore  pgtype.Int4        `json:"metacritic_score"`
+	LetterboxdRating pgtype.Numeric     `json:"letterboxd_rating"`
 }
 
 type MovieGenre struct {
