@@ -1,0 +1,39 @@
+# Lefthook - Git hooks manager
+# https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: true
+  commands:
+    api-build:
+      root: apps/api
+      run: go build ./...
+      fail_text: "Build failed. Fix errors before committing."
+
+    api-vet:
+      root: apps/api
+      run: go vet ./...
+      fail_text: "go vet found issues. Fix them before committing."
+
+    api-fmt-check:
+      root: apps/api
+      run: |
+        UNFMT=$(gofmt -l . 2>&1)
+        if [ -n "$UNFMT" ]; then
+          echo "Files need formatting:"
+          echo "$UNFMT"
+          exit 1
+        fi
+      fail_text: "Code not formatted. Run 'go fmt ./...' before committing."
+
+pre-push:
+  parallel: true
+  commands:
+    api-build:
+      root: apps/api
+      run: go build ./...
+      fail_text: "Build failed. Fix errors before pushing."
+
+    api-test:
+      root: apps/api
+      run: go test ./...
+      fail_text: "Tests failed. Fix them before pushing."
