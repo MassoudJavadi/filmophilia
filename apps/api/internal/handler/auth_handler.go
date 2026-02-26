@@ -17,11 +17,9 @@ type AuthHandler struct {
 	oauthSvc *service.OAuthService
 }
 
-
 func NewAuthHandler(as *service.AuthService, os *service.OAuthService) *AuthHandler {
 	return &AuthHandler{authSvc: as, oauthSvc: os}
 }
-
 
 func (h *AuthHandler) Signup(c *gin.Context) {
 	var req dto.SignupRequest
@@ -87,32 +85,31 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-    var req dto.RefreshRequest //Get refresh token from body to invalidate it.
-    if err := c.ShouldBindJSON(&req); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "refresh token required"})
-        return
-    }
+	var req dto.RefreshRequest //Get refresh token from body to invalidate it.
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "refresh token required"})
+		return
+	}
 
-    if err := h.authSvc.Logout(c.Request.Context(), req.RefreshToken); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to logout"})
-        return
-    }
+	if err := h.authSvc.Logout(c.Request.Context(), req.RefreshToken); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to logout"})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
 func (h *AuthHandler) GetMe(c *gin.Context) {
 
-    userID := c.MustGet("user_id").(int32)
-    
+	userID := c.MustGet("user_id").(int32)
 
-    user, err := h.authSvc.GetUser(c.Request.Context(), userID)
-    if err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-        return
-    }
+	user, err := h.authSvc.GetUser(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
 
-    c.JSON(http.StatusOK, mapper.ToUserResponse(user))
+	c.JSON(http.StatusOK, mapper.ToUserResponse(user))
 }
 
 func (h *AuthHandler) GoogleRedirect(c *gin.Context) {
@@ -140,13 +137,12 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 
 	queryState := c.Query("state")
 
-	
 	if cookieState != queryState {
 		c.JSON(http.StatusForbidden, gin.H{"error": "invalid oauth state (CSRF detected!)"})
 		return
 	}
 
-    //Remove cookie after use
+	//Remove cookie after use
 	c.SetCookie("oauth_state", "", -1, "/", "", false, true)
 
 	code := c.Query("code")

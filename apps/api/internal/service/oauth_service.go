@@ -9,9 +9,9 @@ import (
 )
 
 type OAuthService struct {
-	queries    *db.Queries
-	authSvc    *AuthService // We reuse AuthService to issue tokens
-	googleMgr  *oauth.GoogleManager
+	queries   *db.Queries
+	authSvc   *AuthService // We reuse AuthService to issue tokens
+	googleMgr *oauth.GoogleManager
 }
 
 func NewOAuthService(q *db.Queries, a *AuthService, g *oauth.GoogleManager) *OAuthService {

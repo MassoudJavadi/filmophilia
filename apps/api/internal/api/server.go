@@ -13,7 +13,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-
 type Server struct {
 	httpServer *http.Server
 	router     *gin.Engine
@@ -31,12 +30,12 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, jwt *token.JWTManag
 	}
 
 	s.router.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:3000"}, //Client(Next.js) url
-        AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-        AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
-        AllowCredentials: true,
-        MaxAge:           12 * time.Hour,
-    }))
+		AllowOrigins:     []string{"http://localhost:3000"}, //Client(Next.js) url
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	s.setupRoutes()
 	return s
 }
@@ -53,7 +52,7 @@ func (s *Server) setupRoutes() {
 		auth.POST("/logout", s.authH.Logout)
 
 		auth.GET("/google", s.authH.GoogleRedirect)
-        auth.GET("/google/callback", s.authH.GoogleCallback)
+		auth.GET("/google/callback", s.authH.GoogleCallback)
 	}
 
 	// Protected routes

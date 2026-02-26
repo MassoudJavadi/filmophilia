@@ -1,4 +1,4 @@
-.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop migrate-build migrate-up migrate-down migrate-create migrate-version migrate-force
+.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop migrate-build migrate-up migrate-down migrate-create migrate-version migrate-force import
 
 # Run the API in development mode on port 8080
 dev:
@@ -15,6 +15,10 @@ db:
 # Stop PostgreSQL container
 db-stop:
 	docker stop filmophilia_db
+
+# Import movies from CSV using TMDB/OMDB APIs
+import:
+	cd cmd/importer && go run main.go
 
 # Build the binary
 build:
@@ -97,6 +101,7 @@ help:
 	@echo "  Database:"
 	@echo "    db            - Enter PostgreSQL shell"
 	@echo "    db-stop       - Stop PostgreSQL container"
+	@echo "    import        - Import movies from CSV (requires TMDB/OMDB keys)"
 	@echo ""
 	@echo "  Migrations:"
 	@echo "    migrate-create name=X  - Create new migration in YYYY/MM/"

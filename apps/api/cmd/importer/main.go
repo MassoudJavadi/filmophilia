@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"encoding/csv"
 	"fmt"
@@ -18,14 +19,30 @@ import (
 )
 
 func main() {
+	// Load .env file if it exists (try multiple paths)
+	loadEnvFile(".env")
+	loadEnvFile("../../.env")
+
 	ctx := context.Background()
 
+	// Get database URL from environment
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		dbURL = "postgres://user:password@localhost:5432/filmophilia?sslmode=disable"
+	}
+
 	// Connect to Database
-	pool, err := pgxpool.New(ctx, "postgres://user:password@localhost:5432/filmophilia?sslmode=disable")
+	pool, err := pgxpool.New(ctx, dbURL)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer pool.Close()
+
+	// Test connection
+	if err := pool.Ping(ctx); err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
+	}
+	fmt.Println("Connected to database successfully!")
 
 	queries := db.New(pool)
 
@@ -41,24 +58,40 @@ func main() {
 		log.Fatalf("Failed to read CSV: %v", err)
 	}
 
+	total := len(lines) - 1 // Exclude header
+	success := 0
+	failed := 0
+
+	fmt.Printf("Found %d movies to import\n\n", total)
+
 	for i, line := range lines {
 		if i == 0 {
 			continue // Skip header
 		}
 
-		title := line[0]
-		year, _ := strconv.Atoi(line[1])
-
-		fmt.Printf("Processing %s (%d)...\n", title, year)
-
-		tmdb, credits, omdb, err := importer.FetchFullMovieData(title, year)
-		if err != nil {
-			fmt.Printf("Failed: %v\n", err)
+		title := strings.TrimSpace(line[0])
+		if title == "" {
+			fmt.Printf("[%d/%d] Skipping empty title\n", i, total)
+			failed++
 			continue
 		}
 
-		// Slug generation
-		slug := strings.ToLower(strings.ReplaceAll(title, " ", "-")) + "-" + strconv.Itoa(year)
+		year := 0
+		if len(line) > 1 && line[1] != "" {
+			year, _ = strconv.Atoi(strings.TrimSpace(line[1]))
+		}
+
+		fmt.Printf("[%d/%d] Processing: %s (%d)... ", i, total, title, year)
+
+		tmdb, credits, omdb, err := importer.FetchFullMovieData(title, year)
+		if err != nil {
+			fmt.Printf("FAILED: %v\n", err)
+			failed++
+			continue
+		}
+
+		// Slug generation - clean up special characters
+		slug := generateSlug(tmdb.Title, year)
 
 		// Parse release date
 		var releaseDate pgtype.Date
@@ -110,7 +143,8 @@ func main() {
 			MetacriticScore: metacriticScore,
 		})
 		if err != nil {
-			fmt.Printf("Failed to create movie: %v\n", err)
+			fmt.Printf("FAILED to insert: %v\n", err)
+			failed++
 			continue
 		}
 
@@ -119,10 +153,10 @@ func main() {
 			if person.Job == "Director" {
 				pID, err := queries.UpsertPerson(ctx, db.UpsertPersonParams{
 					Name: person.Name,
-					Slug: strings.ToLower(strings.ReplaceAll(person.Name, " ", "-")),
+					Slug: generateSlug(person.Name, 0),
 				})
 				if err != nil {
-					fmt.Printf("Failed to upsert person: %v\n", err)
+					fmt.Printf("Warning: Failed to upsert person %s: %v\n", person.Name, err)
 					continue
 				}
 
@@ -134,11 +168,76 @@ func main() {
 					Character:  pgtype.Text{},
 				})
 				if err != nil {
-					fmt.Printf("Failed to create credit: %v\n", err)
+					fmt.Printf("Warning: Failed to create credit: %v\n", err)
 				}
 			}
 		}
 
-		fmt.Printf("Successfully imported: %s\n", title)
+		fmt.Printf("OK\n")
+		success++
+
+		// Small delay to avoid rate limiting
+		time.Sleep(250 * time.Millisecond)
+	}
+
+	fmt.Printf("\n========================================\n")
+	fmt.Printf("Import completed!\n")
+	fmt.Printf("Success: %d\n", success)
+	fmt.Printf("Failed: %d\n", failed)
+	fmt.Printf("Total: %d\n", total)
+}
+
+// generateSlug creates a URL-friendly slug from a title
+func generateSlug(title string, year int) string {
+	slug := strings.ToLower(title)
+	// Replace common special characters
+	replacer := strings.NewReplacer(
+		" ", "-",
+		"'", "",
+		"'", "",
+		":", "",
+		",", "",
+		".", "",
+		"!", "",
+		"?", "",
+		"&", "and",
+		"/", "-",
+		"(", "",
+		")", "",
+	)
+	slug = replacer.Replace(slug)
+	// Remove multiple dashes
+	for strings.Contains(slug, "--") {
+		slug = strings.ReplaceAll(slug, "--", "-")
+	}
+	slug = strings.Trim(slug, "-")
+	if year > 0 {
+		slug = fmt.Sprintf("%s-%d", slug, year)
+	}
+	return slug
+}
+
+// loadEnvFile loads environment variables from a file
+func loadEnvFile(filename string) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return // File doesn't exist, skip
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			if os.Getenv(key) == "" { // Don't override existing env vars
+				os.Setenv(key, value)
+			}
+		}
 	}
 }
