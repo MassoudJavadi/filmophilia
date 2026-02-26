@@ -31,7 +31,9 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 		oauth.NewGoogleManager,
 		service.NewAuthService,
 		service.NewOAuthService,
+		service.NewMovieService,
 		handler.NewAuthHandler,
+		handler.NewMovieHandler,
 		NewServer,
 	)
 	return &Server{}

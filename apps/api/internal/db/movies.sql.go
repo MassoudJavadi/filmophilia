@@ -86,6 +86,154 @@ func (q *Queries) CreateMovie(ctx context.Context, arg CreateMovieParams) (int32
 	return id, err
 }
 
+const getMovieBySlug = `-- name: GetMovieBySlug :one
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies
+WHERE slug = $1 LIMIT 1
+`
+
+// Get a single movie by its unique slug
+func (q *Queries) GetMovieBySlug(ctx context.Context, slug string) (Movie, error) {
+	row := q.db.QueryRow(ctx, getMovieBySlug, slug)
+	var i Movie
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Overview,
+		&i.PosterUrl,
+		&i.BackdropUrl,
+		&i.TrailerUrl,
+		&i.ReleaseDate,
+		&i.Runtime,
+		&i.ContentRating,
+		&i.OriginalLanguage,
+		&i.Country,
+		&i.ImdbID,
+		&i.TmdbID,
+		&i.UserAvgRating,
+		&i.UserRatingCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ImdbRating,
+		&i.RottenTomatoes,
+		&i.MetacriticScore,
+		&i.LetterboxdRating,
+	)
+	return i, err
+}
+
+const listMovies = `-- name: ListMovies :many
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListMoviesParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+// Get a paginated list of movies ordered by creation date
+func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]Movie, error) {
+	rows, err := q.db.Query(ctx, listMovies, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Movie
+	for rows.Next() {
+		var i Movie
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Overview,
+			&i.PosterUrl,
+			&i.BackdropUrl,
+			&i.TrailerUrl,
+			&i.ReleaseDate,
+			&i.Runtime,
+			&i.ContentRating,
+			&i.OriginalLanguage,
+			&i.Country,
+			&i.ImdbID,
+			&i.TmdbID,
+			&i.UserAvgRating,
+			&i.UserRatingCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ImdbRating,
+			&i.RottenTomatoes,
+			&i.MetacriticScore,
+			&i.LetterboxdRating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchMovies = `-- name: SearchMovies :many
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies
+WHERE title ILIKE '%' || $1 || '%' OR slug ILIKE '%' || $1 || '%'
+ORDER BY imdb_rating DESC
+LIMIT $2 OFFSET $3
+`
+
+type SearchMoviesParams struct {
+	Column1 pgtype.Text `json:"column_1"`
+	Limit   int32       `json:"limit"`
+	Offset  int32       `json:"offset"`
+}
+
+// Simple search by title or slug
+func (q *Queries) SearchMovies(ctx context.Context, arg SearchMoviesParams) ([]Movie, error) {
+	rows, err := q.db.Query(ctx, searchMovies, arg.Column1, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Movie
+	for rows.Next() {
+		var i Movie
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Overview,
+			&i.PosterUrl,
+			&i.BackdropUrl,
+			&i.TrailerUrl,
+			&i.ReleaseDate,
+			&i.Runtime,
+			&i.ContentRating,
+			&i.OriginalLanguage,
+			&i.Country,
+			&i.ImdbID,
+			&i.TmdbID,
+			&i.UserAvgRating,
+			&i.UserRatingCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ImdbRating,
+			&i.RottenTomatoes,
+			&i.MetacriticScore,
+			&i.LetterboxdRating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const upsertPerson = `-- name: UpsertPerson :one
 
 INSERT INTO persons (name, slug)

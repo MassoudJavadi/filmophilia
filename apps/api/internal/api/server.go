@@ -18,14 +18,16 @@ type Server struct {
 	router     *gin.Engine
 	db         *pgxpool.Pool
 	authH      *handler.AuthHandler
+	movieH     *handler.MovieHandler
 	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, jwt *token.JWTManager) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
 		router: gin.Default(),
 		db:     db,
 		authH:  authH,
+		movieH: movieH,
 		jwt:    jwt,
 	}
 
@@ -53,6 +55,13 @@ func (s *Server) setupRoutes() {
 
 		auth.GET("/google", s.authH.GoogleRedirect)
 		auth.GET("/google/callback", s.authH.GoogleCallback)
+	}
+
+	// Movie routes (public)
+	movies := v1.Group("/movies")
+	{
+		movies.GET("", s.movieH.GetMovies)
+		movies.GET("/:slug", s.movieH.GetMovie)
 	}
 
 	// Protected routes

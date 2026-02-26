@@ -25,7 +25,9 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	googleManager := oauth.NewGoogleManager()
 	oAuthService := service.NewOAuthService(queries, authService, googleManager)
 	authHandler := handler.NewAuthHandler(authService, oAuthService)
-	server := NewServer(dbPool, authHandler, jwtManager)
+	movieService := service.NewMovieService(queries)
+	movieHandler := handler.NewMovieHandler(movieService)
+	server := NewServer(dbPool, authHandler, movieHandler, jwtManager)
 	return server
 }
 

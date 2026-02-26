@@ -21,6 +21,24 @@ INSERT INTO movies (
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 RETURNING id;
 
+-- name: ListMovies :many
+-- Get a paginated list of movies ordered by creation date
+SELECT * FROM movies
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetMovieBySlug :one
+-- Get a single movie by its unique slug
+SELECT * FROM movies
+WHERE slug = $1 LIMIT 1;
+
+-- name: SearchMovies :many
+-- Simple search by title or slug
+SELECT * FROM movies
+WHERE title ILIKE '%' || $1 || '%' OR slug ILIKE '%' || $1 || '%'
+ORDER BY imdb_rating DESC
+LIMIT $2 OFFSET $3;
+
 -- ============================================================
 -- CREDITS QUERIES
 -- ============================================================
