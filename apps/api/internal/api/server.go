@@ -118,8 +118,6 @@ func (s *Server) setupRoutes() {
 		// Reactions
 		protected.POST("/comments/:commentId/reactions", s.reactionH.ReactToComment)
 		protected.DELETE("/comments/:commentId/reactions", s.reactionH.RemoveCommentReaction)
-		protected.POST("/reviews/:reviewId/reactions", s.reactionH.ReactToReview)
-		protected.DELETE("/reviews/:reviewId/reactions", s.reactionH.RemoveReviewReaction)
 	}
 }
 

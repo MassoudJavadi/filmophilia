@@ -14,7 +14,7 @@ import (
 const addReactionToComment = `-- name: AddReactionToComment :one
 INSERT INTO reactions (user_id, comment_id, type)
 VALUES ($1, $2, $3)
-ON CONFLICT (user_id, comment_id) WHERE comment_id IS NOT NULL
+ON CONFLICT (user_id, comment_id)
 DO UPDATE SET type = EXCLUDED.type
 RETURNING id, user_id, review_id, comment_id, type, created_at
 `
@@ -27,34 +27,6 @@ type AddReactionToCommentParams struct {
 
 func (q *Queries) AddReactionToComment(ctx context.Context, arg AddReactionToCommentParams) (Reaction, error) {
 	row := q.db.QueryRow(ctx, addReactionToComment, arg.UserID, arg.CommentID, arg.Type)
-	var i Reaction
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.ReviewID,
-		&i.CommentID,
-		&i.Type,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const addReactionToReview = `-- name: AddReactionToReview :one
-INSERT INTO reactions (user_id, review_id, type)
-VALUES ($1, $2, $3)
-ON CONFLICT (user_id, review_id) WHERE review_id IS NOT NULL
-DO UPDATE SET type = EXCLUDED.type
-RETURNING id, user_id, review_id, comment_id, type, created_at
-`
-
-type AddReactionToReviewParams struct {
-	UserID   int32        `json:"user_id"`
-	ReviewID pgtype.Int4  `json:"review_id"`
-	Type     ReactionType `json:"type"`
-}
-
-func (q *Queries) AddReactionToReview(ctx context.Context, arg AddReactionToReviewParams) (Reaction, error) {
-	row := q.db.QueryRow(ctx, addReactionToReview, arg.UserID, arg.ReviewID, arg.Type)
 	var i Reaction
 	err := row.Scan(
 		&i.ID,
@@ -88,38 +60,6 @@ func (q *Queries) CountCommentReactionsByType(ctx context.Context, commentID pgt
 	var items []CountCommentReactionsByTypeRow
 	for rows.Next() {
 		var i CountCommentReactionsByTypeRow
-		if err := rows.Scan(&i.Type, &i.Count); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const countReviewReactionsByType = `-- name: CountReviewReactionsByType :many
-SELECT type, COUNT(*)::INT as count
-FROM reactions
-WHERE review_id = $1
-GROUP BY type
-`
-
-type CountReviewReactionsByTypeRow struct {
-	Type  ReactionType `json:"type"`
-	Count int32        `json:"count"`
-}
-
-func (q *Queries) CountReviewReactionsByType(ctx context.Context, reviewID pgtype.Int4) ([]CountReviewReactionsByTypeRow, error) {
-	rows, err := q.db.Query(ctx, countReviewReactionsByType, reviewID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []CountReviewReactionsByTypeRow
-	for rows.Next() {
-		var i CountReviewReactionsByTypeRow
 		if err := rows.Scan(&i.Type, &i.Count); err != nil {
 			return nil, err
 		}
@@ -192,67 +132,6 @@ func (q *Queries) GetCommentReactions(ctx context.Context, arg GetCommentReactio
 	return items, nil
 }
 
-const getReviewReactions = `-- name: GetReviewReactions :many
-SELECT
-    r.id, r.user_id, r.review_id, r.comment_id, r.type, r.created_at,
-    u.username,
-    u.display_name,
-    u.avatar_url
-FROM reactions r
-JOIN users u ON u.id = r.user_id
-WHERE r.review_id = $1
-ORDER BY r.created_at DESC
-LIMIT $2 OFFSET $3
-`
-
-type GetReviewReactionsParams struct {
-	ReviewID pgtype.Int4 `json:"review_id"`
-	Limit    int32       `json:"limit"`
-	Offset   int32       `json:"offset"`
-}
-
-type GetReviewReactionsRow struct {
-	ID          int32              `json:"id"`
-	UserID      int32              `json:"user_id"`
-	ReviewID    pgtype.Int4        `json:"review_id"`
-	CommentID   pgtype.Int4        `json:"comment_id"`
-	Type        ReactionType       `json:"type"`
-	CreatedAt   pgtype.Timestamptz `json:"created_at"`
-	Username    string             `json:"username"`
-	DisplayName pgtype.Text        `json:"display_name"`
-	AvatarUrl   pgtype.Text        `json:"avatar_url"`
-}
-
-func (q *Queries) GetReviewReactions(ctx context.Context, arg GetReviewReactionsParams) ([]GetReviewReactionsRow, error) {
-	rows, err := q.db.Query(ctx, getReviewReactions, arg.ReviewID, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetReviewReactionsRow
-	for rows.Next() {
-		var i GetReviewReactionsRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.UserID,
-			&i.ReviewID,
-			&i.CommentID,
-			&i.Type,
-			&i.CreatedAt,
-			&i.Username,
-			&i.DisplayName,
-			&i.AvatarUrl,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getUserReactionOnComment = `-- name: GetUserReactionOnComment :one
 SELECT id, user_id, review_id, comment_id, type, created_at FROM reactions
 WHERE user_id = $1 AND comment_id = $2
@@ -277,30 +156,6 @@ func (q *Queries) GetUserReactionOnComment(ctx context.Context, arg GetUserReact
 	return i, err
 }
 
-const getUserReactionOnReview = `-- name: GetUserReactionOnReview :one
-SELECT id, user_id, review_id, comment_id, type, created_at FROM reactions
-WHERE user_id = $1 AND review_id = $2
-`
-
-type GetUserReactionOnReviewParams struct {
-	UserID   int32       `json:"user_id"`
-	ReviewID pgtype.Int4 `json:"review_id"`
-}
-
-func (q *Queries) GetUserReactionOnReview(ctx context.Context, arg GetUserReactionOnReviewParams) (Reaction, error) {
-	row := q.db.QueryRow(ctx, getUserReactionOnReview, arg.UserID, arg.ReviewID)
-	var i Reaction
-	err := row.Scan(
-		&i.ID,
-		&i.UserID,
-		&i.ReviewID,
-		&i.CommentID,
-		&i.Type,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
 const removeReactionFromComment = `-- name: RemoveReactionFromComment :exec
 DELETE FROM reactions
 WHERE user_id = $1 AND comment_id = $2
@@ -313,20 +168,5 @@ type RemoveReactionFromCommentParams struct {
 
 func (q *Queries) RemoveReactionFromComment(ctx context.Context, arg RemoveReactionFromCommentParams) error {
 	_, err := q.db.Exec(ctx, removeReactionFromComment, arg.UserID, arg.CommentID)
-	return err
-}
-
-const removeReactionFromReview = `-- name: RemoveReactionFromReview :exec
-DELETE FROM reactions
-WHERE user_id = $1 AND review_id = $2
-`
-
-type RemoveReactionFromReviewParams struct {
-	UserID   int32       `json:"user_id"`
-	ReviewID pgtype.Int4 `json:"review_id"`
-}
-
-func (q *Queries) RemoveReactionFromReview(ctx context.Context, arg RemoveReactionFromReviewParams) error {
-	_, err := q.db.Exec(ctx, removeReactionFromReview, arg.UserID, arg.ReviewID)
 	return err
 }
