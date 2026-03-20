@@ -37,6 +37,8 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 		service.NewCommentService,
 		service.NewReactionService,
 		service.NewUserService,
+		service.NewFollowService,
+		service.NewGenreService,
 		handler.NewAuthHandler,
 		handler.NewMovieHandler,
 		handler.NewRatingHandler,
@@ -44,6 +46,8 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 		handler.NewCommentHandler,
 		handler.NewReactionHandler,
 		handler.NewUserHandler,
+		handler.NewFollowHandler,
+		handler.NewGenreHandler,
 		NewServer,
 	)
 	return &Server{}

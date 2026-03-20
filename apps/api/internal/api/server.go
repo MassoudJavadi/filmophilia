@@ -24,10 +24,12 @@ type Server struct {
 	commentH   *handler.CommentHandler
 	reactionH  *handler.ReactionHandler
 	userH      *handler.UserHandler
+	followH    *handler.FollowHandler
+	genreH     *handler.GenreHandler
 	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, jwt *token.JWTManager) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, followH *handler.FollowHandler, genreH *handler.GenreHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
 		router:     gin.Default(),
 		db:         db,
@@ -38,6 +40,8 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.Mov
 		commentH:   commentH,
 		reactionH:  reactionH,
 		userH:      userH,
+		followH:    followH,
+		genreH:     genreH,
 		jwt:        jwt,
 	}
 
@@ -92,6 +96,20 @@ func (s *Server) setupRoutes() {
 		users.GET("/:userId", s.userH.GetProfile)
 		users.GET("/username/:username", s.userH.GetProfileByUsername)
 		users.GET("/search", s.userH.SearchUsers)
+		users.GET("/:userId/followers", s.followH.GetFollowers)
+		users.GET("/:userId/following", s.followH.GetFollowing)
+		users.GET("/:userId/follow-stats", s.followH.GetStats)
+	}
+
+	// Genres (public)
+	genres := v1.Group("/genres")
+	{
+		genres.GET("", s.genreH.GetAll)
+		genres.GET("/:genreId", s.genreH.GetByID)
+		genres.GET("/:genreId/movies", s.genreH.GetMoviesByGenre)
+		genres.GET("/:genreId/stats", s.genreH.GetGenreWithCount)
+		genres.GET("/slug/:slug", s.genreH.GetBySlug)
+		genres.GET("/slug/:slug/movies", s.genreH.GetMoviesByGenreSlug)
 	}
 
 	// Protected routes
@@ -130,6 +148,13 @@ func (s *Server) setupRoutes() {
 		// Reactions
 		protected.POST("/comments/:commentId/reactions", s.reactionH.ReactToComment)
 		protected.DELETE("/comments/:commentId/reactions", s.reactionH.RemoveCommentReaction)
+
+		// Follows
+		protected.GET("/me/followers", s.followH.GetMyFollowers)
+		protected.GET("/me/following", s.followH.GetMyFollowing)
+		protected.POST("/users/:userId/follow", s.followH.Follow)
+		protected.DELETE("/users/:userId/follow", s.followH.Unfollow)
+		protected.GET("/users/:userId/following/check", s.followH.IsFollowing)
 	}
 }
 
