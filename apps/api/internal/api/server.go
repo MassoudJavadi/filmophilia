@@ -19,16 +19,20 @@ type Server struct {
 	db         *pgxpool.Pool
 	authH      *handler.AuthHandler
 	movieH     *handler.MovieHandler
+	ratingH    *handler.RatingHandler
+	watchlistH *handler.WatchlistHandler
 	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, jwt *token.JWTManager) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
-		router: gin.Default(),
-		db:     db,
-		authH:  authH,
-		movieH: movieH,
-		jwt:    jwt,
+		router:     gin.Default(),
+		db:         db,
+		authH:      authH,
+		movieH:     movieH,
+		ratingH:    ratingH,
+		watchlistH: watchlistH,
+		jwt:        jwt,
 	}
 
 	s.router.Use(cors.New(cors.Config{
@@ -62,13 +66,32 @@ func (s *Server) setupRoutes() {
 	{
 		movies.GET("", s.movieH.GetMovies)
 		movies.GET("/:slug", s.movieH.GetMovie)
+		movies.GET("/:movieId/ratings", s.ratingH.GetMovieRatings)
 	}
 
 	// Protected routes
 	protected := v1.Group("/")
 	protected.Use(middleware.AuthMiddleware(s.jwt))
 	{
+		// User profile
 		protected.GET("/me", s.authH.GetMe)
+
+		// Ratings
+		protected.GET("/me/ratings", s.ratingH.GetMyRatings)
+		protected.GET("/movies/:movieId/rating", s.ratingH.GetMyRating)
+		protected.PUT("/movies/:movieId/rating", s.ratingH.RateMovie)
+		protected.DELETE("/movies/:movieId/rating", s.ratingH.DeleteRating)
+
+		// Watchlist
+		protected.GET("/me/watchlist", s.watchlistH.GetWatchlist)
+		protected.GET("/me/watchlist/count", s.watchlistH.GetWatchlistCount)
+		protected.POST("/movies/:movieId/watchlist", s.watchlistH.AddToWatchlist)
+		protected.GET("/movies/:movieId/watchlist", s.watchlistH.GetWatchlistEntry)
+		protected.GET("/movies/:movieId/watchlist/check", s.watchlistH.CheckInWatchlist)
+		protected.PATCH("/movies/:movieId/watchlist", s.watchlistH.UpdateWatchlistEntry)
+		protected.POST("/movies/:movieId/watchlist/watched", s.watchlistH.MarkAsWatched)
+		protected.DELETE("/movies/:movieId/watchlist/watched", s.watchlistH.MarkAsUnwatched)
+		protected.DELETE("/movies/:movieId/watchlist", s.watchlistH.RemoveFromWatchlist)
 	}
 }
 
