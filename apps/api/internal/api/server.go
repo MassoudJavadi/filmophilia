@@ -21,10 +21,12 @@ type Server struct {
 	movieH     *handler.MovieHandler
 	ratingH    *handler.RatingHandler
 	watchlistH *handler.WatchlistHandler
+	commentH   *handler.CommentHandler
+	reactionH  *handler.ReactionHandler
 	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, jwt *token.JWTManager) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
 		router:     gin.Default(),
 		db:         db,
@@ -32,6 +34,8 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.Mov
 		movieH:     movieH,
 		ratingH:    ratingH,
 		watchlistH: watchlistH,
+		commentH:   commentH,
+		reactionH:  reactionH,
 		jwt:        jwt,
 	}
 
@@ -67,6 +71,17 @@ func (s *Server) setupRoutes() {
 		movies.GET("", s.movieH.GetMovies)
 		movies.GET("/:slug", s.movieH.GetMovie)
 		movies.GET("/:movieId/ratings", s.ratingH.GetMovieRatings)
+		movies.GET("/:movieId/comments", s.commentH.GetMovieComments)
+		movies.GET("/:movieId/comments/count", s.commentH.GetMovieCommentCount)
+	}
+
+	// Comments (public read)
+	comments := v1.Group("/comments")
+	{
+		comments.GET("/:commentId", s.commentH.GetComment)
+		comments.GET("/:commentId/replies", s.commentH.GetReplies)
+		comments.GET("/:commentId/reactions", s.reactionH.GetCommentReactions)
+		comments.GET("/:commentId/reactions/summary", s.reactionH.GetCommentReactionSummary)
 	}
 
 	// Protected routes
@@ -92,6 +107,19 @@ func (s *Server) setupRoutes() {
 		protected.POST("/movies/:movieId/watchlist/watched", s.watchlistH.MarkAsWatched)
 		protected.DELETE("/movies/:movieId/watchlist/watched", s.watchlistH.MarkAsUnwatched)
 		protected.DELETE("/movies/:movieId/watchlist", s.watchlistH.RemoveFromWatchlist)
+
+		// Comments
+		protected.GET("/me/comments", s.commentH.GetMyComments)
+		protected.POST("/movies/:movieId/comments", s.commentH.CreateComment)
+		protected.POST("/movies/:movieId/comments/:commentId/replies", s.commentH.CreateReply)
+		protected.PATCH("/comments/:commentId", s.commentH.UpdateComment)
+		protected.DELETE("/comments/:commentId", s.commentH.DeleteComment)
+
+		// Reactions
+		protected.POST("/comments/:commentId/reactions", s.reactionH.ReactToComment)
+		protected.DELETE("/comments/:commentId/reactions", s.reactionH.RemoveCommentReaction)
+		protected.POST("/reviews/:reviewId/reactions", s.reactionH.ReactToReview)
+		protected.DELETE("/reviews/:reviewId/reactions", s.reactionH.RemoveReviewReaction)
 	}
 }
 
