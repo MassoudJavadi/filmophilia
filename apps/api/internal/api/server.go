@@ -23,10 +23,11 @@ type Server struct {
 	watchlistH *handler.WatchlistHandler
 	commentH   *handler.CommentHandler
 	reactionH  *handler.ReactionHandler
+	userH      *handler.UserHandler
 	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, jwt *token.JWTManager) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
 		router:     gin.Default(),
 		db:         db,
@@ -36,6 +37,7 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.Mov
 		watchlistH: watchlistH,
 		commentH:   commentH,
 		reactionH:  reactionH,
+		userH:      userH,
 		jwt:        jwt,
 	}
 
@@ -84,12 +86,22 @@ func (s *Server) setupRoutes() {
 		comments.GET("/:commentId/reactions/summary", s.reactionH.GetCommentReactionSummary)
 	}
 
+	// Users (public)
+	users := v1.Group("/users")
+	{
+		users.GET("/:userId", s.userH.GetProfile)
+		users.GET("/username/:username", s.userH.GetProfileByUsername)
+		users.GET("/search", s.userH.SearchUsers)
+	}
+
 	// Protected routes
 	protected := v1.Group("/")
 	protected.Use(middleware.AuthMiddleware(s.jwt))
 	{
 		// User profile
 		protected.GET("/me", s.authH.GetMe)
+		protected.GET("/me/profile", s.userH.GetMyProfile)
+		protected.PATCH("/me/profile", s.userH.UpdateMyProfile)
 
 		// Ratings
 		protected.GET("/me/ratings", s.ratingH.GetMyRatings)

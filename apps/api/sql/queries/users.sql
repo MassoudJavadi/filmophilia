@@ -14,3 +14,57 @@ SELECT * FROM users WHERE username = $1;
 
 -- name: UpdateUserStatus :exec
 UPDATE users SET status = $2 WHERE id = $1;
+
+-- name: GetUserProfile :one
+SELECT
+    u.id,
+    u.username,
+    u.display_name,
+    u.avatar_url,
+    u.bio,
+    u.created_at,
+    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
+    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
+    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
+    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+FROM users u
+WHERE u.id = $1 AND u.status = 'ACTIVE';
+
+-- name: GetUserProfileByUsername :one
+SELECT
+    u.id,
+    u.username,
+    u.display_name,
+    u.avatar_url,
+    u.bio,
+    u.created_at,
+    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
+    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
+    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
+    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+FROM users u
+WHERE u.username = $1 AND u.status = 'ACTIVE';
+
+-- name: UpdateUserProfile :one
+UPDATE users
+SET
+    display_name = COALESCE($2, display_name),
+    avatar_url = COALESCE($3, avatar_url),
+    bio = COALESCE($4, bio),
+    updated_at = NOW()
+WHERE id = $1
+RETURNING *;
+
+-- name: SearchUsers :many
+SELECT
+    id,
+    username,
+    display_name,
+    avatar_url
+FROM users
+WHERE status = 'ACTIVE'
+  AND (username ILIKE '%' || $1 || '%' OR display_name ILIKE '%' || $1 || '%')
+ORDER BY
+    CASE WHEN username ILIKE $1 || '%' THEN 0 ELSE 1 END,
+    username
+LIMIT $2 OFFSET $3;

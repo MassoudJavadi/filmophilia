@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 // SignupRequest is what we expect from the frontend
 type SignupRequest struct {
 	Email    string `json:"email" binding:"required,email"`
@@ -30,4 +32,32 @@ type AuthResponse struct {
 
 type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+// Profile DTOs
+
+type UpdateProfileRequest struct {
+	DisplayName *string `json:"display_name,omitempty" binding:"omitempty,max=100"`
+	AvatarURL   *string `json:"avatar_url,omitempty" binding:"omitempty,url"`
+	Bio         *string `json:"bio,omitempty" binding:"omitempty,max=500"`
+}
+
+type UserProfileResponse struct {
+	ID             int32     `json:"id"`
+	Username       string    `json:"username"`
+	DisplayName    string    `json:"display_name,omitempty"`
+	AvatarURL      string    `json:"avatar_url,omitempty"`
+	Bio            string    `json:"bio,omitempty"`
+	CreatedAt      time.Time `json:"created_at"`
+	FollowerCount  int32     `json:"follower_count"`
+	FollowingCount int32     `json:"following_count"`
+	RatingCount    int32     `json:"rating_count"`
+	CommentCount   int32     `json:"comment_count"`
+}
+
+type UserSearchResult struct {
+	ID          int32  `json:"id"`
+	Username    string `json:"username"`
+	DisplayName string `json:"display_name,omitempty"`
+	AvatarURL   string `json:"avatar_url,omitempty"`
 }

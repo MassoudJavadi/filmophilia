@@ -35,7 +35,9 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	commentHandler := handler.NewCommentHandler(commentService)
 	reactionService := service.NewReactionService(queries)
 	reactionHandler := handler.NewReactionHandler(reactionService)
-	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, jwtManager)
+	userService := service.NewUserService(queries)
+	userHandler := handler.NewUserHandler(userService)
+	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, jwtManager)
 	return server
 }
 

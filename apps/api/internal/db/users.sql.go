@@ -121,6 +121,196 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	return i, err
 }
 
+const getUserProfile = `-- name: GetUserProfile :one
+SELECT
+    u.id,
+    u.username,
+    u.display_name,
+    u.avatar_url,
+    u.bio,
+    u.created_at,
+    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
+    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
+    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
+    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+FROM users u
+WHERE u.id = $1 AND u.status = 'ACTIVE'
+`
+
+type GetUserProfileRow struct {
+	ID             int32              `json:"id"`
+	Username       string             `json:"username"`
+	DisplayName    pgtype.Text        `json:"display_name"`
+	AvatarUrl      pgtype.Text        `json:"avatar_url"`
+	Bio            pgtype.Text        `json:"bio"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	FollowerCount  int32              `json:"follower_count"`
+	FollowingCount int32              `json:"following_count"`
+	RatingCount    int32              `json:"rating_count"`
+	CommentCount   int32              `json:"comment_count"`
+}
+
+func (q *Queries) GetUserProfile(ctx context.Context, id int32) (GetUserProfileRow, error) {
+	row := q.db.QueryRow(ctx, getUserProfile, id)
+	var i GetUserProfileRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.DisplayName,
+		&i.AvatarUrl,
+		&i.Bio,
+		&i.CreatedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
+	)
+	return i, err
+}
+
+const getUserProfileByUsername = `-- name: GetUserProfileByUsername :one
+SELECT
+    u.id,
+    u.username,
+    u.display_name,
+    u.avatar_url,
+    u.bio,
+    u.created_at,
+    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
+    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
+    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
+    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+FROM users u
+WHERE u.username = $1 AND u.status = 'ACTIVE'
+`
+
+type GetUserProfileByUsernameRow struct {
+	ID             int32              `json:"id"`
+	Username       string             `json:"username"`
+	DisplayName    pgtype.Text        `json:"display_name"`
+	AvatarUrl      pgtype.Text        `json:"avatar_url"`
+	Bio            pgtype.Text        `json:"bio"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	FollowerCount  int32              `json:"follower_count"`
+	FollowingCount int32              `json:"following_count"`
+	RatingCount    int32              `json:"rating_count"`
+	CommentCount   int32              `json:"comment_count"`
+}
+
+func (q *Queries) GetUserProfileByUsername(ctx context.Context, username string) (GetUserProfileByUsernameRow, error) {
+	row := q.db.QueryRow(ctx, getUserProfileByUsername, username)
+	var i GetUserProfileByUsernameRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.DisplayName,
+		&i.AvatarUrl,
+		&i.Bio,
+		&i.CreatedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
+	)
+	return i, err
+}
+
+const searchUsers = `-- name: SearchUsers :many
+SELECT
+    id,
+    username,
+    display_name,
+    avatar_url
+FROM users
+WHERE status = 'ACTIVE'
+  AND (username ILIKE '%' || $1 || '%' OR display_name ILIKE '%' || $1 || '%')
+ORDER BY
+    CASE WHEN username ILIKE $1 || '%' THEN 0 ELSE 1 END,
+    username
+LIMIT $2 OFFSET $3
+`
+
+type SearchUsersParams struct {
+	Column1 pgtype.Text `json:"column_1"`
+	Limit   int32       `json:"limit"`
+	Offset  int32       `json:"offset"`
+}
+
+type SearchUsersRow struct {
+	ID          int32       `json:"id"`
+	Username    string      `json:"username"`
+	DisplayName pgtype.Text `json:"display_name"`
+	AvatarUrl   pgtype.Text `json:"avatar_url"`
+}
+
+func (q *Queries) SearchUsers(ctx context.Context, arg SearchUsersParams) ([]SearchUsersRow, error) {
+	rows, err := q.db.Query(ctx, searchUsers, arg.Column1, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchUsersRow
+	for rows.Next() {
+		var i SearchUsersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.DisplayName,
+			&i.AvatarUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateUserProfile = `-- name: UpdateUserProfile :one
+UPDATE users
+SET
+    display_name = COALESCE($2, display_name),
+    avatar_url = COALESCE($3, avatar_url),
+    bio = COALESCE($4, bio),
+    updated_at = NOW()
+WHERE id = $1
+RETURNING id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at
+`
+
+type UpdateUserProfileParams struct {
+	ID          int32       `json:"id"`
+	DisplayName pgtype.Text `json:"display_name"`
+	AvatarUrl   pgtype.Text `json:"avatar_url"`
+	Bio         pgtype.Text `json:"bio"`
+}
+
+func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfileParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUserProfile,
+		arg.ID,
+		arg.DisplayName,
+		arg.AvatarUrl,
+		arg.Bio,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.PasswordHash,
+		&i.DisplayName,
+		&i.AvatarUrl,
+		&i.Bio,
+		&i.Role,
+		&i.Status,
+		&i.IsVerified,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const updateUserStatus = `-- name: UpdateUserStatus :exec
 UPDATE users SET status = $2 WHERE id = $1
 `
