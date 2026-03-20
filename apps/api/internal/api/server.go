@@ -26,10 +26,12 @@ type Server struct {
 	userH      *handler.UserHandler
 	followH    *handler.FollowHandler
 	genreH     *handler.GenreHandler
+	activityH  *handler.ActivityHandler
+	notifH     *handler.NotificationHandler
 	jwt        *token.JWTManager
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, followH *handler.FollowHandler, genreH *handler.GenreHandler, jwt *token.JWTManager) *Server {
+func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, followH *handler.FollowHandler, genreH *handler.GenreHandler, activityH *handler.ActivityHandler, notifH *handler.NotificationHandler, jwt *token.JWTManager) *Server {
 	s := &Server{
 		router:     gin.Default(),
 		db:         db,
@@ -42,6 +44,8 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.Mov
 		userH:      userH,
 		followH:    followH,
 		genreH:     genreH,
+		activityH:  activityH,
+		notifH:     notifH,
 		jwt:        jwt,
 	}
 
@@ -100,7 +104,11 @@ func (s *Server) setupRoutes() {
 		users.GET("/:userId/followers", s.followH.GetFollowers)
 		users.GET("/:userId/following", s.followH.GetFollowing)
 		users.GET("/:userId/follow-stats", s.followH.GetStats)
+		users.GET("/:userId/activities", s.activityH.GetUserActivities)
 	}
+
+	// Movie activities (public)
+	v1.GET("/movies/:movieId/activities", s.activityH.GetMovieActivities)
 
 	// Genres (public)
 	genres := v1.Group("/genres")
@@ -156,6 +164,20 @@ func (s *Server) setupRoutes() {
 		protected.POST("/users/:userId/follow", s.followH.Follow)
 		protected.DELETE("/users/:userId/follow", s.followH.Unfollow)
 		protected.GET("/users/:userId/following/check", s.followH.IsFollowing)
+
+		// Activities
+		protected.GET("/me/activities", s.activityH.GetMyActivities)
+		protected.GET("/me/feed", s.activityH.GetFollowingFeed)
+		protected.POST("/activities", s.activityH.CreateActivity)
+
+		// Notifications
+		protected.GET("/me/notifications", s.notifH.GetMyNotifications)
+		protected.GET("/me/notifications/unread", s.notifH.GetUnreadNotifications)
+		protected.GET("/me/notifications/unread/count", s.notifH.GetUnreadCount)
+		protected.PATCH("/notifications/:notificationId/read", s.notifH.MarkAsRead)
+		protected.POST("/notifications/read-all", s.notifH.MarkAllAsRead)
+		protected.DELETE("/notifications/:notificationId", s.notifH.DeleteNotification)
+		protected.DELETE("/notifications", s.notifH.DeleteAllNotifications)
 	}
 }
 

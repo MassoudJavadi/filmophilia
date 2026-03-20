@@ -41,7 +41,11 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	followHandler := handler.NewFollowHandler(followService)
 	genreService := service.NewGenreService(queries)
 	genreHandler := handler.NewGenreHandler(genreService)
-	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, followHandler, genreHandler, jwtManager)
+	activityService := service.NewActivityService(queries)
+	activityHandler := handler.NewActivityHandler(activityService)
+	notificationService := service.NewNotificationService(queries)
+	notificationHandler := handler.NewNotificationHandler(notificationService)
+	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, followHandler, genreHandler, activityHandler, notificationHandler, jwtManager)
 	return server
 }
 
