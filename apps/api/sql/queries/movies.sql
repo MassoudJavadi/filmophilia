@@ -39,6 +39,67 @@ WHERE title ILIKE '%' || $1 || '%' OR slug ILIKE '%' || $1 || '%'
 ORDER BY imdb_rating DESC
 LIMIT $2 OFFSET $3;
 
+-- name: AdvancedSearchMovies :many
+-- Advanced search with filters: query, genres, year range, rating range, sort
+SELECT DISTINCT m.*
+FROM movies m
+LEFT JOIN movie_genres mg ON mg.movie_id = m.id
+WHERE
+    -- Text search (optional)
+    (sqlc.narg(query)::TEXT IS NULL OR m.title ILIKE '%' || sqlc.narg(query)::TEXT || '%')
+    -- Genre filter (optional, array of genre IDs)
+    AND (sqlc.narg(genre_ids)::INT[] IS NULL OR mg.genre_id = ANY(sqlc.narg(genre_ids)::INT[]))
+    -- Year range (optional)
+    AND (sqlc.narg(year_from)::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) >= sqlc.narg(year_from)::INT)
+    AND (sqlc.narg(year_to)::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) <= sqlc.narg(year_to)::INT)
+    -- IMDB rating range (optional, scale 0-10)
+    AND (sqlc.narg(imdb_min)::NUMERIC IS NULL OR m.imdb_rating >= sqlc.narg(imdb_min)::NUMERIC)
+    AND (sqlc.narg(imdb_max)::NUMERIC IS NULL OR m.imdb_rating <= sqlc.narg(imdb_max)::NUMERIC)
+    -- User rating range (optional, scale 1-10)
+    AND (sqlc.narg(user_rating_min)::REAL IS NULL OR m.user_avg_rating >= sqlc.narg(user_rating_min)::REAL)
+    AND (sqlc.narg(user_rating_max)::REAL IS NULL OR m.user_avg_rating <= sqlc.narg(user_rating_max)::REAL)
+    -- Rotten Tomatoes range (optional, scale 0-100)
+    AND (sqlc.narg(rt_min)::INT IS NULL OR m.rotten_tomatoes >= sqlc.narg(rt_min)::INT)
+    AND (sqlc.narg(rt_max)::INT IS NULL OR m.rotten_tomatoes <= sqlc.narg(rt_max)::INT)
+    -- Metacritic range (optional, scale 0-100)
+    AND (sqlc.narg(metacritic_min)::INT IS NULL OR m.metacritic_score >= sqlc.narg(metacritic_min)::INT)
+    AND (sqlc.narg(metacritic_max)::INT IS NULL OR m.metacritic_score <= sqlc.narg(metacritic_max)::INT)
+ORDER BY
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'title_asc' THEN m.title END ASC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'title_desc' THEN m.title END DESC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'release_date_asc' THEN m.release_date END ASC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'release_date_desc' THEN m.release_date END DESC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'imdb_rating_asc' THEN m.imdb_rating END ASC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'imdb_rating_desc' THEN m.imdb_rating END DESC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'user_rating_asc' THEN m.user_avg_rating END ASC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'user_rating_desc' THEN m.user_avg_rating END DESC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'rotten_tomatoes_asc' THEN m.rotten_tomatoes END ASC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'rotten_tomatoes_desc' THEN m.rotten_tomatoes END DESC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'metacritic_asc' THEN m.metacritic_score END ASC,
+    CASE WHEN sqlc.narg(sort_by)::TEXT = 'metacritic_desc' THEN m.metacritic_score END DESC,
+    m.imdb_rating DESC NULLS LAST,
+    m.release_date DESC NULLS LAST
+LIMIT $1 OFFSET $2;
+
+-- name: CountAdvancedSearchMovies :one
+-- Count total results for advanced search (for pagination)
+SELECT COUNT(DISTINCT m.id)::INT as total
+FROM movies m
+LEFT JOIN movie_genres mg ON mg.movie_id = m.id
+WHERE
+    (sqlc.narg(query)::TEXT IS NULL OR m.title ILIKE '%' || sqlc.narg(query)::TEXT || '%')
+    AND (sqlc.narg(genre_ids)::INT[] IS NULL OR mg.genre_id = ANY(sqlc.narg(genre_ids)::INT[]))
+    AND (sqlc.narg(year_from)::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) >= sqlc.narg(year_from)::INT)
+    AND (sqlc.narg(year_to)::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) <= sqlc.narg(year_to)::INT)
+    AND (sqlc.narg(imdb_min)::NUMERIC IS NULL OR m.imdb_rating >= sqlc.narg(imdb_min)::NUMERIC)
+    AND (sqlc.narg(imdb_max)::NUMERIC IS NULL OR m.imdb_rating <= sqlc.narg(imdb_max)::NUMERIC)
+    AND (sqlc.narg(user_rating_min)::REAL IS NULL OR m.user_avg_rating >= sqlc.narg(user_rating_min)::REAL)
+    AND (sqlc.narg(user_rating_max)::REAL IS NULL OR m.user_avg_rating <= sqlc.narg(user_rating_max)::REAL)
+    AND (sqlc.narg(rt_min)::INT IS NULL OR m.rotten_tomatoes >= sqlc.narg(rt_min)::INT)
+    AND (sqlc.narg(rt_max)::INT IS NULL OR m.rotten_tomatoes <= sqlc.narg(rt_max)::INT)
+    AND (sqlc.narg(metacritic_min)::INT IS NULL OR m.metacritic_score >= sqlc.narg(metacritic_min)::INT)
+    AND (sqlc.narg(metacritic_max)::INT IS NULL OR m.metacritic_score <= sqlc.narg(metacritic_max)::INT);
+
 -- ============================================================
 -- CREDITS QUERIES
 -- ============================================================

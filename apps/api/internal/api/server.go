@@ -75,6 +75,7 @@ func (s *Server) setupRoutes() {
 	movies := v1.Group("/movies")
 	{
 		movies.GET("", s.movieH.GetMovies)
+		movies.GET("/search", s.movieH.AdvancedSearch)
 		movies.GET("/:slug", s.movieH.GetMovie)
 		movies.GET("/:movieId/ratings", s.ratingH.GetMovieRatings)
 		movies.GET("/:movieId/comments", s.commentH.GetMovieComments)

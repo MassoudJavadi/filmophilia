@@ -11,6 +11,181 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const advancedSearchMovies = `-- name: AdvancedSearchMovies :many
+SELECT DISTINCT m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating
+FROM movies m
+LEFT JOIN movie_genres mg ON mg.movie_id = m.id
+WHERE
+    -- Text search (optional)
+    ($3::TEXT IS NULL OR m.title ILIKE '%' || $3::TEXT || '%')
+    -- Genre filter (optional, array of genre IDs)
+    AND ($4::INT[] IS NULL OR mg.genre_id = ANY($4::INT[]))
+    -- Year range (optional)
+    AND ($5::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) >= $5::INT)
+    AND ($6::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) <= $6::INT)
+    -- IMDB rating range (optional, scale 0-10)
+    AND ($7::NUMERIC IS NULL OR m.imdb_rating >= $7::NUMERIC)
+    AND ($8::NUMERIC IS NULL OR m.imdb_rating <= $8::NUMERIC)
+    -- User rating range (optional, scale 1-10)
+    AND ($9::REAL IS NULL OR m.user_avg_rating >= $9::REAL)
+    AND ($10::REAL IS NULL OR m.user_avg_rating <= $10::REAL)
+    -- Rotten Tomatoes range (optional, scale 0-100)
+    AND ($11::INT IS NULL OR m.rotten_tomatoes >= $11::INT)
+    AND ($12::INT IS NULL OR m.rotten_tomatoes <= $12::INT)
+    -- Metacritic range (optional, scale 0-100)
+    AND ($13::INT IS NULL OR m.metacritic_score >= $13::INT)
+    AND ($14::INT IS NULL OR m.metacritic_score <= $14::INT)
+ORDER BY
+    CASE WHEN $15::TEXT = 'title_asc' THEN m.title END ASC,
+    CASE WHEN $15::TEXT = 'title_desc' THEN m.title END DESC,
+    CASE WHEN $15::TEXT = 'release_date_asc' THEN m.release_date END ASC,
+    CASE WHEN $15::TEXT = 'release_date_desc' THEN m.release_date END DESC,
+    CASE WHEN $15::TEXT = 'imdb_rating_asc' THEN m.imdb_rating END ASC,
+    CASE WHEN $15::TEXT = 'imdb_rating_desc' THEN m.imdb_rating END DESC,
+    CASE WHEN $15::TEXT = 'user_rating_asc' THEN m.user_avg_rating END ASC,
+    CASE WHEN $15::TEXT = 'user_rating_desc' THEN m.user_avg_rating END DESC,
+    CASE WHEN $15::TEXT = 'rotten_tomatoes_asc' THEN m.rotten_tomatoes END ASC,
+    CASE WHEN $15::TEXT = 'rotten_tomatoes_desc' THEN m.rotten_tomatoes END DESC,
+    CASE WHEN $15::TEXT = 'metacritic_asc' THEN m.metacritic_score END ASC,
+    CASE WHEN $15::TEXT = 'metacritic_desc' THEN m.metacritic_score END DESC,
+    m.imdb_rating DESC NULLS LAST,
+    m.release_date DESC NULLS LAST
+LIMIT $1 OFFSET $2
+`
+
+type AdvancedSearchMoviesParams struct {
+	Limit         int32          `json:"limit"`
+	Offset        int32          `json:"offset"`
+	Query         pgtype.Text    `json:"query"`
+	GenreIds      []int32        `json:"genre_ids"`
+	YearFrom      pgtype.Int4    `json:"year_from"`
+	YearTo        pgtype.Int4    `json:"year_to"`
+	ImdbMin       pgtype.Numeric `json:"imdb_min"`
+	ImdbMax       pgtype.Numeric `json:"imdb_max"`
+	UserRatingMin pgtype.Float4  `json:"user_rating_min"`
+	UserRatingMax pgtype.Float4  `json:"user_rating_max"`
+	RtMin         pgtype.Int4    `json:"rt_min"`
+	RtMax         pgtype.Int4    `json:"rt_max"`
+	MetacriticMin pgtype.Int4    `json:"metacritic_min"`
+	MetacriticMax pgtype.Int4    `json:"metacritic_max"`
+	SortBy        pgtype.Text    `json:"sort_by"`
+}
+
+// Advanced search with filters: query, genres, year range, rating range, sort
+func (q *Queries) AdvancedSearchMovies(ctx context.Context, arg AdvancedSearchMoviesParams) ([]Movie, error) {
+	rows, err := q.db.Query(ctx, advancedSearchMovies,
+		arg.Limit,
+		arg.Offset,
+		arg.Query,
+		arg.GenreIds,
+		arg.YearFrom,
+		arg.YearTo,
+		arg.ImdbMin,
+		arg.ImdbMax,
+		arg.UserRatingMin,
+		arg.UserRatingMax,
+		arg.RtMin,
+		arg.RtMax,
+		arg.MetacriticMin,
+		arg.MetacriticMax,
+		arg.SortBy,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Movie
+	for rows.Next() {
+		var i Movie
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Overview,
+			&i.PosterUrl,
+			&i.BackdropUrl,
+			&i.TrailerUrl,
+			&i.ReleaseDate,
+			&i.Runtime,
+			&i.ContentRating,
+			&i.OriginalLanguage,
+			&i.Country,
+			&i.ImdbID,
+			&i.TmdbID,
+			&i.UserAvgRating,
+			&i.UserRatingCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ImdbRating,
+			&i.RottenTomatoes,
+			&i.MetacriticScore,
+			&i.LetterboxdRating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const countAdvancedSearchMovies = `-- name: CountAdvancedSearchMovies :one
+SELECT COUNT(DISTINCT m.id)::INT as total
+FROM movies m
+LEFT JOIN movie_genres mg ON mg.movie_id = m.id
+WHERE
+    ($1::TEXT IS NULL OR m.title ILIKE '%' || $1::TEXT || '%')
+    AND ($2::INT[] IS NULL OR mg.genre_id = ANY($2::INT[]))
+    AND ($3::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) >= $3::INT)
+    AND ($4::INT IS NULL OR EXTRACT(YEAR FROM m.release_date) <= $4::INT)
+    AND ($5::NUMERIC IS NULL OR m.imdb_rating >= $5::NUMERIC)
+    AND ($6::NUMERIC IS NULL OR m.imdb_rating <= $6::NUMERIC)
+    AND ($7::REAL IS NULL OR m.user_avg_rating >= $7::REAL)
+    AND ($8::REAL IS NULL OR m.user_avg_rating <= $8::REAL)
+    AND ($9::INT IS NULL OR m.rotten_tomatoes >= $9::INT)
+    AND ($10::INT IS NULL OR m.rotten_tomatoes <= $10::INT)
+    AND ($11::INT IS NULL OR m.metacritic_score >= $11::INT)
+    AND ($12::INT IS NULL OR m.metacritic_score <= $12::INT)
+`
+
+type CountAdvancedSearchMoviesParams struct {
+	Query         pgtype.Text    `json:"query"`
+	GenreIds      []int32        `json:"genre_ids"`
+	YearFrom      pgtype.Int4    `json:"year_from"`
+	YearTo        pgtype.Int4    `json:"year_to"`
+	ImdbMin       pgtype.Numeric `json:"imdb_min"`
+	ImdbMax       pgtype.Numeric `json:"imdb_max"`
+	UserRatingMin pgtype.Float4  `json:"user_rating_min"`
+	UserRatingMax pgtype.Float4  `json:"user_rating_max"`
+	RtMin         pgtype.Int4    `json:"rt_min"`
+	RtMax         pgtype.Int4    `json:"rt_max"`
+	MetacriticMin pgtype.Int4    `json:"metacritic_min"`
+	MetacriticMax pgtype.Int4    `json:"metacritic_max"`
+}
+
+// Count total results for advanced search (for pagination)
+func (q *Queries) CountAdvancedSearchMovies(ctx context.Context, arg CountAdvancedSearchMoviesParams) (int32, error) {
+	row := q.db.QueryRow(ctx, countAdvancedSearchMovies,
+		arg.Query,
+		arg.GenreIds,
+		arg.YearFrom,
+		arg.YearTo,
+		arg.ImdbMin,
+		arg.ImdbMax,
+		arg.UserRatingMin,
+		arg.UserRatingMax,
+		arg.RtMin,
+		arg.RtMax,
+		arg.MetacriticMin,
+		arg.MetacriticMax,
+	)
+	var total int32
+	err := row.Scan(&total)
+	return total, err
+}
+
 const createCredit = `-- name: CreateCredit :exec
 
 INSERT INTO credits (movie_id, person_id, department, role, character)
