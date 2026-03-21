@@ -1,4 +1,4 @@
-.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop migrate-build migrate-up migrate-down migrate-create migrate-version migrate-force import
+.PHONY: dev dev-stop build test generate wire sqlc lint clean help db db-stop migrate-build migrate-up migrate-down migrate-create migrate-version migrate-force schema-snapshot verify-migration-replay import
 
 # Run the API in development mode on port 8080
 dev:
@@ -90,6 +90,15 @@ ifndef version
 endif
 	migrate -path $(MIGRATIONS_BUILD) -database "$(DATABASE_URL)" force $(version)
 
+# Generate a unified schema snapshot from all up migrations
+schema-snapshot: migrate-build
+	@$(DB_DIR)/scripts/build-schema-snapshot.sh
+
+# Verify all up migrations replay cleanly from scratch
+verify-migration-replay: migrate-build
+	@$(DB_DIR)/scripts/build-schema-snapshot.sh /tmp/filmophilia-schema-replay-check.sql
+	@rm -f /tmp/filmophilia-schema-replay-check.sql
+
 # Show help
 help:
 	@echo "Available targets:"
@@ -109,6 +118,8 @@ help:
 	@echo "    migrate-down           - Rollback last migration"
 	@echo "    migrate-version        - Show current version"
 	@echo "    migrate-build          - Build flat structure for migrate"
+	@echo "    schema-snapshot        - Build db/schema.snapshot.sql from all up migrations"
+	@echo "    verify-migration-replay - Replay all up migrations into a temp DB"
 	@echo ""
 	@echo "  Build & Test:"
 	@echo "    build         - Build the binary to bin/api"

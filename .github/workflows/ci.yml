@@ -35,6 +35,8 @@ jobs:
        
       - run: npm ci
 
+      - name: Verify DB migrations replay from scratch
+        run: make -C apps/api verify-migration-replay
 
       # Prepend any command with "nx record --" to record its logs to Nx Cloud
       # - run: npx nx record -- echo Hello World
