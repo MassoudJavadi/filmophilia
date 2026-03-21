@@ -8,6 +8,7 @@
 -- ============================================================
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ============================================================
 -- ENUMS
@@ -68,7 +69,7 @@ CREATE INDEX user_status_logs_user_idx ON user_status_logs (user_id, created_at 
 -- ============================================================
 
 CREATE TABLE sessions (
-    id            VARCHAR(255) PRIMARY KEY,
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id       INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     refresh_token TEXT,
     user_agent    TEXT,

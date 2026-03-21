@@ -50,4 +50,5 @@ DROP TYPE IF EXISTS user_status;
 DROP TYPE IF EXISTS role;
 
 -- Drop extensions
+DROP EXTENSION IF EXISTS pgcrypto;
 DROP EXTENSION IF EXISTS pg_trgm;

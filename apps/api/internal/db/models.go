@@ -411,7 +411,7 @@ type Reaction struct {
 }
 
 type Session struct {
-	ID           string             `json:"id"`
+	ID           pgtype.UUID        `json:"id"`
 	UserID       int32              `json:"user_id"`
 	RefreshToken pgtype.Text        `json:"refresh_token"`
 	UserAgent    pgtype.Text        `json:"user_agent"`

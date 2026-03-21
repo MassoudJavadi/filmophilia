@@ -110,7 +110,6 @@ func (s *AuthService) issueTokens(ctx context.Context, user db.User) (*dto.AuthR
 
 	refresh := uuid.New().String()
 	_, err = s.queries.CreateSession(ctx, db.CreateSessionParams{
-		ID:           uuid.New().String(),
 		UserID:       user.ID,
 		RefreshToken: pgtype.Text{String: refresh, Valid: true},
 		ExpiresAt:    pgtype.Timestamptz{Time: time.Now().Add(token.RefreshTokenDuration), Valid: true},

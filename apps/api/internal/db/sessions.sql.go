@@ -12,13 +12,12 @@ import (
 )
 
 const createSession = `-- name: CreateSession :one
-INSERT INTO sessions (id, user_id, refresh_token, user_agent, ip_address, expires_at)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO sessions (user_id, refresh_token, user_agent, ip_address, expires_at)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at
 `
 
 type CreateSessionParams struct {
-	ID           string             `json:"id"`
 	UserID       int32              `json:"user_id"`
 	RefreshToken pgtype.Text        `json:"refresh_token"`
 	UserAgent    pgtype.Text        `json:"user_agent"`
@@ -28,7 +27,6 @@ type CreateSessionParams struct {
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
 	row := q.db.QueryRow(ctx, createSession,
-		arg.ID,
 		arg.UserID,
 		arg.RefreshToken,
 		arg.UserAgent,
@@ -61,7 +59,7 @@ const deleteSession = `-- name: DeleteSession :exec
 DELETE FROM sessions WHERE id = $1
 `
 
-func (q *Queries) DeleteSession(ctx context.Context, id string) error {
+func (q *Queries) DeleteSession(ctx context.Context, id pgtype.UUID) error {
 	_, err := q.db.Exec(ctx, deleteSession, id)
 	return err
 }
@@ -89,7 +87,7 @@ const getSessionByID = `-- name: GetSessionByID :one
 SELECT id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at FROM sessions WHERE id = $1
 `
 
-func (q *Queries) GetSessionByID(ctx context.Context, id string) (Session, error) {
+func (q *Queries) GetSessionByID(ctx context.Context, id pgtype.UUID) (Session, error) {
 	row := q.db.QueryRow(ctx, getSessionByID, id)
 	var i Session
 	err := row.Scan(
@@ -130,7 +128,7 @@ WHERE id = $1
 `
 
 type UpdateSessionParams struct {
-	ID           string             `json:"id"`
+	ID           pgtype.UUID        `json:"id"`
 	RefreshToken pgtype.Text        `json:"refresh_token"`
 	ExpiresAt    pgtype.Timestamptz `json:"expires_at"`
 }
