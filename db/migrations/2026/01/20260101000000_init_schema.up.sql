@@ -45,8 +45,6 @@ CREATE TABLE users (
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX users_email_idx ON users (email);
-CREATE INDEX users_username_idx ON users (username);
 CREATE INDEX users_status_idx ON users (status);
 
 -- ============================================================
@@ -141,7 +139,6 @@ CREATE TABLE movies (
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX movies_slug_idx ON movies (slug);
 CREATE INDEX movies_release_date_idx ON movies (release_date DESC);
 CREATE INDEX movies_average_rating_idx ON movies (average_rating DESC);
 CREATE INDEX movies_title_trgm_idx ON movies USING GIN (title gin_trgm_ops);
