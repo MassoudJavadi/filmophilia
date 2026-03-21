@@ -56,8 +56,6 @@ func (s *notificationService) CreateNotification(ctx context.Context, userID int
 		typeEnum = db.NotificationTypeNEWLIKE
 	case "NEW_COMMENT":
 		typeEnum = db.NotificationTypeNEWCOMMENT
-	case "NEW_REVIEW":
-		typeEnum = db.NotificationTypeNEWREVIEW
 	case "ACCOUNT_ACTIVATED":
 		typeEnum = db.NotificationTypeACCOUNTACTIVATED
 	case "ACCOUNT_SUSPENDED":

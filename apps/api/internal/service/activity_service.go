@@ -40,8 +40,6 @@ func (s *activityService) CreateActivity(ctx context.Context, userID int32, acti
 	switch entityType {
 	case "MOVIE":
 		entityTypeEnum = db.EntityTypeMOVIE
-	case "REVIEW":
-		entityTypeEnum = db.EntityTypeREVIEW
 	case "COMMENT":
 		entityTypeEnum = db.EntityTypeCOMMENT
 	case "USER":
@@ -104,10 +102,8 @@ func (s *activityService) GetActivitiesByEntity(ctx context.Context, entityType,
 	case 1:
 		entityTypeEnum = db.EntityTypeMOVIE
 	case 2:
-		entityTypeEnum = db.EntityTypeREVIEW
-	case 3:
 		entityTypeEnum = db.EntityTypeCOMMENT
-	case 4:
+	case 3:
 		entityTypeEnum = db.EntityTypeUSER
 	default:
 		entityTypeEnum = db.EntityTypeMOVIE
@@ -130,8 +126,6 @@ func (s *activityService) DeleteActivityByEntity(ctx context.Context, entityType
 	switch entityType {
 	case "MOVIE":
 		entityTypeEnum = db.EntityTypeMOVIE
-	case "REVIEW":
-		entityTypeEnum = db.EntityTypeREVIEW
 	case "COMMENT":
 		entityTypeEnum = db.EntityTypeCOMMENT
 	case "USER":

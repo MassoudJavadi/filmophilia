@@ -16,12 +16,12 @@ INSERT INTO reactions (user_id, comment_id, type)
 VALUES ($1, $2, $3)
 ON CONFLICT (user_id, comment_id)
 DO UPDATE SET type = EXCLUDED.type
-RETURNING id, user_id, review_id, comment_id, type, created_at
+RETURNING id, user_id, comment_id, type, created_at
 `
 
 type AddReactionToCommentParams struct {
 	UserID    int32        `json:"user_id"`
-	CommentID pgtype.Int4  `json:"comment_id"`
+	CommentID int32        `json:"comment_id"`
 	Type      ReactionType `json:"type"`
 }
 
@@ -31,7 +31,6 @@ func (q *Queries) AddReactionToComment(ctx context.Context, arg AddReactionToCom
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
-		&i.ReviewID,
 		&i.CommentID,
 		&i.Type,
 		&i.CreatedAt,
@@ -51,7 +50,7 @@ type CountCommentReactionsByTypeRow struct {
 	Count int32        `json:"count"`
 }
 
-func (q *Queries) CountCommentReactionsByType(ctx context.Context, commentID pgtype.Int4) ([]CountCommentReactionsByTypeRow, error) {
+func (q *Queries) CountCommentReactionsByType(ctx context.Context, commentID int32) ([]CountCommentReactionsByTypeRow, error) {
 	rows, err := q.db.Query(ctx, countCommentReactionsByType, commentID)
 	if err != nil {
 		return nil, err
@@ -73,7 +72,7 @@ func (q *Queries) CountCommentReactionsByType(ctx context.Context, commentID pgt
 
 const getCommentReactions = `-- name: GetCommentReactions :many
 SELECT
-    r.id, r.user_id, r.review_id, r.comment_id, r.type, r.created_at,
+    r.id, r.user_id, r.comment_id, r.type, r.created_at,
     u.username,
     u.display_name,
     u.avatar_url
@@ -85,16 +84,15 @@ LIMIT $2 OFFSET $3
 `
 
 type GetCommentReactionsParams struct {
-	CommentID pgtype.Int4 `json:"comment_id"`
-	Limit     int32       `json:"limit"`
-	Offset    int32       `json:"offset"`
+	CommentID int32 `json:"comment_id"`
+	Limit     int32 `json:"limit"`
+	Offset    int32 `json:"offset"`
 }
 
 type GetCommentReactionsRow struct {
 	ID          int32              `json:"id"`
 	UserID      int32              `json:"user_id"`
-	ReviewID    pgtype.Int4        `json:"review_id"`
-	CommentID   pgtype.Int4        `json:"comment_id"`
+	CommentID   int32              `json:"comment_id"`
 	Type        ReactionType       `json:"type"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	Username    string             `json:"username"`
@@ -114,7 +112,6 @@ func (q *Queries) GetCommentReactions(ctx context.Context, arg GetCommentReactio
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
-			&i.ReviewID,
 			&i.CommentID,
 			&i.Type,
 			&i.CreatedAt,
@@ -133,13 +130,13 @@ func (q *Queries) GetCommentReactions(ctx context.Context, arg GetCommentReactio
 }
 
 const getUserReactionOnComment = `-- name: GetUserReactionOnComment :one
-SELECT id, user_id, review_id, comment_id, type, created_at FROM reactions
+SELECT id, user_id, comment_id, type, created_at FROM reactions
 WHERE user_id = $1 AND comment_id = $2
 `
 
 type GetUserReactionOnCommentParams struct {
-	UserID    int32       `json:"user_id"`
-	CommentID pgtype.Int4 `json:"comment_id"`
+	UserID    int32 `json:"user_id"`
+	CommentID int32 `json:"comment_id"`
 }
 
 func (q *Queries) GetUserReactionOnComment(ctx context.Context, arg GetUserReactionOnCommentParams) (Reaction, error) {
@@ -148,7 +145,6 @@ func (q *Queries) GetUserReactionOnComment(ctx context.Context, arg GetUserReact
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
-		&i.ReviewID,
 		&i.CommentID,
 		&i.Type,
 		&i.CreatedAt,
@@ -162,8 +158,8 @@ WHERE user_id = $1 AND comment_id = $2
 `
 
 type RemoveReactionFromCommentParams struct {
-	UserID    int32       `json:"user_id"`
-	CommentID pgtype.Int4 `json:"comment_id"`
+	UserID    int32 `json:"user_id"`
+	CommentID int32 `json:"comment_id"`
 }
 
 func (q *Queries) RemoveReactionFromComment(ctx context.Context, arg RemoveReactionFromCommentParams) error {

@@ -63,7 +63,6 @@ type EntityType string
 
 const (
 	EntityTypeMOVIE   EntityType = "MOVIE"
-	EntityTypeREVIEW  EntityType = "REVIEW"
 	EntityTypeCOMMENT EntityType = "COMMENT"
 	EntityTypeUSER    EntityType = "USER"
 )
@@ -109,7 +108,6 @@ const (
 	NotificationTypeNEWFOLLOWER      NotificationType = "NEW_FOLLOWER"
 	NotificationTypeNEWLIKE          NotificationType = "NEW_LIKE"
 	NotificationTypeNEWCOMMENT       NotificationType = "NEW_COMMENT"
-	NotificationTypeNEWREVIEW        NotificationType = "NEW_REVIEW"
 	NotificationTypeACCOUNTACTIVATED NotificationType = "ACCOUNT_ACTIVATED"
 	NotificationTypeACCOUNTSUSPENDED NotificationType = "ACCOUNT_SUSPENDED"
 	NotificationTypeACCOUNTBANNED    NotificationType = "ACCOUNT_BANNED"
@@ -407,21 +405,9 @@ type Rating struct {
 type Reaction struct {
 	ID        int32              `json:"id"`
 	UserID    int32              `json:"user_id"`
-	ReviewID  pgtype.Int4        `json:"review_id"`
-	CommentID pgtype.Int4        `json:"comment_id"`
+	CommentID int32              `json:"comment_id"`
 	Type      ReactionType       `json:"type"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
-}
-
-type Review struct {
-	ID        int32              `json:"id"`
-	UserID    int32              `json:"user_id"`
-	MovieID   int32              `json:"movie_id"`
-	Title     pgtype.Text        `json:"title"`
-	Content   string             `json:"content"`
-	LikeCount pgtype.Int4        `json:"like_count"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 type Session struct {

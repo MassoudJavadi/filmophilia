@@ -6,7 +6,6 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var (
@@ -39,7 +38,7 @@ func (s *reactionService) ReactToComment(ctx context.Context, userID, commentID 
 
 	return s.queries.AddReactionToComment(ctx, db.AddReactionToCommentParams{
 		UserID:    userID,
-		CommentID: pgtype.Int4{Int32: commentID, Valid: true},
+		CommentID: commentID,
 		Type:      reactionType,
 	})
 }
@@ -47,7 +46,7 @@ func (s *reactionService) ReactToComment(ctx context.Context, userID, commentID 
 func (s *reactionService) RemoveCommentReaction(ctx context.Context, userID, commentID int32) error {
 	_, err := s.queries.GetUserReactionOnComment(ctx, db.GetUserReactionOnCommentParams{
 		UserID:    userID,
-		CommentID: pgtype.Int4{Int32: commentID, Valid: true},
+		CommentID: commentID,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -58,26 +57,26 @@ func (s *reactionService) RemoveCommentReaction(ctx context.Context, userID, com
 
 	return s.queries.RemoveReactionFromComment(ctx, db.RemoveReactionFromCommentParams{
 		UserID:    userID,
-		CommentID: pgtype.Int4{Int32: commentID, Valid: true},
+		CommentID: commentID,
 	})
 }
 
 func (s *reactionService) GetCommentReactions(ctx context.Context, commentID, limit, offset int32) ([]db.GetCommentReactionsRow, error) {
 	return s.queries.GetCommentReactions(ctx, db.GetCommentReactionsParams{
-		CommentID: pgtype.Int4{Int32: commentID, Valid: true},
+		CommentID: commentID,
 		Limit:     limit,
 		Offset:    offset,
 	})
 }
 
 func (s *reactionService) GetCommentReactionCounts(ctx context.Context, commentID int32) ([]db.CountCommentReactionsByTypeRow, error) {
-	return s.queries.CountCommentReactionsByType(ctx, pgtype.Int4{Int32: commentID, Valid: true})
+	return s.queries.CountCommentReactionsByType(ctx, commentID)
 }
 
 func (s *reactionService) GetUserCommentReaction(ctx context.Context, userID, commentID int32) (*db.Reaction, error) {
 	reaction, err := s.queries.GetUserReactionOnComment(ctx, db.GetUserReactionOnCommentParams{
 		UserID:    userID,
-		CommentID: pgtype.Int4{Int32: commentID, Valid: true},
+		CommentID: commentID,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
