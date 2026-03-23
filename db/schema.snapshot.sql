@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict jaR19vUz4eMiK5YCJby3g4q3PPZ4m6g5LoCRPhRjX02FuXthyAmi0iY3QYurVrj
+\restrict wCeoLywuOcUHBnn1gKSOcoirXa5Jy9jYDsOAI2HauUjXHkqcuVaFgzeYHdwm28G
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
@@ -122,6 +122,50 @@ CREATE TYPE public.user_status AS ENUM (
     'SUSPENDED',
     'BANNED'
 );
+
+
+--
+-- Name: hash_accounts_tokens(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.hash_accounts_tokens() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.access_token = hash_token_value(NEW.access_token);
+    NEW.refresh_token = hash_token_value(NEW.refresh_token);
+    RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: hash_sessions_refresh_token(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.hash_sessions_refresh_token() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.refresh_token = hash_token_value(NEW.refresh_token);
+    RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: hash_token_value(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.hash_token_value(token_value text) RETURNS text
+    LANGUAGE sql IMMUTABLE
+    AS $$
+    SELECT CASE
+        WHEN token_value IS NULL THEN NULL
+        WHEN token_value LIKE 'sha256:%' THEN token_value
+        ELSE 'sha256:' || encode(digest(token_value, 'sha256'), 'hex')
+    END
+$$;
 
 
 --
@@ -1303,6 +1347,13 @@ CREATE INDEX watchlists_user_rank_idx ON public.watchlists USING btree (user_id,
 
 
 --
+-- Name: accounts accounts_hash_tokens_before_write; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER accounts_hash_tokens_before_write BEFORE INSERT OR UPDATE OF access_token, refresh_token ON public.accounts FOR EACH ROW EXECUTE FUNCTION public.hash_accounts_tokens();
+
+
+--
 -- Name: comments comments_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1370,6 +1421,13 @@ CREATE TRIGGER reactions_like_count_insert AFTER INSERT ON public.reactions FOR 
 --
 
 CREATE TRIGGER reactions_like_count_update AFTER UPDATE ON public.reactions FOR EACH ROW EXECUTE FUNCTION public.update_like_counts();
+
+
+--
+-- Name: sessions sessions_hash_refresh_token_before_write; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER sessions_hash_refresh_token_before_write BEFORE INSERT OR UPDATE OF refresh_token ON public.sessions FOR EACH ROW EXECUTE FUNCTION public.hash_sessions_refresh_token();
 
 
 --
@@ -1558,5 +1616,5 @@ ALTER TABLE ONLY public.watchlists
 -- PostgreSQL database dump complete
 --
 
-\unrestrict jaR19vUz4eMiK5YCJby3g4q3PPZ4m6g5LoCRPhRjX02FuXthyAmi0iY3QYurVrj
+\unrestrict wCeoLywuOcUHBnn1gKSOcoirXa5Jy9jYDsOAI2HauUjXHkqcuVaFgzeYHdwm28G
 

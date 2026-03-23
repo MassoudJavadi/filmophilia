@@ -13,7 +13,7 @@ import (
 
 const createSession = `-- name: CreateSession :one
 INSERT INTO sessions (user_id, refresh_token, user_agent, ip_address, expires_at)
-VALUES ($1, $2, $3, $4, $5)
+VALUES ($1, 'sha256:' || encode(digest($2, 'sha256'), 'hex'), $3, $4, $5)
 RETURNING id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at
 `
 
@@ -66,7 +66,7 @@ func (q *Queries) DeleteSession(ctx context.Context, id pgtype.UUID) error {
 
 const deleteSessionByRefreshToken = `-- name: DeleteSessionByRefreshToken :exec
 DELETE FROM sessions
-WHERE refresh_token = $1
+WHERE refresh_token = 'sha256:' || encode(digest($1, 'sha256'), 'hex')
 `
 
 func (q *Queries) DeleteSessionByRefreshToken(ctx context.Context, refreshToken pgtype.Text) error {
@@ -103,7 +103,9 @@ func (q *Queries) GetSessionByID(ctx context.Context, id pgtype.UUID) (Session, 
 }
 
 const getSessionByRefreshToken = `-- name: GetSessionByRefreshToken :one
-SELECT id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at FROM sessions WHERE refresh_token = $1 LIMIT 1
+SELECT id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at FROM sessions
+WHERE refresh_token = 'sha256:' || encode(digest($1, 'sha256'), 'hex')
+LIMIT 1
 `
 
 func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken pgtype.Text) (Session, error) {
@@ -123,7 +125,7 @@ func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken pgt
 
 const updateSession = `-- name: UpdateSession :exec
 UPDATE sessions 
-SET refresh_token = $2, expires_at = $3 
+SET refresh_token = 'sha256:' || encode(digest($2, 'sha256'), 'hex'), expires_at = $3 
 WHERE id = $1
 `
 
