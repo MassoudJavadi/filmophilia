@@ -42,7 +42,7 @@ func (s *AuthService) Signup(ctx context.Context, req dto.SignupRequest) (db.Use
 	user, err := s.queries.CreateUser(ctx, db.CreateUserParams{
 		Email:        req.Email,
 		Username:     req.Username,
-		PasswordHash: string(hash),
+		PasswordHash: pgtype.Text{String: string(hash), Valid: true},
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "users_email_key") {
@@ -67,7 +67,11 @@ func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Aut
 		return nil, ErrUserBanned
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+	if !user.PasswordHash.Valid || user.PasswordHash.String == "" {
+		return nil, ErrInvalidCredentials
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash.String), []byte(req.Password)); err != nil {
 		return nil, ErrInvalidCredentials
 	}
 

@@ -424,7 +424,7 @@ type User struct {
 	ID           int32              `json:"id"`
 	Email        string             `json:"email"`
 	Username     string             `json:"username"`
-	PasswordHash string             `json:"password_hash"`
+	PasswordHash pgtype.Text        `json:"password_hash"`
 	DisplayName  pgtype.Text        `json:"display_name"`
 	AvatarUrl    pgtype.Text        `json:"avatar_url"`
 	Bio          pgtype.Text        `json:"bio"`

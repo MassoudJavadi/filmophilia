@@ -6,6 +6,7 @@ import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type OAuthService struct {
@@ -32,11 +33,11 @@ func (s *OAuthService) HandleGoogleCallback(ctx context.Context, code string) (*
 	// 2. Find or Create user in our DB
 	user, err := s.queries.GetUserByEmail(ctx, gUser.Email)
 	if err != nil {
-		// User doesn't exist, create them (Password is empty for OAuth users)
+		// User doesn't exist, create them without a local password hash.
 		user, err = s.queries.CreateUser(ctx, db.CreateUserParams{
 			Email:        gUser.Email,
 			Username:     gUser.Email, // Simplified for now
-			PasswordHash: "",          // No password for OAuth
+			PasswordHash: pgtype.Text{},
 		})
 		if err != nil {
 			return nil, err

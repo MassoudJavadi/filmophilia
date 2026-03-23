@@ -20,7 +20,7 @@ RETURNING id, email, username, password_hash, display_name, avatar_url, bio, rol
 type CreateUserParams struct {
 	Email        string      `json:"email"`
 	Username     string      `json:"username"`
-	PasswordHash string      `json:"password_hash"`
+	PasswordHash pgtype.Text `json:"password_hash"`
 	DisplayName  pgtype.Text `json:"display_name"`
 }
 

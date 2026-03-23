@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict wCeoLywuOcUHBnn1gKSOcoirXa5Jy9jYDsOAI2HauUjXHkqcuVaFgzeYHdwm28G
+\restrict johDIMyI3oewfH5zzptKG4bGktabYEeKCee7F0WAAa8YSYgH074gRpGtZN98C3P
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
@@ -739,7 +739,7 @@ CREATE TABLE public.users (
     id integer NOT NULL,
     email character varying(255) NOT NULL,
     username character varying(50) NOT NULL,
-    password_hash character varying(255) NOT NULL,
+    password_hash character varying(255),
     display_name character varying(100),
     avatar_url text,
     bio text,
@@ -747,7 +747,8 @@ CREATE TABLE public.users (
     status public.user_status DEFAULT 'PENDING'::public.user_status NOT NULL,
     is_verified boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT users_password_hash_nonempty_chk CHECK (((password_hash IS NULL) OR (length((password_hash)::text) > 0)))
 );
 
 
@@ -1616,5 +1617,5 @@ ALTER TABLE ONLY public.watchlists
 -- PostgreSQL database dump complete
 --
 
-\unrestrict wCeoLywuOcUHBnn1gKSOcoirXa5Jy9jYDsOAI2HauUjXHkqcuVaFgzeYHdwm28G
+\unrestrict johDIMyI3oewfH5zzptKG4bGktabYEeKCee7F0WAAa8YSYgH074gRpGtZN98C3P
 
