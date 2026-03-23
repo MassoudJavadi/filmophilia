@@ -134,7 +134,7 @@ func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 
 func (h *ActivityHandler) GetMovieActivities(c *gin.Context) {
 	movieIDStr := c.Param("movieId")
-	movieID, err := strconv.Atoi(movieIDStr)
+	movieID, err := strconv.ParseInt(movieIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
 		return
@@ -145,7 +145,7 @@ func (h *ActivityHandler) GetMovieActivities(c *gin.Context) {
 	offset := (page - 1) * limit
 
 	// Entity type 1 = MOVIE (based on enum in schema)
-	activities, err := h.activitySvc.GetActivitiesByEntity(c.Request.Context(), 1, int32(movieID), int32(limit), int32(offset))
+	activities, err := h.activitySvc.GetActivitiesByEntity(c.Request.Context(), 1, movieID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get movie activities error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch activities"})

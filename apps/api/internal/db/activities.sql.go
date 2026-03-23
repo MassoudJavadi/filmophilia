@@ -50,7 +50,7 @@ type CreateActivityParams struct {
 	UserID     int32      `json:"user_id"`
 	Action     string     `json:"action"`
 	EntityType EntityType `json:"entity_type"`
-	EntityID   int32      `json:"entity_id"`
+	EntityID   int64      `json:"entity_id"`
 	Metadata   []byte     `json:"metadata"`
 }
 
@@ -83,7 +83,7 @@ WHERE entity_type = $1 AND entity_id = $2
 
 type DeleteActivityByEntityParams struct {
 	EntityType EntityType `json:"entity_type"`
-	EntityID   int32      `json:"entity_id"`
+	EntityID   int64      `json:"entity_id"`
 }
 
 // Delete activities related to a specific entity (when entity is deleted)
@@ -117,17 +117,17 @@ LIMIT $3 OFFSET $4
 
 type GetActivitiesByEntityParams struct {
 	EntityType EntityType `json:"entity_type"`
-	EntityID   int32      `json:"entity_id"`
+	EntityID   int64      `json:"entity_id"`
 	Limit      int32      `json:"limit"`
 	Offset     int32      `json:"offset"`
 }
 
 type GetActivitiesByEntityRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	Action      string             `json:"action"`
 	EntityType  EntityType         `json:"entity_type"`
-	EntityID    int32              `json:"entity_id"`
+	EntityID    int64              `json:"entity_id"`
 	Metadata    []byte             `json:"metadata"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	Username    string             `json:"username"`
@@ -192,11 +192,11 @@ type GetFollowingActivitiesParams struct {
 }
 
 type GetFollowingActivitiesRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	Action      string             `json:"action"`
 	EntityType  EntityType         `json:"entity_type"`
-	EntityID    int32              `json:"entity_id"`
+	EntityID    int64              `json:"entity_id"`
 	Metadata    []byte             `json:"metadata"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	Username    string             `json:"username"`
@@ -255,11 +255,11 @@ type GetUserActivitiesParams struct {
 }
 
 type GetUserActivitiesRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	Action      string             `json:"action"`
 	EntityType  EntityType         `json:"entity_type"`
-	EntityID    int32              `json:"entity_id"`
+	EntityID    int64              `json:"entity_id"`
 	Metadata    []byte             `json:"metadata"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	Username    string             `json:"username"`

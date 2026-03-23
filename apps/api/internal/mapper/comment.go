@@ -20,7 +20,8 @@ func ToCommentResponse(c db.GetMovieCommentsRow) dto.CommentResponse {
 		ReplyCount:  c.ReplyCount,
 	}
 	if c.ParentID.Valid {
-		resp.ParentID = &c.ParentID.Int32
+		parentID := c.ParentID.Int64
+		resp.ParentID = &parentID
 	}
 	return resp
 }
@@ -47,7 +48,8 @@ func ToReplyResponse(c db.GetCommentRepliesRow) dto.CommentResponse {
 		AvatarURL:   c.AvatarUrl.String,
 	}
 	if c.ParentID.Valid {
-		resp.ParentID = &c.ParentID.Int32
+		parentID := c.ParentID.Int64
+		resp.ParentID = &parentID
 	}
 	return resp
 }
@@ -74,7 +76,8 @@ func ToCommentWithUserResponse(c db.GetCommentWithUserRow) dto.CommentResponse {
 		AvatarURL:   c.AvatarUrl.String,
 	}
 	if c.ParentID.Valid {
-		resp.ParentID = &c.ParentID.Int32
+		parentID := c.ParentID.Int64
+		resp.ParentID = &parentID
 	}
 	return resp
 }
@@ -91,7 +94,8 @@ func ToCommentWithMovieResponse(c db.GetUserCommentsRow) dto.CommentWithMovieRes
 		UpdatedAt:  c.UpdatedAt.Time,
 	}
 	if c.ParentID.Valid {
-		resp.ParentID = &c.ParentID.Int32
+		parentID := c.ParentID.Int64
+		resp.ParentID = &parentID
 	}
 	return resp
 }

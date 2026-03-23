@@ -292,20 +292,20 @@ type Account struct {
 }
 
 type Activity struct {
-	ID         int32              `json:"id"`
+	ID         int64              `json:"id"`
 	UserID     int32              `json:"user_id"`
 	Action     string             `json:"action"`
 	EntityType EntityType         `json:"entity_type"`
-	EntityID   int32              `json:"entity_id"`
+	EntityID   int64              `json:"entity_id"`
 	Metadata   []byte             `json:"metadata"`
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }
 
 type Comment struct {
-	ID        int32              `json:"id"`
+	ID        int64              `json:"id"`
 	UserID    int32              `json:"user_id"`
 	MovieID   int32              `json:"movie_id"`
-	ParentID  pgtype.Int4        `json:"parent_id"`
+	ParentID  pgtype.Int8        `json:"parent_id"`
 	Content   string             `json:"content"`
 	LikeCount pgtype.Int4        `json:"like_count"`
 	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
@@ -368,7 +368,7 @@ type MovieGenre struct {
 }
 
 type Notification struct {
-	ID        int32              `json:"id"`
+	ID        int64              `json:"id"`
 	UserID    int32              `json:"user_id"`
 	Type      NotificationType   `json:"type"`
 	Title     string             `json:"title"`
@@ -394,7 +394,7 @@ type Person struct {
 }
 
 type Rating struct {
-	ID        int32              `json:"id"`
+	ID        int64              `json:"id"`
 	UserID    int32              `json:"user_id"`
 	MovieID   int32              `json:"movie_id"`
 	Score     int32              `json:"score"`
@@ -403,9 +403,9 @@ type Rating struct {
 }
 
 type Reaction struct {
-	ID        int32              `json:"id"`
+	ID        int64              `json:"id"`
 	UserID    int32              `json:"user_id"`
-	CommentID int32              `json:"comment_id"`
+	CommentID int64              `json:"comment_id"`
 	Type      ReactionType       `json:"type"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }

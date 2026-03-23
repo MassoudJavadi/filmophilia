@@ -8,12 +8,12 @@ import (
 )
 
 type ActivityService interface {
-	CreateActivity(ctx context.Context, userID int32, action, entityType string, entityID int32, metadata map[string]interface{}) error
+	CreateActivity(ctx context.Context, userID int32, action, entityType string, entityID int64, metadata map[string]interface{}) error
 	GetUserActivities(ctx context.Context, userID, limit, offset int32) ([]db.GetUserActivitiesRow, int32, error)
 	GetFollowingActivities(ctx context.Context, userID, limit, offset int32) ([]db.GetFollowingActivitiesRow, int32, error)
-	GetActivitiesByEntity(ctx context.Context, entityType, entityID, limit, offset int32) ([]db.GetActivitiesByEntityRow, error)
+	GetActivitiesByEntity(ctx context.Context, entityType int32, entityID int64, limit, offset int32) ([]db.GetActivitiesByEntityRow, error)
 	DeleteUserActivities(ctx context.Context, userID int32) error
-	DeleteActivityByEntity(ctx context.Context, entityType string, entityID int32) error
+	DeleteActivityByEntity(ctx context.Context, entityType string, entityID int64) error
 }
 
 type activityService struct {
@@ -24,7 +24,7 @@ func NewActivityService(queries *db.Queries) ActivityService {
 	return &activityService{queries: queries}
 }
 
-func (s *activityService) CreateActivity(ctx context.Context, userID int32, action, entityType string, entityID int32, metadata map[string]interface{}) error {
+func (s *activityService) CreateActivity(ctx context.Context, userID int32, action, entityType string, entityID int64, metadata map[string]interface{}) error {
 	// Marshal metadata to JSON
 	var metadataBytes []byte
 	if metadata != nil {
@@ -95,7 +95,7 @@ func (s *activityService) GetFollowingActivities(ctx context.Context, userID, li
 	return activities, count, nil
 }
 
-func (s *activityService) GetActivitiesByEntity(ctx context.Context, entityType, entityID, limit, offset int32) ([]db.GetActivitiesByEntityRow, error) {
+func (s *activityService) GetActivitiesByEntity(ctx context.Context, entityType int32, entityID int64, limit, offset int32) ([]db.GetActivitiesByEntityRow, error) {
 	// Convert entityType int to enum
 	var entityTypeEnum db.EntityType
 	switch entityType {
@@ -121,7 +121,7 @@ func (s *activityService) DeleteUserActivities(ctx context.Context, userID int32
 	return s.queries.DeleteUserActivities(ctx, userID)
 }
 
-func (s *activityService) DeleteActivityByEntity(ctx context.Context, entityType string, entityID int32) error {
+func (s *activityService) DeleteActivityByEntity(ctx context.Context, entityType string, entityID int64) error {
 	var entityTypeEnum db.EntityType
 	switch entityType {
 	case "MOVIE":

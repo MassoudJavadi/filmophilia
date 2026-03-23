@@ -79,7 +79,7 @@ func (s *AuthService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Aut
 }
 
 func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (*dto.AuthResponse, error) {
-	session, err := s.queries.GetSessionByRefreshToken(ctx, pgtype.Text{String: refreshToken, Valid: true})
+	session, err := s.queries.GetSessionByRefreshToken(ctx, refreshToken)
 	if err != nil || time.Now().After(session.ExpiresAt.Time) {
 		return nil, ErrInvalidToken
 	}
@@ -98,7 +98,7 @@ func (s *AuthService) Refresh(ctx context.Context, refreshToken string) (*dto.Au
 }
 
 func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
-	return s.queries.DeleteSessionByRefreshToken(ctx, pgtype.Text{String: refreshToken, Valid: true})
+	return s.queries.DeleteSessionByRefreshToken(ctx, refreshToken)
 }
 
 func (s *AuthService) GetUser(ctx context.Context, userID int32) (db.User, error) {
@@ -114,9 +114,9 @@ func (s *AuthService) issueTokens(ctx context.Context, user db.User) (*dto.AuthR
 
 	refresh := uuid.New().String()
 	_, err = s.queries.CreateSession(ctx, db.CreateSessionParams{
-		UserID:       user.ID,
-		RefreshToken: pgtype.Text{String: refresh, Valid: true},
-		ExpiresAt:    pgtype.Timestamptz{Time: time.Now().Add(token.RefreshTokenDuration), Valid: true},
+		UserID:    user.ID,
+		Digest:    refresh,
+		ExpiresAt: pgtype.Timestamptz{Time: time.Now().Add(token.RefreshTokenDuration), Valid: true},
 	})
 
 	return &dto.AuthResponse{

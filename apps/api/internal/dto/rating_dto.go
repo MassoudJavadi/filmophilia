@@ -7,7 +7,7 @@ type RateMovieRequest struct {
 }
 
 type RatingResponse struct {
-	ID        int32     `json:"id"`
+	ID        int64     `json:"id"`
 	UserID    int32     `json:"user_id"`
 	MovieID   int32     `json:"movie_id"`
 	Score     int32     `json:"score"`
@@ -16,7 +16,7 @@ type RatingResponse struct {
 }
 
 type RatingWithUserResponse struct {
-	ID          int32     `json:"id"`
+	ID          int64     `json:"id"`
 	Score       int32     `json:"score"`
 	CreatedAt   time.Time `json:"created_at"`
 	UserID      int32     `json:"user_id"`
@@ -26,7 +26,7 @@ type RatingWithUserResponse struct {
 }
 
 type RatingWithMovieResponse struct {
-	ID        int32     `json:"id"`
+	ID        int64     `json:"id"`
 	Score     int32     `json:"score"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

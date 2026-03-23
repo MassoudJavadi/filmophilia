@@ -17,7 +17,7 @@ FROM comments
 WHERE parent_id = $1 AND deleted_at IS NULL
 `
 
-func (q *Queries) CountCommentReplies(ctx context.Context, parentID pgtype.Int4) (int32, error) {
+func (q *Queries) CountCommentReplies(ctx context.Context, parentID pgtype.Int8) (int32, error) {
 	row := q.db.QueryRow(ctx, countCommentReplies, parentID)
 	var count int32
 	err := row.Scan(&count)
@@ -46,7 +46,7 @@ RETURNING id, user_id, movie_id, parent_id, content, like_count, deleted_at, cre
 type CreateCommentParams struct {
 	UserID   int32       `json:"user_id"`
 	MovieID  int32       `json:"movie_id"`
-	ParentID pgtype.Int4 `json:"parent_id"`
+	ParentID pgtype.Int8 `json:"parent_id"`
 	Content  string      `json:"content"`
 }
 
@@ -77,7 +77,7 @@ SELECT id, user_id, movie_id, parent_id, content, like_count, deleted_at, create
 WHERE id = $1 AND deleted_at IS NULL
 `
 
-func (q *Queries) GetCommentByID(ctx context.Context, id int32) (Comment, error) {
+func (q *Queries) GetCommentByID(ctx context.Context, id int64) (Comment, error) {
 	row := q.db.QueryRow(ctx, getCommentByID, id)
 	var i Comment
 	err := row.Scan(
@@ -108,16 +108,16 @@ LIMIT $2 OFFSET $3
 `
 
 type GetCommentRepliesParams struct {
-	ParentID pgtype.Int4 `json:"parent_id"`
+	ParentID pgtype.Int8 `json:"parent_id"`
 	Limit    int32       `json:"limit"`
 	Offset   int32       `json:"offset"`
 }
 
 type GetCommentRepliesRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
-	ParentID    pgtype.Int4        `json:"parent_id"`
+	ParentID    pgtype.Int8        `json:"parent_id"`
 	Content     string             `json:"content"`
 	LikeCount   pgtype.Int4        `json:"like_count"`
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
@@ -173,10 +173,10 @@ WHERE c.id = $1 AND c.deleted_at IS NULL
 `
 
 type GetCommentWithUserRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
-	ParentID    pgtype.Int4        `json:"parent_id"`
+	ParentID    pgtype.Int8        `json:"parent_id"`
 	Content     string             `json:"content"`
 	LikeCount   pgtype.Int4        `json:"like_count"`
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
@@ -187,7 +187,7 @@ type GetCommentWithUserRow struct {
 	AvatarUrl   pgtype.Text        `json:"avatar_url"`
 }
 
-func (q *Queries) GetCommentWithUser(ctx context.Context, id int32) (GetCommentWithUserRow, error) {
+func (q *Queries) GetCommentWithUser(ctx context.Context, id int64) (GetCommentWithUserRow, error) {
 	row := q.db.QueryRow(ctx, getCommentWithUser, id)
 	var i GetCommentWithUserRow
 	err := row.Scan(
@@ -230,10 +230,10 @@ type GetMovieCommentsParams struct {
 }
 
 type GetMovieCommentsRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
-	ParentID    pgtype.Int4        `json:"parent_id"`
+	ParentID    pgtype.Int8        `json:"parent_id"`
 	Content     string             `json:"content"`
 	LikeCount   pgtype.Int4        `json:"like_count"`
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
@@ -298,10 +298,10 @@ type GetUserCommentsParams struct {
 }
 
 type GetUserCommentsRow struct {
-	ID         int32              `json:"id"`
+	ID         int64              `json:"id"`
 	UserID     int32              `json:"user_id"`
 	MovieID    int32              `json:"movie_id"`
-	ParentID   pgtype.Int4        `json:"parent_id"`
+	ParentID   pgtype.Int8        `json:"parent_id"`
 	Content    string             `json:"content"`
 	LikeCount  pgtype.Int4        `json:"like_count"`
 	DeletedAt  pgtype.Timestamptz `json:"deleted_at"`
@@ -349,7 +349,7 @@ SET deleted_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
 `
 
-func (q *Queries) SoftDeleteComment(ctx context.Context, id int32) error {
+func (q *Queries) SoftDeleteComment(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, softDeleteComment, id)
 	return err
 }
@@ -362,7 +362,7 @@ RETURNING id, user_id, movie_id, parent_id, content, like_count, deleted_at, cre
 `
 
 type UpdateCommentParams struct {
-	ID      int32  `json:"id"`
+	ID      int64  `json:"id"`
 	Content string `json:"content"`
 }
 

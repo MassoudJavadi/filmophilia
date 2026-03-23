@@ -18,17 +18,17 @@ RETURNING id, user_id, refresh_token, user_agent, ip_address, expires_at, create
 `
 
 type CreateSessionParams struct {
-	UserID       int32              `json:"user_id"`
-	RefreshToken pgtype.Text        `json:"refresh_token"`
-	UserAgent    pgtype.Text        `json:"user_agent"`
-	IpAddress    pgtype.Text        `json:"ip_address"`
-	ExpiresAt    pgtype.Timestamptz `json:"expires_at"`
+	UserID    int32              `json:"user_id"`
+	Digest    string             `json:"digest"`
+	UserAgent pgtype.Text        `json:"user_agent"`
+	IpAddress pgtype.Text        `json:"ip_address"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
 	row := q.db.QueryRow(ctx, createSession,
 		arg.UserID,
-		arg.RefreshToken,
+		arg.Digest,
 		arg.UserAgent,
 		arg.IpAddress,
 		arg.ExpiresAt,
@@ -69,8 +69,8 @@ DELETE FROM sessions
 WHERE refresh_token = 'sha256:' || encode(digest($1, 'sha256'), 'hex')
 `
 
-func (q *Queries) DeleteSessionByRefreshToken(ctx context.Context, refreshToken pgtype.Text) error {
-	_, err := q.db.Exec(ctx, deleteSessionByRefreshToken, refreshToken)
+func (q *Queries) DeleteSessionByRefreshToken(ctx context.Context, digest string) error {
+	_, err := q.db.Exec(ctx, deleteSessionByRefreshToken, digest)
 	return err
 }
 
@@ -108,8 +108,8 @@ WHERE refresh_token = 'sha256:' || encode(digest($1, 'sha256'), 'hex')
 LIMIT 1
 `
 
-func (q *Queries) GetSessionByRefreshToken(ctx context.Context, refreshToken pgtype.Text) (Session, error) {
-	row := q.db.QueryRow(ctx, getSessionByRefreshToken, refreshToken)
+func (q *Queries) GetSessionByRefreshToken(ctx context.Context, digest string) (Session, error) {
+	row := q.db.QueryRow(ctx, getSessionByRefreshToken, digest)
 	var i Session
 	err := row.Scan(
 		&i.ID,
@@ -130,12 +130,12 @@ WHERE id = $1
 `
 
 type UpdateSessionParams struct {
-	ID           pgtype.UUID        `json:"id"`
-	RefreshToken pgtype.Text        `json:"refresh_token"`
-	ExpiresAt    pgtype.Timestamptz `json:"expires_at"`
+	ID        pgtype.UUID        `json:"id"`
+	Digest    string             `json:"digest"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
 }
 
 func (q *Queries) UpdateSession(ctx context.Context, arg UpdateSessionParams) error {
-	_, err := q.db.Exec(ctx, updateSession, arg.ID, arg.RefreshToken, arg.ExpiresAt)
+	_, err := q.db.Exec(ctx, updateSession, arg.ID, arg.Digest, arg.ExpiresAt)
 	return err
 }

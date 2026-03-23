@@ -57,7 +57,7 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 		return
 	}
 
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -70,7 +70,7 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 	}
 
 	userID := c.MustGet("user_id").(int32)
-	parentID := int32(commentID)
+	parentID := commentID
 
 	comment, err := h.commentSvc.Create(c.Request.Context(), userID, int32(movieID), &parentID, req.Content)
 	if err != nil {
@@ -92,13 +92,13 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 }
 
 func (h *CommentHandler) GetComment(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
 	}
 
-	comment, err := h.commentSvc.GetByID(c.Request.Context(), int32(commentID))
+	comment, err := h.commentSvc.GetByID(c.Request.Context(), commentID)
 	if err != nil {
 		if errors.Is(err, service.ErrCommentNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
@@ -134,7 +134,7 @@ func (h *CommentHandler) GetMovieComments(c *gin.Context) {
 }
 
 func (h *CommentHandler) GetReplies(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -144,7 +144,7 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	offset := (page - 1) * limit
 
-	replies, err := h.commentSvc.GetReplies(c.Request.Context(), int32(commentID), int32(limit), int32(offset))
+	replies, err := h.commentSvc.GetReplies(c.Request.Context(), commentID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get replies error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -172,7 +172,7 @@ func (h *CommentHandler) GetMyComments(c *gin.Context) {
 }
 
 func (h *CommentHandler) UpdateComment(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -186,7 +186,7 @@ func (h *CommentHandler) UpdateComment(c *gin.Context) {
 
 	userID := c.MustGet("user_id").(int32)
 
-	comment, err := h.commentSvc.Update(c.Request.Context(), userID, int32(commentID), req.Content)
+	comment, err := h.commentSvc.Update(c.Request.Context(), userID, commentID, req.Content)
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrCommentNotFound):
@@ -204,7 +204,7 @@ func (h *CommentHandler) UpdateComment(c *gin.Context) {
 }
 
 func (h *CommentHandler) DeleteComment(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -212,7 +212,7 @@ func (h *CommentHandler) DeleteComment(c *gin.Context) {
 
 	userID := c.MustGet("user_id").(int32)
 
-	if err := h.commentSvc.Delete(c.Request.Context(), userID, int32(commentID)); err != nil {
+	if err := h.commentSvc.Delete(c.Request.Context(), userID, commentID); err != nil {
 		switch {
 		case errors.Is(err, service.ErrCommentNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})

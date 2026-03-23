@@ -21,7 +21,7 @@ RETURNING id, user_id, comment_id, type, created_at
 
 type AddReactionToCommentParams struct {
 	UserID    int32        `json:"user_id"`
-	CommentID int32        `json:"comment_id"`
+	CommentID int64        `json:"comment_id"`
 	Type      ReactionType `json:"type"`
 }
 
@@ -50,7 +50,7 @@ type CountCommentReactionsByTypeRow struct {
 	Count int32        `json:"count"`
 }
 
-func (q *Queries) CountCommentReactionsByType(ctx context.Context, commentID int32) ([]CountCommentReactionsByTypeRow, error) {
+func (q *Queries) CountCommentReactionsByType(ctx context.Context, commentID int64) ([]CountCommentReactionsByTypeRow, error) {
 	rows, err := q.db.Query(ctx, countCommentReactionsByType, commentID)
 	if err != nil {
 		return nil, err
@@ -84,15 +84,15 @@ LIMIT $2 OFFSET $3
 `
 
 type GetCommentReactionsParams struct {
-	CommentID int32 `json:"comment_id"`
+	CommentID int64 `json:"comment_id"`
 	Limit     int32 `json:"limit"`
 	Offset    int32 `json:"offset"`
 }
 
 type GetCommentReactionsRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
-	CommentID   int32              `json:"comment_id"`
+	CommentID   int64              `json:"comment_id"`
 	Type        ReactionType       `json:"type"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	Username    string             `json:"username"`
@@ -136,7 +136,7 @@ WHERE user_id = $1 AND comment_id = $2
 
 type GetUserReactionOnCommentParams struct {
 	UserID    int32 `json:"user_id"`
-	CommentID int32 `json:"comment_id"`
+	CommentID int64 `json:"comment_id"`
 }
 
 func (q *Queries) GetUserReactionOnComment(ctx context.Context, arg GetUserReactionOnCommentParams) (Reaction, error) {
@@ -159,7 +159,7 @@ WHERE user_id = $1 AND comment_id = $2
 
 type RemoveReactionFromCommentParams struct {
 	UserID    int32 `json:"user_id"`
-	CommentID int32 `json:"comment_id"`
+	CommentID int64 `json:"comment_id"`
 }
 
 func (q *Queries) RemoveReactionFromComment(ctx context.Context, arg RemoveReactionFromCommentParams) error {

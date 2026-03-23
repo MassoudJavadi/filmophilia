@@ -11,9 +11,9 @@ type UpdateCommentRequest struct {
 }
 
 type CommentResponse struct {
-	ID          int32     `json:"id"`
+	ID          int64     `json:"id"`
 	MovieID     int32     `json:"movie_id"`
-	ParentID    *int32    `json:"parent_id,omitempty"`
+	ParentID    *int64    `json:"parent_id,omitempty"`
 	Content     string    `json:"content"`
 	LikeCount   int32     `json:"like_count"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -26,11 +26,11 @@ type CommentResponse struct {
 }
 
 type CommentWithMovieResponse struct {
-	ID         int32     `json:"id"`
+	ID         int64     `json:"id"`
 	MovieID    int32     `json:"movie_id"`
 	MovieTitle string    `json:"movie_title"`
 	MovieSlug  string    `json:"movie_slug"`
-	ParentID   *int32    `json:"parent_id,omitempty"`
+	ParentID   *int64    `json:"parent_id,omitempty"`
 	Content    string    `json:"content"`
 	LikeCount  int32     `json:"like_count"`
 	CreatedAt  time.Time `json:"created_at"`

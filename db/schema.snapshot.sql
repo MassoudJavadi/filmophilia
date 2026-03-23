@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict johDIMyI3oewfH5zzptKG4bGktabYEeKCee7F0WAAa8YSYgH074gRpGtZN98C3P
-
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
 
@@ -310,11 +308,11 @@ ALTER SEQUENCE public.accounts_id_seq OWNED BY public.accounts.id;
 --
 
 CREATE TABLE public.activities (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     user_id integer NOT NULL,
     action character varying(50) NOT NULL,
     entity_type public.entity_type NOT NULL,
-    entity_id integer NOT NULL,
+    entity_id bigint NOT NULL,
     metadata jsonb,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -325,7 +323,7 @@ CREATE TABLE public.activities (
 --
 
 CREATE SEQUENCE public.activities_id_seq
-    AS integer
+    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -345,10 +343,10 @@ ALTER SEQUENCE public.activities_id_seq OWNED BY public.activities.id;
 --
 
 CREATE TABLE public.comments (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     user_id integer NOT NULL,
     movie_id integer NOT NULL,
-    parent_id integer,
+    parent_id bigint,
     content text NOT NULL,
     like_count integer DEFAULT 0,
     deleted_at timestamp with time zone,
@@ -362,7 +360,7 @@ CREATE TABLE public.comments (
 --
 
 CREATE SEQUENCE public.comments_id_seq
-    AS integer
+    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -542,7 +540,7 @@ ALTER SEQUENCE public.movies_id_seq OWNED BY public.movies.id;
 --
 
 CREATE TABLE public.notifications (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     user_id integer NOT NULL,
     type public.notification_type NOT NULL,
     title character varying(255) NOT NULL,
@@ -558,7 +556,7 @@ CREATE TABLE public.notifications (
 --
 
 CREATE SEQUENCE public.notifications_id_seq
-    AS integer
+    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -618,7 +616,7 @@ ALTER SEQUENCE public.persons_id_seq OWNED BY public.persons.id;
 --
 
 CREATE TABLE public.ratings (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     user_id integer NOT NULL,
     movie_id integer NOT NULL,
     score integer NOT NULL,
@@ -633,7 +631,7 @@ CREATE TABLE public.ratings (
 --
 
 CREATE SEQUENCE public.ratings_id_seq
-    AS integer
+    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -653,9 +651,9 @@ ALTER SEQUENCE public.ratings_id_seq OWNED BY public.ratings.id;
 --
 
 CREATE TABLE public.reactions (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     user_id integer NOT NULL,
-    comment_id integer NOT NULL,
+    comment_id bigint NOT NULL,
     type public.reaction_type NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -666,7 +664,7 @@ CREATE TABLE public.reactions (
 --
 
 CREATE SEQUENCE public.reactions_id_seq
-    AS integer
+    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1616,6 +1614,3 @@ ALTER TABLE ONLY public.watchlists
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict johDIMyI3oewfH5zzptKG4bGktabYEeKCee7F0WAAa8YSYgH074gRpGtZN98C3P
-

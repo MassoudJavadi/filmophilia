@@ -80,7 +80,7 @@ type GetMovieRatingsParams struct {
 }
 
 type GetMovieRatingsRow struct {
-	ID          int32              `json:"id"`
+	ID          int64              `json:"id"`
 	UserID      int32              `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
 	Score       int32              `json:"score"`
@@ -165,7 +165,7 @@ type GetUserRatingsParams struct {
 }
 
 type GetUserRatingsRow struct {
-	ID        int32              `json:"id"`
+	ID        int64              `json:"id"`
 	UserID    int32              `json:"user_id"`
 	MovieID   int32              `json:"movie_id"`
 	Score     int32              `json:"score"`

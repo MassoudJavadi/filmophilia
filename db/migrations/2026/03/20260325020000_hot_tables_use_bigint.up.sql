@@ -1,0 +1,16 @@
+ALTER SEQUENCE activities_id_seq AS BIGINT;
+ALTER TABLE activities
+    ALTER COLUMN id TYPE BIGINT,
+    ALTER COLUMN entity_id TYPE BIGINT;
+
+ALTER SEQUENCE notifications_id_seq AS BIGINT;
+ALTER TABLE notifications
+    ALTER COLUMN id TYPE BIGINT;
+
+ALTER SEQUENCE ratings_id_seq AS BIGINT;
+ALTER TABLE ratings
+    ALTER COLUMN id TYPE BIGINT;
+
+ALTER SEQUENCE reactions_id_seq AS BIGINT;
+ALTER TABLE reactions
+    ALTER COLUMN id TYPE BIGINT;

@@ -99,13 +99,13 @@ func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
 	notifIDStr := c.Param("notificationId")
-	notifID, err := strconv.Atoi(notifIDStr)
+	notifID, err := strconv.ParseInt(notifIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid notification id"})
 		return
 	}
 
-	if err := h.notifSvc.MarkNotificationAsRead(c.Request.Context(), userID, int32(notifID)); err != nil {
+	if err := h.notifSvc.MarkNotificationAsRead(c.Request.Context(), userID, notifID); err != nil {
 		switch {
 		case errors.Is(err, service.ErrNotificationNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "notification not found"})
@@ -137,13 +137,13 @@ func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
 	notifIDStr := c.Param("notificationId")
-	notifID, err := strconv.Atoi(notifIDStr)
+	notifID, err := strconv.ParseInt(notifIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid notification id"})
 		return
 	}
 
-	if err := h.notifSvc.DeleteNotification(c.Request.Context(), userID, int32(notifID)); err != nil {
+	if err := h.notifSvc.DeleteNotification(c.Request.Context(), userID, notifID); err != nil {
 		switch {
 		case errors.Is(err, service.ErrNotificationNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "notification not found"})

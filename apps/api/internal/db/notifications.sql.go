@@ -93,7 +93,7 @@ WHERE id = $1 AND user_id = $2
 `
 
 type DeleteNotificationParams struct {
-	ID     int32 `json:"id"`
+	ID     int64 `json:"id"`
 	UserID int32 `json:"user_id"`
 }
 
@@ -120,7 +120,7 @@ WHERE id = $1
 `
 
 // Get a specific notification
-func (q *Queries) GetNotificationByID(ctx context.Context, id int32) (Notification, error) {
+func (q *Queries) GetNotificationByID(ctx context.Context, id int64) (Notification, error) {
 	row := q.db.QueryRow(ctx, getNotificationByID, id)
 	var i Notification
 	err := row.Scan(
@@ -241,7 +241,7 @@ WHERE id = $1 AND user_id = $2
 `
 
 type MarkNotificationAsReadParams struct {
-	ID     int32 `json:"id"`
+	ID     int64 `json:"id"`
 	UserID int32 `json:"user_id"`
 }
 

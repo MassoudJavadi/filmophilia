@@ -7,7 +7,7 @@ type AddReactionRequest struct {
 }
 
 type ReactionResponse struct {
-	ID          int32     `json:"id"`
+	ID          int64     `json:"id"`
 	Type        string    `json:"type"`
 	CreatedAt   time.Time `json:"created_at"`
 	UserID      int32     `json:"user_id"`

@@ -20,10 +20,10 @@ type NotificationService interface {
 	CreateNotification(ctx context.Context, userID int32, notifType, title, content string, metadata map[string]interface{}) error
 	GetUserNotifications(ctx context.Context, userID, limit, offset int32) ([]db.Notification, int32, int32, error)
 	GetUnreadNotifications(ctx context.Context, userID, limit, offset int32) ([]db.Notification, int32, error)
-	GetNotificationByID(ctx context.Context, notificationID int32) (db.Notification, error)
-	MarkNotificationAsRead(ctx context.Context, userID, notificationID int32) error
+	GetNotificationByID(ctx context.Context, notificationID int64) (db.Notification, error)
+	MarkNotificationAsRead(ctx context.Context, userID int32, notificationID int64) error
 	MarkAllAsRead(ctx context.Context, userID int32) error
-	DeleteNotification(ctx context.Context, userID, notificationID int32) error
+	DeleteNotification(ctx context.Context, userID int32, notificationID int64) error
 	DeleteAllNotifications(ctx context.Context, userID int32) error
 	CleanupOldNotifications(ctx context.Context, olderThan time.Time) error
 }
@@ -125,7 +125,7 @@ func (s *notificationService) GetUnreadNotifications(ctx context.Context, userID
 	return notifications, count, nil
 }
 
-func (s *notificationService) GetNotificationByID(ctx context.Context, notificationID int32) (db.Notification, error) {
+func (s *notificationService) GetNotificationByID(ctx context.Context, notificationID int64) (db.Notification, error) {
 	notification, err := s.queries.GetNotificationByID(ctx, notificationID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -136,7 +136,7 @@ func (s *notificationService) GetNotificationByID(ctx context.Context, notificat
 	return notification, nil
 }
 
-func (s *notificationService) MarkNotificationAsRead(ctx context.Context, userID, notificationID int32) error {
+func (s *notificationService) MarkNotificationAsRead(ctx context.Context, userID int32, notificationID int64) error {
 	// Verify notification belongs to user before marking as read
 	notification, err := s.queries.GetNotificationByID(ctx, notificationID)
 	if err != nil {
@@ -160,7 +160,7 @@ func (s *notificationService) MarkAllAsRead(ctx context.Context, userID int32) e
 	return s.queries.MarkAllNotificationsAsRead(ctx, userID)
 }
 
-func (s *notificationService) DeleteNotification(ctx context.Context, userID, notificationID int32) error {
+func (s *notificationService) DeleteNotification(ctx context.Context, userID int32, notificationID int64) error {
 	// Verify notification belongs to user before deleting
 	notification, err := s.queries.GetNotificationByID(ctx, notificationID)
 	if err != nil {

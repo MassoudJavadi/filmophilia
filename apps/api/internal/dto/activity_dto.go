@@ -3,14 +3,14 @@ package dto
 import "time"
 
 type ActivityResponse struct {
-	ID          int32                  `json:"id"`
+	ID          int64                  `json:"id"`
 	UserID      int32                  `json:"user_id"`
 	Username    string                 `json:"username"`
 	DisplayName string                 `json:"display_name,omitempty"`
 	AvatarURL   string                 `json:"avatar_url,omitempty"`
 	Action      string                 `json:"action"`
 	EntityType  string                 `json:"entity_type"`
-	EntityID    int32                  `json:"entity_id"`
+	EntityID    int64                  `json:"entity_id"`
 	Metadata    map[string]interface{} `json:"metadata,omitempty"`
 	CreatedAt   time.Time              `json:"created_at"`
 }
@@ -26,6 +26,6 @@ type ActivityFeedResponse struct {
 type CreateActivityRequest struct {
 	Action     string                 `json:"action" binding:"required"`
 	EntityType string                 `json:"entity_type" binding:"required"`
-	EntityID   int32                  `json:"entity_id" binding:"required"`
+	EntityID   int64                  `json:"entity_id" binding:"required"`
 	Metadata   map[string]interface{} `json:"metadata"`
 }

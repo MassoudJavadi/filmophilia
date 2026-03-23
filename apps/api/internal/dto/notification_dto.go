@@ -3,7 +3,7 @@ package dto
 import "time"
 
 type NotificationResponse struct {
-	ID        int32                  `json:"id"`
+	ID        int64                  `json:"id"`
 	UserID    int32                  `json:"user_id"`
 	Type      string                 `json:"type"`
 	Title     string                 `json:"title"`

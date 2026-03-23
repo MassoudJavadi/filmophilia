@@ -22,7 +22,7 @@ func NewReactionHandler(reactionSvc service.ReactionService) *ReactionHandler {
 }
 
 func (h *ReactionHandler) ReactToComment(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -36,7 +36,7 @@ func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 
 	userID := c.MustGet("user_id").(int32)
 
-	reaction, err := h.reactionSvc.ReactToComment(c.Request.Context(), userID, int32(commentID), db.ReactionType(req.Type))
+	reaction, err := h.reactionSvc.ReactToComment(c.Request.Context(), userID, commentID, db.ReactionType(req.Type))
 	if err != nil {
 		if errors.Is(err, service.ErrCommentNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
@@ -55,7 +55,7 @@ func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 }
 
 func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -63,7 +63,7 @@ func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 
 	userID := c.MustGet("user_id").(int32)
 
-	if err := h.reactionSvc.RemoveCommentReaction(c.Request.Context(), userID, int32(commentID)); err != nil {
+	if err := h.reactionSvc.RemoveCommentReaction(c.Request.Context(), userID, commentID); err != nil {
 		if errors.Is(err, service.ErrReactionNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "reaction not found"})
 			return
@@ -77,7 +77,7 @@ func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 }
 
 func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
@@ -87,7 +87,7 @@ func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	offset := (page - 1) * limit
 
-	reactions, err := h.reactionSvc.GetCommentReactions(c.Request.Context(), int32(commentID), int32(limit), int32(offset))
+	reactions, err := h.reactionSvc.GetCommentReactions(c.Request.Context(), commentID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get comment reactions error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -98,13 +98,13 @@ func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 }
 
 func (h *ReactionHandler) GetCommentReactionSummary(c *gin.Context) {
-	commentID, err := strconv.Atoi(c.Param("commentId"))
+	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
 		return
 	}
 
-	counts, err := h.reactionSvc.GetCommentReactionCounts(c.Request.Context(), int32(commentID))
+	counts, err := h.reactionSvc.GetCommentReactionCounts(c.Request.Context(), commentID)
 	if err != nil {
 		log.Printf("get comment reaction counts error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -117,7 +117,7 @@ func (h *ReactionHandler) GetCommentReactionSummary(c *gin.Context) {
 
 	// If authenticated, include user's reaction
 	if userID, exists := c.Get("user_id"); exists {
-		userReaction, err := h.reactionSvc.GetUserCommentReaction(c.Request.Context(), userID.(int32), int32(commentID))
+		userReaction, err := h.reactionSvc.GetUserCommentReaction(c.Request.Context(), userID.(int32), commentID)
 		if err != nil {
 			log.Printf("get user comment reaction error: %v", err)
 		} else if userReaction != nil {

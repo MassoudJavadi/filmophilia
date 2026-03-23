@@ -17,13 +17,13 @@ var (
 )
 
 type CommentService interface {
-	Create(ctx context.Context, userID, movieID int32, parentID *int32, content string) (db.GetCommentWithUserRow, error)
-	GetByID(ctx context.Context, commentID int32) (db.GetCommentWithUserRow, error)
+	Create(ctx context.Context, userID, movieID int32, parentID *int64, content string) (db.GetCommentWithUserRow, error)
+	GetByID(ctx context.Context, commentID int64) (db.GetCommentWithUserRow, error)
 	GetMovieComments(ctx context.Context, movieID, limit, offset int32) ([]db.GetMovieCommentsRow, error)
-	GetReplies(ctx context.Context, parentID, limit, offset int32) ([]db.GetCommentRepliesRow, error)
+	GetReplies(ctx context.Context, parentID int64, limit, offset int32) ([]db.GetCommentRepliesRow, error)
 	GetUserComments(ctx context.Context, userID, limit, offset int32) ([]db.GetUserCommentsRow, error)
-	Update(ctx context.Context, userID, commentID int32, content string) (db.GetCommentWithUserRow, error)
-	Delete(ctx context.Context, userID, commentID int32) error
+	Update(ctx context.Context, userID int32, commentID int64, content string) (db.GetCommentWithUserRow, error)
+	Delete(ctx context.Context, userID int32, commentID int64) error
 	CountMovieComments(ctx context.Context, movieID int32) (int32, error)
 }
 
@@ -35,7 +35,7 @@ func NewCommentService(queries *db.Queries) CommentService {
 	return &commentService{queries: queries}
 }
 
-func (s *commentService) Create(ctx context.Context, userID, movieID int32, parentID *int32, content string) (db.GetCommentWithUserRow, error) {
+func (s *commentService) Create(ctx context.Context, userID, movieID int32, parentID *int64, content string) (db.GetCommentWithUserRow, error) {
 	if _, err := s.queries.GetMovieByID(ctx, movieID); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return db.GetCommentWithUserRow{}, ErrMovieNotFound
@@ -63,7 +63,7 @@ func (s *commentService) Create(ctx context.Context, userID, movieID int32, pare
 		if parent.MovieID != movieID {
 			return db.GetCommentWithUserRow{}, ErrParentNotFound
 		}
-		params.ParentID = pgtype.Int4{Int32: *parentID, Valid: true}
+		params.ParentID = pgtype.Int8{Int64: *parentID, Valid: true}
 	}
 
 	comment, err := s.queries.CreateComment(ctx, params)
@@ -74,7 +74,7 @@ func (s *commentService) Create(ctx context.Context, userID, movieID int32, pare
 	return s.queries.GetCommentWithUser(ctx, comment.ID)
 }
 
-func (s *commentService) GetByID(ctx context.Context, commentID int32) (db.GetCommentWithUserRow, error) {
+func (s *commentService) GetByID(ctx context.Context, commentID int64) (db.GetCommentWithUserRow, error) {
 	comment, err := s.queries.GetCommentWithUser(ctx, commentID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -93,9 +93,9 @@ func (s *commentService) GetMovieComments(ctx context.Context, movieID, limit, o
 	})
 }
 
-func (s *commentService) GetReplies(ctx context.Context, parentID, limit, offset int32) ([]db.GetCommentRepliesRow, error) {
+func (s *commentService) GetReplies(ctx context.Context, parentID int64, limit, offset int32) ([]db.GetCommentRepliesRow, error) {
 	return s.queries.GetCommentReplies(ctx, db.GetCommentRepliesParams{
-		ParentID: pgtype.Int4{Int32: parentID, Valid: true},
+		ParentID: pgtype.Int8{Int64: parentID, Valid: true},
 		Limit:    limit,
 		Offset:   offset,
 	})
@@ -109,7 +109,7 @@ func (s *commentService) GetUserComments(ctx context.Context, userID, limit, off
 	})
 }
 
-func (s *commentService) Update(ctx context.Context, userID, commentID int32, content string) (db.GetCommentWithUserRow, error) {
+func (s *commentService) Update(ctx context.Context, userID int32, commentID int64, content string) (db.GetCommentWithUserRow, error) {
 	comment, err := s.queries.GetCommentByID(ctx, commentID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -132,7 +132,7 @@ func (s *commentService) Update(ctx context.Context, userID, commentID int32, co
 	return s.queries.GetCommentWithUser(ctx, commentID)
 }
 
-func (s *commentService) Delete(ctx context.Context, userID, commentID int32) error {
+func (s *commentService) Delete(ctx context.Context, userID int32, commentID int64) error {
 	comment, err := s.queries.GetCommentByID(ctx, commentID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
