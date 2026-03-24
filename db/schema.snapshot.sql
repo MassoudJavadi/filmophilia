@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict AQNaffeZnQMP5lkMtDsBYUGgbTgYc8KoGf1LO7SdAHj8jxSfkuMP5aeKhGtlcLf
+\restrict XMZmwbhkNgBc8lykI5NHicXcq6yJoLKgIU634iV58DF12R9iy2ZKJV2c5DDDTu5
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
@@ -120,7 +120,8 @@ CREATE TYPE public.user_status AS ENUM (
     'PENDING',
     'ACTIVE',
     'SUSPENDED',
-    'BANNED'
+    'BANNED',
+    'DELETED'
 );
 
 
@@ -779,7 +780,7 @@ CREATE TABLE public.activities_default (
 
 CREATE TABLE public.comments (
     id bigint NOT NULL,
-    user_id integer NOT NULL,
+    user_id integer,
     movie_id integer NOT NULL,
     parent_id bigint,
     content text NOT NULL,
@@ -1445,7 +1446,7 @@ ALTER SEQUENCE public.persons_id_seq OWNED BY public.persons.id;
 
 CREATE TABLE public.ratings (
     id bigint NOT NULL,
-    user_id integer NOT NULL,
+    user_id integer,
     movie_id integer NOT NULL,
     score integer NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -1572,6 +1573,9 @@ CREATE TABLE public.users (
     is_verified boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    anonymized_at timestamp with time zone,
+    CONSTRAINT users_anonymization_after_deletion_check CHECK (((anonymized_at IS NULL) OR (deleted_at IS NOT NULL))),
     CONSTRAINT users_password_hash_nonempty_chk CHECK (((password_hash IS NULL) OR (length((password_hash)::text) > 0)))
 );
 
@@ -2626,14 +2630,6 @@ ALTER TABLE ONLY public.ratings
 
 
 --
--- Name: ratings ratings_user_id_movie_id_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.ratings
-    ADD CONSTRAINT ratings_user_id_movie_id_key UNIQUE (user_id, movie_id);
-
-
---
 -- Name: reactions reactions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3104,6 +3100,13 @@ CREATE INDEX comments_user_created_active_idx ON public.comments USING btree (us
 
 
 --
+-- Name: comments_user_id_active_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX comments_user_id_active_idx ON public.comments USING btree (user_id) WHERE (user_id IS NOT NULL);
+
+
+--
 -- Name: credits_department_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3384,6 +3387,13 @@ CREATE INDEX ratings_movie_id_idx ON public.ratings USING btree (movie_id);
 
 
 --
+-- Name: ratings_user_movie_unique_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ratings_user_movie_unique_idx ON public.ratings USING btree (user_id, movie_id) WHERE (user_id IS NOT NULL);
+
+
+--
 -- Name: reactions_comment_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3416,6 +3426,20 @@ CREATE INDEX sessions_user_id_idx ON public.sessions USING btree (user_id);
 --
 
 CREATE INDEX user_status_logs_user_idx ON public.user_status_logs USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: users_active_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX users_active_idx ON public.users USING btree (id) WHERE (deleted_at IS NULL);
+
+
+--
+-- Name: users_deleted_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX users_deleted_at_idx ON public.users USING btree (deleted_at) WHERE (deleted_at IS NOT NULL);
 
 
 --
@@ -4442,7 +4466,7 @@ ALTER TABLE ONLY public.comments
 --
 
 ALTER TABLE ONLY public.comments
-    ADD CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
 
 --
@@ -4514,7 +4538,7 @@ ALTER TABLE ONLY public.ratings
 --
 
 ALTER TABLE ONLY public.ratings
-    ADD CONSTRAINT ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE SET NULL;
 
 
 --
@@ -4577,5 +4601,5 @@ ALTER TABLE ONLY public.watchlists
 -- PostgreSQL database dump complete
 --
 
-\unrestrict AQNaffeZnQMP5lkMtDsBYUGgbTgYc8KoGf1LO7SdAHj8jxSfkuMP5aeKhGtlcLf
+\unrestrict XMZmwbhkNgBc8lykI5NHicXcq6yJoLKgIU634iV58DF12R9iy2ZKJV2c5DDDTu5
 
