@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 1TcVJ5TngzjjxM1z2t2hqTfxy26yXS1GWnNXsnCe2wes4FJq1NkUJIzyix4S8fl
+\restrict AQNaffeZnQMP5lkMtDsBYUGgbTgYc8KoGf1LO7SdAHj8jxSfkuMP5aeKhGtlcLf
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
@@ -371,21 +371,6 @@ ALTER SEQUENCE public.accounts_id_seq OWNED BY public.accounts.id;
 
 
 --
--- Name: activities; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.activities (
-    id bigint NOT NULL,
-    user_id integer NOT NULL,
-    action character varying(50) NOT NULL,
-    entity_type public.entity_type NOT NULL,
-    entity_id bigint NOT NULL,
-    metadata jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
 -- Name: activities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -398,10 +383,394 @@ CREATE SEQUENCE public.activities_id_seq
 
 
 --
--- Name: activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: activities; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.activities_id_seq OWNED BY public.activities.id;
+CREATE TABLE public.activities (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+)
+PARTITION BY RANGE (created_at);
+
+
+--
+-- Name: activities_2026_01; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_01 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_02; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_02 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_03; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_03 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_04; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_04 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_05; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_05 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_06; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_06 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_07; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_07 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_08; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_08 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_09; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_09 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_10; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_10 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_11; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_11 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2026_12; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2026_12 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_01; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_01 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_02; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_02 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_03; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_03 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_04; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_04 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_05; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_05 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_06; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_06 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_07; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_07 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_08; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_08 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_09; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_09 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_10; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_10 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_11; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_11 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_2027_12; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_2027_12 (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: activities_default; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.activities_default (
+    id bigint DEFAULT nextval('public.activities_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    action character varying(50) NOT NULL,
+    entity_type public.entity_type NOT NULL,
+    entity_id bigint NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
 
 
 --
@@ -602,22 +971,6 @@ ALTER SEQUENCE public.movies_id_seq OWNED BY public.movies.id;
 
 
 --
--- Name: notifications; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.notifications (
-    id bigint NOT NULL,
-    user_id integer NOT NULL,
-    type public.notification_type NOT NULL,
-    title character varying(255) NOT NULL,
-    content text,
-    is_read boolean DEFAULT false NOT NULL,
-    metadata jsonb,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
 -- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -630,10 +983,420 @@ CREATE SEQUENCE public.notifications_id_seq
 
 
 --
--- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: notifications; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
+CREATE TABLE public.notifications (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+)
+PARTITION BY RANGE (created_at);
+
+
+--
+-- Name: notifications_2026_01; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_01 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_02; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_02 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_03; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_03 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_04; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_04 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_05; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_05 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_06; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_06 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_07; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_07 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_08; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_08 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_09; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_09 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_10; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_10 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_11; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_11 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2026_12; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2026_12 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_01; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_01 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_02; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_02 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_03; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_03 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_04; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_04 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_05; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_05 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_06; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_06 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_07; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_07 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_08; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_08 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_09; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_09 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_10; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_10 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_11; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_11 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_2027_12; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_2027_12 (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: notifications_default; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.notifications_default (
+    id bigint DEFAULT nextval('public.notifications_id_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    type public.notification_type NOT NULL,
+    title character varying(255) NOT NULL,
+    content text,
+    is_read boolean DEFAULT false NOT NULL,
+    metadata jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
 
 
 --
@@ -869,17 +1632,360 @@ ALTER SEQUENCE public.watchlists_id_seq OWNED BY public.watchlists.id;
 
 
 --
+-- Name: activities_2026_01; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_01 FOR VALUES FROM ('2026-01-01 00:00:00+00') TO ('2026-02-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_02; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_02 FOR VALUES FROM ('2026-02-01 00:00:00+00') TO ('2026-03-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_03; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_03 FOR VALUES FROM ('2026-03-01 00:00:00+00') TO ('2026-04-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_04; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_04 FOR VALUES FROM ('2026-04-01 00:00:00+00') TO ('2026-05-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_05; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_05 FOR VALUES FROM ('2026-05-01 00:00:00+00') TO ('2026-06-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_06; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_06 FOR VALUES FROM ('2026-06-01 00:00:00+00') TO ('2026-07-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_07; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_07 FOR VALUES FROM ('2026-07-01 00:00:00+00') TO ('2026-08-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_08; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_08 FOR VALUES FROM ('2026-08-01 00:00:00+00') TO ('2026-09-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_09; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_09 FOR VALUES FROM ('2026-09-01 00:00:00+00') TO ('2026-10-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_10; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_10 FOR VALUES FROM ('2026-10-01 00:00:00+00') TO ('2026-11-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_11; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_11 FOR VALUES FROM ('2026-11-01 00:00:00+00') TO ('2026-12-01 00:00:00+00');
+
+
+--
+-- Name: activities_2026_12; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2026_12 FOR VALUES FROM ('2026-12-01 00:00:00+00') TO ('2027-01-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_01; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_01 FOR VALUES FROM ('2027-01-01 00:00:00+00') TO ('2027-02-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_02; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_02 FOR VALUES FROM ('2027-02-01 00:00:00+00') TO ('2027-03-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_03; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_03 FOR VALUES FROM ('2027-03-01 00:00:00+00') TO ('2027-04-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_04; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_04 FOR VALUES FROM ('2027-04-01 00:00:00+00') TO ('2027-05-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_05; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_05 FOR VALUES FROM ('2027-05-01 00:00:00+00') TO ('2027-06-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_06; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_06 FOR VALUES FROM ('2027-06-01 00:00:00+00') TO ('2027-07-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_07; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_07 FOR VALUES FROM ('2027-07-01 00:00:00+00') TO ('2027-08-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_08; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_08 FOR VALUES FROM ('2027-08-01 00:00:00+00') TO ('2027-09-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_09; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_09 FOR VALUES FROM ('2027-09-01 00:00:00+00') TO ('2027-10-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_10; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_10 FOR VALUES FROM ('2027-10-01 00:00:00+00') TO ('2027-11-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_11; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_11 FOR VALUES FROM ('2027-11-01 00:00:00+00') TO ('2027-12-01 00:00:00+00');
+
+
+--
+-- Name: activities_2027_12; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_2027_12 FOR VALUES FROM ('2027-12-01 00:00:00+00') TO ('2028-01-01 00:00:00+00');
+
+
+--
+-- Name: activities_default; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities ATTACH PARTITION public.activities_default DEFAULT;
+
+
+--
+-- Name: notifications_2026_01; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_01 FOR VALUES FROM ('2026-01-01 00:00:00+00') TO ('2026-02-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_02; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_02 FOR VALUES FROM ('2026-02-01 00:00:00+00') TO ('2026-03-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_03; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_03 FOR VALUES FROM ('2026-03-01 00:00:00+00') TO ('2026-04-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_04; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_04 FOR VALUES FROM ('2026-04-01 00:00:00+00') TO ('2026-05-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_05; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_05 FOR VALUES FROM ('2026-05-01 00:00:00+00') TO ('2026-06-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_06; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_06 FOR VALUES FROM ('2026-06-01 00:00:00+00') TO ('2026-07-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_07; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_07 FOR VALUES FROM ('2026-07-01 00:00:00+00') TO ('2026-08-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_08; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_08 FOR VALUES FROM ('2026-08-01 00:00:00+00') TO ('2026-09-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_09; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_09 FOR VALUES FROM ('2026-09-01 00:00:00+00') TO ('2026-10-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_10; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_10 FOR VALUES FROM ('2026-10-01 00:00:00+00') TO ('2026-11-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_11; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_11 FOR VALUES FROM ('2026-11-01 00:00:00+00') TO ('2026-12-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2026_12; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2026_12 FOR VALUES FROM ('2026-12-01 00:00:00+00') TO ('2027-01-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_01; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_01 FOR VALUES FROM ('2027-01-01 00:00:00+00') TO ('2027-02-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_02; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_02 FOR VALUES FROM ('2027-02-01 00:00:00+00') TO ('2027-03-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_03; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_03 FOR VALUES FROM ('2027-03-01 00:00:00+00') TO ('2027-04-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_04; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_04 FOR VALUES FROM ('2027-04-01 00:00:00+00') TO ('2027-05-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_05; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_05 FOR VALUES FROM ('2027-05-01 00:00:00+00') TO ('2027-06-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_06; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_06 FOR VALUES FROM ('2027-06-01 00:00:00+00') TO ('2027-07-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_07; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_07 FOR VALUES FROM ('2027-07-01 00:00:00+00') TO ('2027-08-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_08; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_08 FOR VALUES FROM ('2027-08-01 00:00:00+00') TO ('2027-09-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_09; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_09 FOR VALUES FROM ('2027-09-01 00:00:00+00') TO ('2027-10-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_10; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_10 FOR VALUES FROM ('2027-10-01 00:00:00+00') TO ('2027-11-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_11; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_11 FOR VALUES FROM ('2027-11-01 00:00:00+00') TO ('2027-12-01 00:00:00+00');
+
+
+--
+-- Name: notifications_2027_12; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_2027_12 FOR VALUES FROM ('2027-12-01 00:00:00+00') TO ('2028-01-01 00:00:00+00');
+
+
+--
+-- Name: notifications_default; Type: TABLE ATTACH; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications ATTACH PARTITION public.notifications_default DEFAULT;
+
+
+--
 -- Name: accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.accounts ALTER COLUMN id SET DEFAULT nextval('public.accounts_id_seq'::regclass);
-
-
---
--- Name: activities id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.activities ALTER COLUMN id SET DEFAULT nextval('public.activities_id_seq'::regclass);
 
 
 --
@@ -915,13 +2021,6 @@ ALTER TABLE ONLY public.genres ALTER COLUMN id SET DEFAULT nextval('public.genre
 --
 
 ALTER TABLE ONLY public.movies ALTER COLUMN id SET DEFAULT nextval('public.movies_id_seq'::regclass);
-
-
---
--- Name: notifications id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('public.notifications_id_seq'::regclass);
 
 
 --
@@ -987,7 +2086,207 @@ ALTER TABLE ONLY public.accounts
 --
 
 ALTER TABLE ONLY public.activities
-    ADD CONSTRAINT activities_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT activities_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_01 activities_2026_01_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_01
+    ADD CONSTRAINT activities_2026_01_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_02 activities_2026_02_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_02
+    ADD CONSTRAINT activities_2026_02_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_03 activities_2026_03_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_03
+    ADD CONSTRAINT activities_2026_03_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_04 activities_2026_04_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_04
+    ADD CONSTRAINT activities_2026_04_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_05 activities_2026_05_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_05
+    ADD CONSTRAINT activities_2026_05_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_06 activities_2026_06_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_06
+    ADD CONSTRAINT activities_2026_06_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_07 activities_2026_07_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_07
+    ADD CONSTRAINT activities_2026_07_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_08 activities_2026_08_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_08
+    ADD CONSTRAINT activities_2026_08_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_09 activities_2026_09_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_09
+    ADD CONSTRAINT activities_2026_09_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_10 activities_2026_10_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_10
+    ADD CONSTRAINT activities_2026_10_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_11 activities_2026_11_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_11
+    ADD CONSTRAINT activities_2026_11_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2026_12 activities_2026_12_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2026_12
+    ADD CONSTRAINT activities_2026_12_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_01 activities_2027_01_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_01
+    ADD CONSTRAINT activities_2027_01_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_02 activities_2027_02_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_02
+    ADD CONSTRAINT activities_2027_02_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_03 activities_2027_03_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_03
+    ADD CONSTRAINT activities_2027_03_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_04 activities_2027_04_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_04
+    ADD CONSTRAINT activities_2027_04_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_05 activities_2027_05_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_05
+    ADD CONSTRAINT activities_2027_05_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_06 activities_2027_06_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_06
+    ADD CONSTRAINT activities_2027_06_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_07 activities_2027_07_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_07
+    ADD CONSTRAINT activities_2027_07_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_08 activities_2027_08_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_08
+    ADD CONSTRAINT activities_2027_08_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_09 activities_2027_09_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_09
+    ADD CONSTRAINT activities_2027_09_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_10 activities_2027_10_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_10
+    ADD CONSTRAINT activities_2027_10_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_11 activities_2027_11_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_11
+    ADD CONSTRAINT activities_2027_11_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_2027_12 activities_2027_12_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_2027_12
+    ADD CONSTRAINT activities_2027_12_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: activities_default activities_default_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.activities_default
+    ADD CONSTRAINT activities_default_pkey PRIMARY KEY (id, created_at);
 
 
 --
@@ -1091,7 +2390,207 @@ ALTER TABLE ONLY public.movies
 --
 
 ALTER TABLE ONLY public.notifications
-    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_01 notifications_2026_01_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_01
+    ADD CONSTRAINT notifications_2026_01_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_02 notifications_2026_02_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_02
+    ADD CONSTRAINT notifications_2026_02_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_03 notifications_2026_03_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_03
+    ADD CONSTRAINT notifications_2026_03_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_04 notifications_2026_04_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_04
+    ADD CONSTRAINT notifications_2026_04_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_05 notifications_2026_05_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_05
+    ADD CONSTRAINT notifications_2026_05_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_06 notifications_2026_06_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_06
+    ADD CONSTRAINT notifications_2026_06_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_07 notifications_2026_07_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_07
+    ADD CONSTRAINT notifications_2026_07_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_08 notifications_2026_08_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_08
+    ADD CONSTRAINT notifications_2026_08_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_09 notifications_2026_09_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_09
+    ADD CONSTRAINT notifications_2026_09_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_10 notifications_2026_10_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_10
+    ADD CONSTRAINT notifications_2026_10_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_11 notifications_2026_11_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_11
+    ADD CONSTRAINT notifications_2026_11_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2026_12 notifications_2026_12_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2026_12
+    ADD CONSTRAINT notifications_2026_12_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_01 notifications_2027_01_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_01
+    ADD CONSTRAINT notifications_2027_01_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_02 notifications_2027_02_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_02
+    ADD CONSTRAINT notifications_2027_02_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_03 notifications_2027_03_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_03
+    ADD CONSTRAINT notifications_2027_03_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_04 notifications_2027_04_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_04
+    ADD CONSTRAINT notifications_2027_04_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_05 notifications_2027_05_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_05
+    ADD CONSTRAINT notifications_2027_05_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_06 notifications_2027_06_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_06
+    ADD CONSTRAINT notifications_2027_06_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_07 notifications_2027_07_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_07
+    ADD CONSTRAINT notifications_2027_07_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_08 notifications_2027_08_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_08
+    ADD CONSTRAINT notifications_2027_08_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_09 notifications_2027_09_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_09
+    ADD CONSTRAINT notifications_2027_09_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_10 notifications_2027_10_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_10
+    ADD CONSTRAINT notifications_2027_10_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_11 notifications_2027_11_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_11
+    ADD CONSTRAINT notifications_2027_11_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_2027_12 notifications_2027_12_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_2027_12
+    ADD CONSTRAINT notifications_2027_12_pkey PRIMARY KEY (id, created_at);
+
+
+--
+-- Name: notifications_default notifications_default_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.notifications_default
+    ADD CONSTRAINT notifications_default_pkey PRIMARY KEY (id, created_at);
 
 
 --
@@ -1209,14 +2708,364 @@ CREATE INDEX accounts_user_id_idx ON public.accounts USING btree (user_id);
 -- Name: activities_entity_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX activities_entity_idx ON public.activities USING btree (entity_type, entity_id);
+CREATE INDEX activities_entity_idx ON ONLY public.activities USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_01_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_01_entity_type_entity_id_idx ON public.activities_2026_01 USING btree (entity_type, entity_id);
 
 
 --
 -- Name: activities_user_created_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX activities_user_created_idx ON public.activities USING btree (user_id, created_at DESC);
+CREATE INDEX activities_user_created_idx ON ONLY public.activities USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_01_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_01_user_id_created_at_idx ON public.activities_2026_01 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_02_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_02_entity_type_entity_id_idx ON public.activities_2026_02 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_02_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_02_user_id_created_at_idx ON public.activities_2026_02 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_03_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_03_entity_type_entity_id_idx ON public.activities_2026_03 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_03_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_03_user_id_created_at_idx ON public.activities_2026_03 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_04_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_04_entity_type_entity_id_idx ON public.activities_2026_04 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_04_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_04_user_id_created_at_idx ON public.activities_2026_04 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_05_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_05_entity_type_entity_id_idx ON public.activities_2026_05 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_05_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_05_user_id_created_at_idx ON public.activities_2026_05 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_06_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_06_entity_type_entity_id_idx ON public.activities_2026_06 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_06_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_06_user_id_created_at_idx ON public.activities_2026_06 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_07_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_07_entity_type_entity_id_idx ON public.activities_2026_07 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_07_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_07_user_id_created_at_idx ON public.activities_2026_07 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_08_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_08_entity_type_entity_id_idx ON public.activities_2026_08 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_08_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_08_user_id_created_at_idx ON public.activities_2026_08 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_09_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_09_entity_type_entity_id_idx ON public.activities_2026_09 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_09_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_09_user_id_created_at_idx ON public.activities_2026_09 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_10_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_10_entity_type_entity_id_idx ON public.activities_2026_10 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_10_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_10_user_id_created_at_idx ON public.activities_2026_10 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_11_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_11_entity_type_entity_id_idx ON public.activities_2026_11 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_11_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_11_user_id_created_at_idx ON public.activities_2026_11 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2026_12_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_12_entity_type_entity_id_idx ON public.activities_2026_12 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2026_12_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2026_12_user_id_created_at_idx ON public.activities_2026_12 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_01_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_01_entity_type_entity_id_idx ON public.activities_2027_01 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_01_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_01_user_id_created_at_idx ON public.activities_2027_01 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_02_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_02_entity_type_entity_id_idx ON public.activities_2027_02 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_02_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_02_user_id_created_at_idx ON public.activities_2027_02 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_03_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_03_entity_type_entity_id_idx ON public.activities_2027_03 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_03_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_03_user_id_created_at_idx ON public.activities_2027_03 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_04_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_04_entity_type_entity_id_idx ON public.activities_2027_04 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_04_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_04_user_id_created_at_idx ON public.activities_2027_04 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_05_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_05_entity_type_entity_id_idx ON public.activities_2027_05 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_05_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_05_user_id_created_at_idx ON public.activities_2027_05 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_06_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_06_entity_type_entity_id_idx ON public.activities_2027_06 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_06_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_06_user_id_created_at_idx ON public.activities_2027_06 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_07_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_07_entity_type_entity_id_idx ON public.activities_2027_07 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_07_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_07_user_id_created_at_idx ON public.activities_2027_07 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_08_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_08_entity_type_entity_id_idx ON public.activities_2027_08 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_08_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_08_user_id_created_at_idx ON public.activities_2027_08 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_09_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_09_entity_type_entity_id_idx ON public.activities_2027_09 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_09_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_09_user_id_created_at_idx ON public.activities_2027_09 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_10_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_10_entity_type_entity_id_idx ON public.activities_2027_10 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_10_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_10_user_id_created_at_idx ON public.activities_2027_10 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_11_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_11_entity_type_entity_id_idx ON public.activities_2027_11 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_11_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_11_user_id_created_at_idx ON public.activities_2027_11 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_2027_12_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_12_entity_type_entity_id_idx ON public.activities_2027_12 USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_2027_12_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_2027_12_user_id_created_at_idx ON public.activities_2027_12 USING btree (user_id, created_at DESC);
+
+
+--
+-- Name: activities_default_entity_type_entity_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_default_entity_type_entity_id_idx ON public.activities_default USING btree (entity_type, entity_id);
+
+
+--
+-- Name: activities_default_user_id_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX activities_default_user_id_created_at_idx ON public.activities_default USING btree (user_id, created_at DESC);
 
 
 --
@@ -1335,7 +3184,182 @@ CREATE INDEX movies_title_trgm_idx ON public.movies USING gin (title public.gin_
 -- Name: notifications_user_unread_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX notifications_user_unread_idx ON public.notifications USING btree (user_id, is_read, created_at DESC);
+CREATE INDEX notifications_user_unread_idx ON ONLY public.notifications USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_01_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_01_user_id_is_read_created_at_idx ON public.notifications_2026_01 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_02_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_02_user_id_is_read_created_at_idx ON public.notifications_2026_02 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_03_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_03_user_id_is_read_created_at_idx ON public.notifications_2026_03 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_04_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_04_user_id_is_read_created_at_idx ON public.notifications_2026_04 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_05_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_05_user_id_is_read_created_at_idx ON public.notifications_2026_05 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_06_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_06_user_id_is_read_created_at_idx ON public.notifications_2026_06 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_07_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_07_user_id_is_read_created_at_idx ON public.notifications_2026_07 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_08_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_08_user_id_is_read_created_at_idx ON public.notifications_2026_08 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_09_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_09_user_id_is_read_created_at_idx ON public.notifications_2026_09 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_10_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_10_user_id_is_read_created_at_idx ON public.notifications_2026_10 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_11_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_11_user_id_is_read_created_at_idx ON public.notifications_2026_11 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2026_12_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2026_12_user_id_is_read_created_at_idx ON public.notifications_2026_12 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_01_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_01_user_id_is_read_created_at_idx ON public.notifications_2027_01 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_02_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_02_user_id_is_read_created_at_idx ON public.notifications_2027_02 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_03_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_03_user_id_is_read_created_at_idx ON public.notifications_2027_03 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_04_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_04_user_id_is_read_created_at_idx ON public.notifications_2027_04 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_05_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_05_user_id_is_read_created_at_idx ON public.notifications_2027_05 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_06_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_06_user_id_is_read_created_at_idx ON public.notifications_2027_06 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_07_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_07_user_id_is_read_created_at_idx ON public.notifications_2027_07 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_08_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_08_user_id_is_read_created_at_idx ON public.notifications_2027_08 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_09_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_09_user_id_is_read_created_at_idx ON public.notifications_2027_09 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_10_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_10_user_id_is_read_created_at_idx ON public.notifications_2027_10 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_11_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_11_user_id_is_read_created_at_idx ON public.notifications_2027_11 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_2027_12_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_2027_12_user_id_is_read_created_at_idx ON public.notifications_2027_12 USING btree (user_id, is_read, created_at DESC);
+
+
+--
+-- Name: notifications_default_user_id_is_read_created_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX notifications_default_user_id_is_read_created_at_idx ON public.notifications_default USING btree (user_id, is_read, created_at DESC);
 
 
 --
@@ -1406,6 +3430,881 @@ CREATE INDEX users_status_idx ON public.users USING btree (status);
 --
 
 CREATE INDEX watchlists_user_rank_idx ON public.watchlists USING btree (user_id, rank_position);
+
+
+--
+-- Name: activities_2026_01_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_01_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_01_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_01_pkey;
+
+
+--
+-- Name: activities_2026_01_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_01_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_02_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_02_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_02_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_02_pkey;
+
+
+--
+-- Name: activities_2026_02_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_02_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_03_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_03_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_03_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_03_pkey;
+
+
+--
+-- Name: activities_2026_03_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_03_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_04_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_04_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_04_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_04_pkey;
+
+
+--
+-- Name: activities_2026_04_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_04_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_05_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_05_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_05_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_05_pkey;
+
+
+--
+-- Name: activities_2026_05_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_05_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_06_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_06_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_06_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_06_pkey;
+
+
+--
+-- Name: activities_2026_06_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_06_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_07_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_07_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_07_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_07_pkey;
+
+
+--
+-- Name: activities_2026_07_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_07_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_08_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_08_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_08_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_08_pkey;
+
+
+--
+-- Name: activities_2026_08_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_08_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_09_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_09_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_09_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_09_pkey;
+
+
+--
+-- Name: activities_2026_09_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_09_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_10_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_10_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_10_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_10_pkey;
+
+
+--
+-- Name: activities_2026_10_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_10_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_11_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_11_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_11_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_11_pkey;
+
+
+--
+-- Name: activities_2026_11_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_11_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2026_12_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2026_12_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2026_12_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2026_12_pkey;
+
+
+--
+-- Name: activities_2026_12_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2026_12_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_01_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_01_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_01_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_01_pkey;
+
+
+--
+-- Name: activities_2027_01_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_01_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_02_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_02_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_02_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_02_pkey;
+
+
+--
+-- Name: activities_2027_02_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_02_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_03_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_03_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_03_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_03_pkey;
+
+
+--
+-- Name: activities_2027_03_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_03_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_04_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_04_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_04_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_04_pkey;
+
+
+--
+-- Name: activities_2027_04_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_04_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_05_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_05_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_05_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_05_pkey;
+
+
+--
+-- Name: activities_2027_05_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_05_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_06_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_06_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_06_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_06_pkey;
+
+
+--
+-- Name: activities_2027_06_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_06_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_07_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_07_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_07_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_07_pkey;
+
+
+--
+-- Name: activities_2027_07_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_07_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_08_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_08_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_08_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_08_pkey;
+
+
+--
+-- Name: activities_2027_08_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_08_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_09_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_09_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_09_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_09_pkey;
+
+
+--
+-- Name: activities_2027_09_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_09_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_10_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_10_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_10_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_10_pkey;
+
+
+--
+-- Name: activities_2027_10_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_10_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_11_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_11_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_11_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_11_pkey;
+
+
+--
+-- Name: activities_2027_11_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_11_user_id_created_at_idx;
+
+
+--
+-- Name: activities_2027_12_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_2027_12_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_2027_12_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_2027_12_pkey;
+
+
+--
+-- Name: activities_2027_12_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_2027_12_user_id_created_at_idx;
+
+
+--
+-- Name: activities_default_entity_type_entity_id_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_entity_idx ATTACH PARTITION public.activities_default_entity_type_entity_id_idx;
+
+
+--
+-- Name: activities_default_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_pkey ATTACH PARTITION public.activities_default_pkey;
+
+
+--
+-- Name: activities_default_user_id_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.activities_user_created_idx ATTACH PARTITION public.activities_default_user_id_created_at_idx;
+
+
+--
+-- Name: notifications_2026_01_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_01_pkey;
+
+
+--
+-- Name: notifications_2026_01_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_01_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_02_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_02_pkey;
+
+
+--
+-- Name: notifications_2026_02_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_02_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_03_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_03_pkey;
+
+
+--
+-- Name: notifications_2026_03_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_03_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_04_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_04_pkey;
+
+
+--
+-- Name: notifications_2026_04_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_04_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_05_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_05_pkey;
+
+
+--
+-- Name: notifications_2026_05_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_05_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_06_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_06_pkey;
+
+
+--
+-- Name: notifications_2026_06_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_06_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_07_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_07_pkey;
+
+
+--
+-- Name: notifications_2026_07_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_07_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_08_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_08_pkey;
+
+
+--
+-- Name: notifications_2026_08_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_08_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_09_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_09_pkey;
+
+
+--
+-- Name: notifications_2026_09_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_09_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_10_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_10_pkey;
+
+
+--
+-- Name: notifications_2026_10_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_10_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_11_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_11_pkey;
+
+
+--
+-- Name: notifications_2026_11_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_11_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2026_12_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2026_12_pkey;
+
+
+--
+-- Name: notifications_2026_12_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2026_12_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_01_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_01_pkey;
+
+
+--
+-- Name: notifications_2027_01_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_01_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_02_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_02_pkey;
+
+
+--
+-- Name: notifications_2027_02_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_02_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_03_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_03_pkey;
+
+
+--
+-- Name: notifications_2027_03_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_03_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_04_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_04_pkey;
+
+
+--
+-- Name: notifications_2027_04_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_04_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_05_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_05_pkey;
+
+
+--
+-- Name: notifications_2027_05_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_05_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_06_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_06_pkey;
+
+
+--
+-- Name: notifications_2027_06_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_06_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_07_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_07_pkey;
+
+
+--
+-- Name: notifications_2027_07_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_07_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_08_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_08_pkey;
+
+
+--
+-- Name: notifications_2027_08_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_08_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_09_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_09_pkey;
+
+
+--
+-- Name: notifications_2027_09_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_09_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_10_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_10_pkey;
+
+
+--
+-- Name: notifications_2027_10_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_10_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_11_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_11_pkey;
+
+
+--
+-- Name: notifications_2027_11_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_11_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_2027_12_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_2027_12_pkey;
+
+
+--
+-- Name: notifications_2027_12_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_2027_12_user_id_is_read_created_at_idx;
+
+
+--
+-- Name: notifications_default_pkey; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_pkey ATTACH PARTITION public.notifications_default_pkey;
+
+
+--
+-- Name: notifications_default_user_id_is_read_created_at_idx; Type: INDEX ATTACH; Schema: public; Owner: -
+--
+
+ALTER INDEX public.notifications_user_unread_idx ATTACH PARTITION public.notifications_default_user_id_is_read_created_at_idx;
 
 
 --
@@ -1518,7 +4417,7 @@ ALTER TABLE ONLY public.accounts
 -- Name: activities activities_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.activities
+ALTER TABLE public.activities
     ADD CONSTRAINT activities_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
@@ -1598,7 +4497,7 @@ ALTER TABLE ONLY public.movie_genres
 -- Name: notifications notifications_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.notifications
+ALTER TABLE public.notifications
     ADD CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
@@ -1678,5 +4577,5 @@ ALTER TABLE ONLY public.watchlists
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 1TcVJ5TngzjjxM1z2t2hqTfxy26yXS1GWnNXsnCe2wes4FJq1NkUJIzyix4S8fl
+\unrestrict AQNaffeZnQMP5lkMtDsBYUGgbTgYc8KoGf1LO7SdAHj8jxSfkuMP5aeKhGtlcLf
 
