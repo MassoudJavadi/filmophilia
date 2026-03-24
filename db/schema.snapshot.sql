@@ -2,6 +2,8 @@
 -- PostgreSQL database dump
 --
 
+\restrict 1TcVJ5TngzjjxM1z2t2hqTfxy26yXS1GWnNXsnCe2wes4FJq1NkUJIzyix4S8fl
+
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
 
@@ -192,32 +194,50 @@ CREATE FUNCTION public.update_like_counts() RETURNS trigger
     AS $$
 BEGIN
     IF TG_OP = 'DELETE' THEN
-        UPDATE comments SET like_count = (
-            SELECT COUNT(*) FROM reactions
-            WHERE comment_id = OLD.comment_id AND type = 'LIKE'
-        ) WHERE id = OLD.comment_id;
-        RETURN OLD;
-    ELSIF TG_OP = 'UPDATE' THEN
-        -- Handle reaction type changes (e.g., LIKE -> LOVE)
-        -- Update old comment if comment_id changed (unlikely but safe)
-        IF OLD.comment_id IS DISTINCT FROM NEW.comment_id THEN
-            UPDATE comments SET like_count = (
-                SELECT COUNT(*) FROM reactions
-                WHERE comment_id = OLD.comment_id AND type = 'LIKE'
-            ) WHERE id = OLD.comment_id;
+        -- Decrement like_count if the deleted reaction was a LIKE
+        IF OLD.type = 'LIKE' THEN
+            UPDATE comments
+            SET like_count = GREATEST(like_count - 1, 0)
+            WHERE id = OLD.comment_id;
         END IF;
-        -- Update new/current comment
-        UPDATE comments SET like_count = (
-            SELECT COUNT(*) FROM reactions
-            WHERE comment_id = NEW.comment_id AND type = 'LIKE'
-        ) WHERE id = NEW.comment_id;
+        RETURN OLD;
+    ELSIF TG_OP = 'INSERT' THEN
+        -- Increment like_count if the new reaction is a LIKE
+        IF NEW.type = 'LIKE' THEN
+            UPDATE comments
+            SET like_count = like_count + 1
+            WHERE id = NEW.comment_id;
+        END IF;
         RETURN NEW;
-    ELSE
-        -- INSERT
-        UPDATE comments SET like_count = (
-            SELECT COUNT(*) FROM reactions
-            WHERE comment_id = NEW.comment_id AND type = 'LIKE'
-        ) WHERE id = NEW.comment_id;
+    ELSIF TG_OP = 'UPDATE' THEN
+        -- Handle reaction type changes (e.g., LIKE -> LOVE or LOVE -> LIKE)
+        IF OLD.type = 'LIKE' AND NEW.type != 'LIKE' THEN
+            -- Changed from LIKE to something else: decrement
+            UPDATE comments
+            SET like_count = GREATEST(like_count - 1, 0)
+            WHERE id = OLD.comment_id;
+        ELSIF OLD.type != 'LIKE' AND NEW.type = 'LIKE' THEN
+            -- Changed from something else to LIKE: increment
+            UPDATE comments
+            SET like_count = like_count + 1
+            WHERE id = NEW.comment_id;
+        END IF;
+
+        -- Handle comment_id changes (rare but possible)
+        IF OLD.comment_id IS DISTINCT FROM NEW.comment_id THEN
+            -- Remove from old comment
+            IF OLD.type = 'LIKE' THEN
+                UPDATE comments
+                SET like_count = GREATEST(like_count - 1, 0)
+                WHERE id = OLD.comment_id;
+            END IF;
+            -- Add to new comment
+            IF NEW.type = 'LIKE' THEN
+                UPDATE comments
+                SET like_count = like_count + 1
+                WHERE id = NEW.comment_id;
+            END IF;
+        END IF;
         RETURN NEW;
     END IF;
 END;
@@ -233,16 +253,63 @@ CREATE FUNCTION public.update_movie_rating_stats() RETURNS trigger
     AS $$
 BEGIN
     IF TG_OP = 'DELETE' THEN
-        UPDATE movies SET
-            average_rating = COALESCE((SELECT AVG(score)::REAL FROM ratings WHERE movie_id = OLD.movie_id), 0),
-            rating_count = (SELECT COUNT(*) FROM ratings WHERE movie_id = OLD.movie_id)
+        -- Decrement count and subtract score from sum
+        UPDATE movies
+        SET
+            user_rating_count = GREATEST(user_rating_count - 1, 0),
+            rating_sum = GREATEST(rating_sum - OLD.score, 0),
+            user_avg_rating = CASE
+                WHEN user_rating_count - 1 > 0
+                THEN (rating_sum - OLD.score)::REAL / (user_rating_count - 1)
+                ELSE 0
+            END
         WHERE id = OLD.movie_id;
         RETURN OLD;
-    ELSE
-        UPDATE movies SET
-            average_rating = COALESCE((SELECT AVG(score)::REAL FROM ratings WHERE movie_id = NEW.movie_id), 0),
-            rating_count = (SELECT COUNT(*) FROM ratings WHERE movie_id = NEW.movie_id)
+    ELSIF TG_OP = 'INSERT' THEN
+        -- Increment count and add score to sum
+        UPDATE movies
+        SET
+            user_rating_count = user_rating_count + 1,
+            rating_sum = rating_sum + NEW.score,
+            user_avg_rating = (rating_sum + NEW.score)::REAL / (user_rating_count + 1)
         WHERE id = NEW.movie_id;
+        RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        -- Handle score changes
+        IF OLD.score != NEW.score THEN
+            UPDATE movies
+            SET
+                rating_sum = rating_sum - OLD.score + NEW.score,
+                user_avg_rating = CASE
+                    WHEN user_rating_count > 0
+                    THEN (rating_sum - OLD.score + NEW.score)::REAL / user_rating_count
+                    ELSE 0
+                END
+            WHERE id = NEW.movie_id;
+        END IF;
+
+        -- Handle movie_id changes (rare but possible due to unique constraint)
+        IF OLD.movie_id != NEW.movie_id THEN
+            -- Remove from old movie
+            UPDATE movies
+            SET
+                user_rating_count = GREATEST(user_rating_count - 1, 0),
+                rating_sum = GREATEST(rating_sum - OLD.score, 0),
+                user_avg_rating = CASE
+                    WHEN user_rating_count - 1 > 0
+                    THEN (rating_sum - OLD.score)::REAL / (user_rating_count - 1)
+                    ELSE 0
+                END
+            WHERE id = OLD.movie_id;
+
+            -- Add to new movie
+            UPDATE movies
+            SET
+                user_rating_count = user_rating_count + 1,
+                rating_sum = rating_sum + NEW.score,
+                user_avg_rating = (rating_sum + NEW.score)::REAL / (user_rating_count + 1)
+            WHERE id = NEW.movie_id;
+        END IF;
         RETURN NEW;
     END IF;
 END;
@@ -323,7 +390,6 @@ CREATE TABLE public.activities (
 --
 
 CREATE SEQUENCE public.activities_id_seq
-    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -360,7 +426,6 @@ CREATE TABLE public.comments (
 --
 
 CREATE SEQUENCE public.comments_id_seq
-    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -511,7 +576,8 @@ CREATE TABLE public.movies (
     imdb_rating numeric(3,1),
     rotten_tomatoes integer,
     metacritic_score integer,
-    letterboxd_rating numeric(3,1)
+    letterboxd_rating numeric(3,1),
+    rating_sum bigint DEFAULT 0
 );
 
 
@@ -556,7 +622,6 @@ CREATE TABLE public.notifications (
 --
 
 CREATE SEQUENCE public.notifications_id_seq
-    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -631,7 +696,6 @@ CREATE TABLE public.ratings (
 --
 
 CREATE SEQUENCE public.ratings_id_seq
-    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -664,7 +728,6 @@ CREATE TABLE public.reactions (
 --
 
 CREATE SEQUENCE public.reactions_id_seq
-    AS bigint
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1614,3 +1677,6 @@ ALTER TABLE ONLY public.watchlists
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict 1TcVJ5TngzjjxM1z2t2hqTfxy26yXS1GWnNXsnCe2wes4FJq1NkUJIzyix4S8fl
+
