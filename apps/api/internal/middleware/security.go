@@ -1,10 +1,20 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"strings"
+
+	"github.com/gin-gonic/gin"
+)
 
 // SecurityHeadersMiddleware adds essential security headers to all responses.
 func SecurityHeadersMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Skip restrictive CSP for Swagger UI (needs to load its own assets)
+		if strings.HasPrefix(c.Request.URL.Path, "/swagger") {
+			c.Next()
+			return
+		}
+
 		// Prevent clickjacking attacks
 		c.Header("X-Frame-Options", "DENY")
 
