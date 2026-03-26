@@ -19,6 +19,18 @@ func NewActivityHandler(activitySvc service.ActivityService) *ActivityHandler {
 	return &ActivityHandler{activitySvc: activitySvc}
 }
 
+// CreateActivity godoc
+// @Summary Create an activity
+// @Description Log a user activity (rating, comment, watchlist action, etc.)
+// @Tags activities
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CreateActivityRequest true "Activity details"
+// @Success 201 {object} map[string]string "Activity created"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /activities [post]
 func (h *ActivityHandler) CreateActivity(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -37,6 +49,17 @@ func (h *ActivityHandler) CreateActivity(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "activity created"})
 }
 
+// GetMyActivities godoc
+// @Summary Get my activities
+// @Description Get the authenticated user's activity history
+// @Tags activities
+// @Produce json
+// @Security BearerAuth
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Activity feed"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/activities [get]
 func (h *ActivityHandler) GetMyActivities(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -67,6 +90,18 @@ func (h *ActivityHandler) GetMyActivities(c *gin.Context) {
 	})
 }
 
+// GetUserActivities godoc
+// @Summary Get user activities
+// @Description Get a specific user's public activity history
+// @Tags activities
+// @Produce json
+// @Param userId path int true "User ID"
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Activity feed"
+// @Failure 400 {object} map[string]string "Invalid user ID"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users/{userId}/activities [get]
 func (h *ActivityHandler) GetUserActivities(c *gin.Context) {
 	userIDStr := c.Param("userId")
 	userID, err := strconv.Atoi(userIDStr)
@@ -102,6 +137,17 @@ func (h *ActivityHandler) GetUserActivities(c *gin.Context) {
 	})
 }
 
+// GetFollowingFeed godoc
+// @Summary Get following feed
+// @Description Get activities from users the authenticated user follows
+// @Tags activities
+// @Produce json
+// @Security BearerAuth
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Activity feed"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/feed [get]
 func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -132,6 +178,18 @@ func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 	})
 }
 
+// GetMovieActivities godoc
+// @Summary Get movie activities
+// @Description Get all activities related to a specific movie
+// @Tags activities
+// @Produce json
+// @Param movieId path int true "Movie ID"
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "List of activities"
+// @Failure 400 {object} map[string]string "Invalid movie ID"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/activities [get]
 func (h *ActivityHandler) GetMovieActivities(c *gin.Context) {
 	movieIDStr := c.Param("movieId")
 	movieID, err := strconv.ParseInt(movieIDStr, 10, 64)

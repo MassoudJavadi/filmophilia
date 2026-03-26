@@ -21,6 +21,20 @@ func NewReactionHandler(reactionSvc service.ReactionService) *ReactionHandler {
 	return &ReactionHandler{reactionSvc: reactionSvc}
 }
 
+// ReactToComment godoc
+// @Summary React to a comment
+// @Description Add or update a reaction (like, love, etc.) to a comment
+// @Tags reactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param commentId path int true "Comment ID"
+// @Param request body dto.AddReactionRequest true "Reaction type"
+// @Success 200 {object} map[string]interface{} "Reaction created/updated"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 404 {object} map[string]string "Comment not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comments/{commentId}/reactions [post]
 func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
@@ -54,6 +68,18 @@ func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 	}})
 }
 
+// RemoveCommentReaction godoc
+// @Summary Remove reaction from comment
+// @Description Remove your reaction from a comment
+// @Tags reactions
+// @Produce json
+// @Security BearerAuth
+// @Param commentId path int true "Comment ID"
+// @Success 200 {object} map[string]string "Reaction removed"
+// @Failure 400 {object} map[string]string "Invalid comment ID"
+// @Failure 404 {object} map[string]string "Reaction not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comments/{commentId}/reactions [delete]
 func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
@@ -76,6 +102,18 @@ func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "reaction removed"})
 }
 
+// GetCommentReactions godoc
+// @Summary Get comment reactions
+// @Description Get all reactions on a comment
+// @Tags reactions
+// @Produce json
+// @Param commentId path int true "Comment ID"
+// @Param limit query int false "Results per page" default(50)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "List of reactions"
+// @Failure 400 {object} map[string]string "Invalid comment ID"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comments/{commentId}/reactions [get]
 func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
@@ -97,6 +135,16 @@ func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToReactionResponses(reactions)})
 }
 
+// GetCommentReactionSummary godoc
+// @Summary Get reaction summary
+// @Description Get reaction counts by type for a comment, plus the current user's reaction if authenticated
+// @Tags reactions
+// @Produce json
+// @Param commentId path int true "Comment ID"
+// @Success 200 {object} object "Reaction summary"
+// @Failure 400 {object} map[string]string "Invalid comment ID"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /comments/{commentId}/reactions/summary [get]
 func (h *ReactionHandler) GetCommentReactionSummary(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {

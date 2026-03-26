@@ -20,6 +20,17 @@ func NewNotificationHandler(notifSvc service.NotificationService) *NotificationH
 	return &NotificationHandler{notifSvc: notifSvc}
 }
 
+// GetMyNotifications godoc
+// @Summary Get my notifications
+// @Description Get all notifications for the authenticated user
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Notifications"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/notifications [get]
 func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -51,6 +62,17 @@ func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 	})
 }
 
+// GetUnreadNotifications godoc
+// @Summary Get unread notifications
+// @Description Get only unread notifications for the authenticated user
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Unread notifications"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/notifications/unread [get]
 func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -82,6 +104,15 @@ func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
 	})
 }
 
+// GetUnreadCount godoc
+// @Summary Get unread notification count
+// @Description Get the count of unread notifications
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} object "Unread count"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/notifications/unread/count [get]
 func (h *NotificationHandler) GetUnreadCount(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -95,6 +126,19 @@ func (h *NotificationHandler) GetUnreadCount(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": gin.H{"unread_count": unreadCount}})
 }
 
+// MarkAsRead godoc
+// @Summary Mark notification as read
+// @Description Mark a specific notification as read
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Param notificationId path int true "Notification ID"
+// @Success 200 {object} map[string]string "Marked as read"
+// @Failure 400 {object} map[string]string "Invalid notification ID"
+// @Failure 403 {object} map[string]string "Unauthorized"
+// @Failure 404 {object} map[string]string "Notification not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /notifications/{notificationId}/read [patch]
 func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -121,6 +165,15 @@ func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "notification marked as read"})
 }
 
+// MarkAllAsRead godoc
+// @Summary Mark all notifications as read
+// @Description Mark all notifications for the authenticated user as read
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]string "All marked as read"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /notifications/read-all [post]
 func (h *NotificationHandler) MarkAllAsRead(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -133,6 +186,19 @@ func (h *NotificationHandler) MarkAllAsRead(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "all notifications marked as read"})
 }
 
+// DeleteNotification godoc
+// @Summary Delete a notification
+// @Description Delete a specific notification
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Param notificationId path int true "Notification ID"
+// @Success 200 {object} map[string]string "Notification deleted"
+// @Failure 400 {object} map[string]string "Invalid notification ID"
+// @Failure 403 {object} map[string]string "Unauthorized"
+// @Failure 404 {object} map[string]string "Notification not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /notifications/{notificationId} [delete]
 func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -159,6 +225,15 @@ func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "notification deleted"})
 }
 
+// DeleteAllNotifications godoc
+// @Summary Delete all notifications
+// @Description Delete all notifications for the authenticated user
+// @Tags notifications
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]string "All notifications deleted"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /notifications [delete]
 func (h *NotificationHandler) DeleteAllNotifications(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 

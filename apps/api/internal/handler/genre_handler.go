@@ -19,6 +19,14 @@ func NewGenreHandler(genreSvc service.GenreService) *GenreHandler {
 	return &GenreHandler{genreSvc: genreSvc}
 }
 
+// GetAll godoc
+// @Summary Get all genres
+// @Description Get a list of all movie genres
+// @Tags genres
+// @Produce json
+// @Success 200 {object} object "List of genres"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /genres [get]
 func (h *GenreHandler) GetAll(c *gin.Context) {
 	genres, err := h.genreSvc.GetAll(c.Request.Context())
 	if err != nil {
@@ -30,6 +38,17 @@ func (h *GenreHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToGenreResponses(genres)})
 }
 
+// GetByID godoc
+// @Summary Get genre by ID
+// @Description Get a specific genre by its ID
+// @Tags genres
+// @Produce json
+// @Param genreId path int true "Genre ID"
+// @Success 200 {object} object "Genre details"
+// @Failure 400 {object} map[string]string "Invalid genre ID"
+// @Failure 404 {object} map[string]string "Genre not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /genres/{genreId} [get]
 func (h *GenreHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("genreId")
 	id, err := strconv.Atoi(idStr)
@@ -52,6 +71,17 @@ func (h *GenreHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToGenreResponse(genre)})
 }
 
+// GetBySlug godoc
+// @Summary Get genre by slug
+// @Description Get a specific genre by its slug
+// @Tags genres
+// @Produce json
+// @Param slug path string true "Genre slug"
+// @Success 200 {object} object "Genre details"
+// @Failure 400 {object} map[string]string "Slug required"
+// @Failure 404 {object} map[string]string "Genre not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /genres/slug/{slug} [get]
 func (h *GenreHandler) GetBySlug(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {
@@ -73,6 +103,18 @@ func (h *GenreHandler) GetBySlug(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToGenreResponse(genre)})
 }
 
+// GetMoviesByGenre godoc
+// @Summary Get movies by genre
+// @Description Get all movies in a specific genre
+// @Tags genres
+// @Produce json
+// @Param genreId path int true "Genre ID"
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "List of movies"
+// @Failure 400 {object} map[string]string "Invalid genre ID"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /genres/{genreId}/movies [get]
 func (h *GenreHandler) GetMoviesByGenre(c *gin.Context) {
 	idStr := c.Param("genreId")
 	id, err := strconv.Atoi(idStr)
@@ -95,6 +137,18 @@ func (h *GenreHandler) GetMoviesByGenre(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": movies})
 }
 
+// GetMoviesByGenreSlug godoc
+// @Summary Get movies by genre slug
+// @Description Get all movies in a specific genre using slug
+// @Tags genres
+// @Produce json
+// @Param slug path string true "Genre slug"
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "List of movies"
+// @Failure 400 {object} map[string]string "Slug required"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /genres/slug/{slug}/movies [get]
 func (h *GenreHandler) GetMoviesByGenreSlug(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {
@@ -116,6 +170,17 @@ func (h *GenreHandler) GetMoviesByGenreSlug(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": movies})
 }
 
+// GetGenreWithCount godoc
+// @Summary Get genre with movie count
+// @Description Get genre details including the number of movies in it
+// @Tags genres
+// @Produce json
+// @Param genreId path int true "Genre ID"
+// @Success 200 {object} map[string]interface{} "Genre with movie count"
+// @Failure 400 {object} map[string]string "Invalid genre ID"
+// @Failure 404 {object} map[string]string "Genre not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /genres/{genreId}/stats [get]
 func (h *GenreHandler) GetGenreWithCount(c *gin.Context) {
 	idStr := c.Param("genreId")
 	id, err := strconv.Atoi(idStr)

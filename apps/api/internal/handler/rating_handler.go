@@ -29,7 +29,7 @@ func NewRatingHandler(ratingSvc service.RatingService) *RatingHandler {
 // @Security BearerAuth
 // @Param movieId path int true "Movie ID"
 // @Param request body dto.RateMovieRequest true "Rating score"
-// @Success 200 {object} map[string]dto.RatingResponse "Rating created/updated"
+// @Success 200 {object} object "Rating created/updated"
 // @Failure 400 {object} map[string]string "Invalid request"
 // @Failure 404 {object} map[string]string "Movie not found"
 // @Failure 500 {object} map[string]string "Internal server error"
@@ -71,7 +71,7 @@ func (h *RatingHandler) RateMovie(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param movieId path int true "Movie ID"
-// @Success 200 {object} map[string]dto.RatingResponse "User's rating"
+// @Success 200 {object} object "User's rating"
 // @Failure 400 {object} map[string]string "Invalid movie ID"
 // @Failure 404 {object} map[string]string "Rating not found"
 // @Failure 500 {object} map[string]string "Internal server error"
@@ -107,7 +107,7 @@ func (h *RatingHandler) GetMyRating(c *gin.Context) {
 // @Param movieId path int true "Movie ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} map[string][]dto.RatingWithUserResponse "List of ratings"
+// @Success 200 {object} object "List of ratings"
 // @Failure 400 {object} map[string]string "Invalid movie ID"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /movies/{movieId}/ratings [get]
@@ -140,7 +140,7 @@ func (h *RatingHandler) GetMovieRatings(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} map[string][]dto.RatingWithMovieResponse "List of ratings"
+// @Success 200 {object} object "List of ratings"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /me/ratings [get]
 func (h *RatingHandler) GetMyRatings(c *gin.Context) {

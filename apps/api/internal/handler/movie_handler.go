@@ -50,7 +50,7 @@ func (h *MovieHandler) GetMovies(c *gin.Context) {
 // @Tags movies
 // @Produce json
 // @Param slug path string true "Movie slug"
-// @Success 200 {object} map[string]dto.MovieResponse "Movie details"
+// @Success 200 {object} object "Movie details"
 // @Failure 404 {object} map[string]string "Movie not found"
 // @Router /movies/slug/{slug} [get]
 func (h *MovieHandler) GetMovie(c *gin.Context) {
@@ -84,7 +84,7 @@ func (h *MovieHandler) GetMovie(c *gin.Context) {
 // @Param sort_by query string false "Sort field" Enums(title_asc, title_desc, release_date_asc, release_date_desc, imdb_rating_asc, imdb_rating_desc, user_rating_asc, user_rating_desc)
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} map[string]dto.AdvancedSearchResponse "Search results"
+// @Success 200 {object} object "Search results"
 // @Failure 500 {object} map[string]string "Search failed"
 // @Router /movies/search [get]
 func (h *MovieHandler) AdvancedSearch(c *gin.Context) {

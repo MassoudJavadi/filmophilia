@@ -1,19 +1,24 @@
 basePath: /api/v1
 definitions:
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.AdvancedSearchResponse:
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.AddReactionRequest:
     properties:
-      limit:
-        type: integer
-      movies:
-        items:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse'
-        type: array
-      page:
-        type: integer
-      total:
-        type: integer
-      total_pages:
-        type: integer
+      type:
+        enum:
+        - LIKE
+        - LOVE
+        - LAUGH
+        - SAD
+        - ANGRY
+        type: string
+    required:
+    - type
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.AddToWatchlistRequest:
+    properties:
+      notes:
+        type: string
+      rank:
+        type: number
     type: object
   github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse:
     properties:
@@ -23,6 +28,31 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateActivityRequest:
+    properties:
+      action:
+        type: string
+      entity_id:
+        type: integer
+      entity_type:
+        type: string
+      metadata:
+        additionalProperties: true
+        type: object
+    required:
+    - action
+    - entity_id
+    - entity_type
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest:
+    properties:
+      content:
+        maxLength: 2000
+        minLength: 1
+        type: string
+    required:
+    - content
     type: object
   github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest:
     properties:
@@ -34,53 +64,6 @@ definitions:
     - email
     - password
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse:
-    properties:
-      backdrop_url:
-        type: string
-      content_rating:
-        type: string
-      country:
-        type: string
-      genres:
-        items:
-          type: string
-        type: array
-      id:
-        type: integer
-      imdb_id:
-        type: string
-      imdb_rating:
-        type: number
-      letterboxd_rating:
-        type: number
-      metacritic_score:
-        type: integer
-      original_language:
-        type: string
-      overview:
-        type: string
-      poster_url:
-        type: string
-      release_date:
-        type: string
-      rotten_tomatoes:
-        type: integer
-      runtime:
-        type: integer
-      slug:
-        type: string
-      title:
-        type: string
-      tmdb_id:
-        type: integer
-      trailer_url:
-        type: string
-      user_avg_rating:
-        type: number
-      user_rating_count:
-        type: integer
-    type: object
   github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest:
     properties:
       score:
@@ -89,57 +72,6 @@ definitions:
         type: integer
     required:
     - score
-    type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      movie_id:
-        type: integer
-      score:
-        type: integer
-      updated_at:
-        type: string
-      user_id:
-        type: integer
-    type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithMovieResponse:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      movie_id:
-        type: integer
-      poster_url:
-        type: string
-      score:
-        type: integer
-      slug:
-        type: string
-      title:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithUserResponse:
-    properties:
-      avatar_url:
-        type: string
-      created_at:
-        type: string
-      display_name:
-        type: string
-      id:
-        type: integer
-      score:
-        type: integer
-      user_id:
-        type: integer
-      username:
-        type: string
     type: object
   github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest:
     properties:
@@ -162,6 +94,33 @@ definitions:
     - email
     - password
     - username
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateCommentRequest:
+    properties:
+      content:
+        maxLength: 2000
+        minLength: 1
+        type: string
+    required:
+    - content
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateProfileRequest:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        maxLength: 500
+        type: string
+      display_name:
+        maxLength: 100
+        type: string
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateWatchlistRequest:
+    properties:
+      notes:
+        type: string
+      rank:
+        type: number
     type: object
   github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse:
     properties:
@@ -187,6 +146,44 @@ info:
   title: Filmophilia API
   version: "1.0"
 paths:
+  /activities:
+    post:
+      consumes:
+      - application/json
+      description: Log a user activity (rating, comment, watchlist action, etc.)
+      parameters:
+      - description: Activity details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateActivityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Activity created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create an activity
+      tags:
+      - activities
   /auth/login:
     post:
       consumes:
@@ -343,6 +340,555 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /comments/{commentId}:
+    delete:
+      description: Delete your own comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Not authorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Comment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a comment
+      tags:
+      - comments
+    get:
+      description: Get a specific comment by ID
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment details
+          schema:
+            type: object
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Comment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a comment
+      tags:
+      - comments
+    patch:
+      consumes:
+      - application/json
+      description: Update the content of your own comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      - description: New content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated comment
+          schema:
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Not authorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Comment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a comment
+      tags:
+      - comments
+  /comments/{commentId}/reactions:
+    delete:
+      description: Remove your reaction from a comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reaction removed
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Reaction not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove reaction from comment
+      tags:
+      - reactions
+    get:
+      description: Get all reactions on a comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      - default: 50
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of reactions
+          schema:
+            type: object
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get comment reactions
+      tags:
+      - reactions
+    post:
+      consumes:
+      - application/json
+      description: Add or update a reaction (like, love, etc.) to a comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      - description: Reaction type
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AddReactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reaction created/updated
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Comment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: React to a comment
+      tags:
+      - reactions
+  /comments/{commentId}/reactions/summary:
+    get:
+      description: Get reaction counts by type for a comment, plus the current user's
+        reaction if authenticated
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reaction summary
+          schema:
+            type: object
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get reaction summary
+      tags:
+      - reactions
+  /comments/{commentId}/replies:
+    get:
+      description: Get all replies to a comment
+      parameters:
+      - description: Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of replies
+          schema:
+            type: object
+        "400":
+          description: Invalid comment ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get comment replies
+      tags:
+      - comments
+  /genres:
+    get:
+      description: Get a list of all movie genres
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of genres
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all genres
+      tags:
+      - genres
+  /genres/{genreId}:
+    get:
+      description: Get a specific genre by its ID
+      parameters:
+      - description: Genre ID
+        in: path
+        name: genreId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Genre details
+          schema:
+            type: object
+        "400":
+          description: Invalid genre ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Genre not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get genre by ID
+      tags:
+      - genres
+  /genres/{genreId}/movies:
+    get:
+      description: Get all movies in a specific genre
+      parameters:
+      - description: Genre ID
+        in: path
+        name: genreId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of movies
+          schema:
+            type: object
+        "400":
+          description: Invalid genre ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movies by genre
+      tags:
+      - genres
+  /genres/{genreId}/stats:
+    get:
+      description: Get genre details including the number of movies in it
+      parameters:
+      - description: Genre ID
+        in: path
+        name: genreId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Genre with movie count
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid genre ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Genre not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get genre with movie count
+      tags:
+      - genres
+  /genres/slug/{slug}:
+    get:
+      description: Get a specific genre by its slug
+      parameters:
+      - description: Genre slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Genre details
+          schema:
+            type: object
+        "400":
+          description: Slug required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Genre not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get genre by slug
+      tags:
+      - genres
+  /genres/slug/{slug}/movies:
+    get:
+      description: Get all movies in a specific genre using slug
+      parameters:
+      - description: Genre slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of movies
+          schema:
+            type: object
+        "400":
+          description: Slug required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movies by genre slug
+      tags:
+      - genres
   /me:
     get:
       description: Get the authenticated user's information
@@ -364,6 +910,313 @@ paths:
       summary: Get current user
       tags:
       - auth
+  /me/activities:
+    get:
+      description: Get the authenticated user's activity history
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Activity feed
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my activities
+      tags:
+      - activities
+  /me/comments:
+    get:
+      description: Get all comments made by the authenticated user
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of comments
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my comments
+      tags:
+      - comments
+  /me/feed:
+    get:
+      description: Get activities from users the authenticated user follows
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Activity feed
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get following feed
+      tags:
+      - activities
+  /me/followers:
+    get:
+      description: Get list of users following the authenticated user
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of followers
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my followers
+      tags:
+      - follows
+  /me/following:
+    get:
+      description: Get list of users the authenticated user is following
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of following
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my following
+      tags:
+      - follows
+  /me/notifications:
+    get:
+      description: Get all notifications for the authenticated user
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notifications
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my notifications
+      tags:
+      - notifications
+  /me/notifications/unread:
+    get:
+      description: Get only unread notifications for the authenticated user
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Unread notifications
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get unread notifications
+      tags:
+      - notifications
+  /me/notifications/unread/count:
+    get:
+      description: Get the count of unread notifications
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Unread count
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get unread notification count
+      tags:
+      - notifications
+  /me/profile:
+    get:
+      description: Get the authenticated user's profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my profile
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Update the authenticated user's profile
+      parameters:
+      - description: Profile updates
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated user
+          schema:
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update my profile
+      tags:
+      - users
   /me/ratings:
     get:
       description: Get all ratings made by the authenticated user
@@ -384,10 +1237,6 @@ paths:
         "200":
           description: List of ratings
           schema:
-            additionalProperties:
-              items:
-                $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithMovieResponse'
-              type: array
             type: object
         "500":
           description: Internal server error
@@ -400,6 +1249,64 @@ paths:
       summary: Get my ratings
       tags:
       - ratings
+  /me/watchlist:
+    get:
+      description: Get the authenticated user's watchlist with optional filtering
+      parameters:
+      - default: all
+        description: 'Filter: all, watched, unwatched'
+        in: query
+        name: filter
+        type: string
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Watchlist items
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my watchlist
+      tags:
+      - watchlist
+  /me/watchlist/count:
+    get:
+      description: Get count of movies in the authenticated user's watchlist
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Watchlist count
+          schema:
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get watchlist count
+      tags:
+      - watchlist
   /movies:
     get:
       description: Get a paginated list of movies
@@ -431,6 +1338,219 @@ paths:
       summary: List movies
       tags:
       - movies
+  /movies/{movieId}/activities:
+    get:
+      description: Get all activities related to a specific movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of activities
+          schema:
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie activities
+      tags:
+      - activities
+  /movies/{movieId}/comments:
+    get:
+      description: Get all top-level comments for a movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of comments
+          schema:
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie comments
+      tags:
+      - comments
+    post:
+      consumes:
+      - application/json
+      description: Add a comment to a movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Comment content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created comment
+          schema:
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a comment
+      tags:
+      - comments
+  /movies/{movieId}/comments/{commentId}/replies:
+    post:
+      consumes:
+      - application/json
+      description: Create a reply to an existing comment
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Parent Comment ID
+        in: path
+        name: commentId
+        required: true
+        type: integer
+      - description: Reply content
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created reply
+          schema:
+            type: object
+        "400":
+          description: Invalid request or cannot reply to reply
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie or parent comment not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Reply to a comment
+      tags:
+      - comments
+  /movies/{movieId}/comments/count:
+    get:
+      description: Get the total number of comments for a movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Comment count
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie comment count
+      tags:
+      - comments
   /movies/{movieId}/rating:
     delete:
       description: Remove the authenticated user's rating for a movie
@@ -486,8 +1606,6 @@ paths:
         "200":
           description: User's rating
           schema:
-            additionalProperties:
-              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingResponse'
             type: object
         "400":
           description: Invalid movie ID
@@ -534,8 +1652,6 @@ paths:
         "200":
           description: Rating created/updated
           schema:
-            additionalProperties:
-              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingResponse'
             type: object
         "400":
           description: Invalid request
@@ -585,10 +1701,6 @@ paths:
         "200":
           description: List of ratings
           schema:
-            additionalProperties:
-              items:
-                $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithUserResponse'
-              type: array
             type: object
         "400":
           description: Invalid movie ID
@@ -605,6 +1717,294 @@ paths:
       summary: Get movie ratings
       tags:
       - ratings
+  /movies/{movieId}/watchlist:
+    delete:
+      description: Remove a movie from the authenticated user's watchlist
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Removed successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not in watchlist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove from watchlist
+      tags:
+      - watchlist
+    get:
+      description: Get a specific movie's watchlist entry for the authenticated user
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Watchlist entry
+          schema:
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not in watchlist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get watchlist entry
+      tags:
+      - watchlist
+    patch:
+      consumes:
+      - application/json
+      description: Update notes or rank for a movie in the watchlist
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateWatchlistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated entry
+          schema:
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not in watchlist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update watchlist entry
+      tags:
+      - watchlist
+    post:
+      consumes:
+      - application/json
+      description: Add a movie to the authenticated user's watchlist
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Optional notes and rank
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AddToWatchlistRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Movie added to watchlist
+          schema:
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Movie already in watchlist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add movie to watchlist
+      tags:
+      - watchlist
+  /movies/{movieId}/watchlist/check:
+    get:
+      description: Check if a movie is in the authenticated user's watchlist
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: In watchlist status
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Check if movie is in watchlist
+      tags:
+      - watchlist
+  /movies/{movieId}/watchlist/watched:
+    delete:
+      description: Mark a movie in the watchlist as not watched
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated entry
+          schema:
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not in watchlist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark movie as unwatched
+      tags:
+      - watchlist
+    post:
+      description: Mark a movie in the watchlist as watched
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated entry
+          schema:
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not in watchlist
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark movie as watched
+      tags:
+      - watchlist
   /movies/search:
     get:
       description: Search movies with various filters including genre, year, ratings,
@@ -687,8 +2087,6 @@ paths:
         "200":
           description: Search results
           schema:
-            additionalProperties:
-              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AdvancedSearchResponse'
             type: object
         "500":
           description: Search failed
@@ -714,8 +2112,6 @@ paths:
         "200":
           description: Movie details
           schema:
-            additionalProperties:
-              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse'
             type: object
         "404":
           description: Movie not found
@@ -726,6 +2122,535 @@ paths:
       summary: Get movie by slug
       tags:
       - movies
+  /notifications:
+    delete:
+      description: Delete all notifications for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All notifications deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete all notifications
+      tags:
+      - notifications
+  /notifications/{notificationId}:
+    delete:
+      description: Delete a specific notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notificationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid notification ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a notification
+      tags:
+      - notifications
+  /notifications/{notificationId}/read:
+    patch:
+      description: Mark a specific notification as read
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notificationId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Marked as read
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid notification ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Notification not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark notification as read
+      tags:
+      - notifications
+  /notifications/read-all:
+    post:
+      description: Mark all notifications for the authenticated user as read
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All marked as read
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mark all notifications as read
+      tags:
+      - notifications
+  /users/{userId}:
+    get:
+      description: Get a user's public profile by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user profile
+      tags:
+      - users
+  /users/{userId}/activities:
+    get:
+      description: Get a specific user's public activity history
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Activity feed
+          schema:
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user activities
+      tags:
+      - activities
+  /users/{userId}/follow:
+    delete:
+      description: Stop following another user
+      parameters:
+      - description: User ID to unfollow
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Unfollowed successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid user ID or cannot unfollow self
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not following this user
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Unfollow a user
+      tags:
+      - follows
+    post:
+      description: Follow another user
+      parameters:
+      - description: User ID to follow
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Followed successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid user ID or cannot follow self
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Already following
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Follow a user
+      tags:
+      - follows
+  /users/{userId}/follow-stats:
+    get:
+      description: Get follower and following counts for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Follow stats
+          schema:
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get follow stats
+      tags:
+      - follows
+  /users/{userId}/followers:
+    get:
+      description: Get list of users following a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of followers
+          schema:
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user's followers
+      tags:
+      - follows
+  /users/{userId}/following:
+    get:
+      description: Get list of users that a specific user is following
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of following
+          schema:
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user's following
+      tags:
+      - follows
+  /users/{userId}/following/check:
+    get:
+      description: Check if the authenticated user is following another user
+      parameters:
+      - description: User ID to check
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Following status
+          schema:
+            type: object
+        "400":
+          description: Invalid user ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Check if following
+      tags:
+      - follows
+  /users/search:
+    get:
+      description: Search for users by username or display name
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            type: object
+        "400":
+          description: Search query required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search users
+      tags:
+      - users
+  /users/username/{username}:
+    get:
+      description: Get a user's public profile by username
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile
+          schema:
+            type: object
+        "400":
+          description: Username required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user profile by username
+      tags:
+      - users
 securityDefinitions:
   BearerAuth:
     description: 'Enter your bearer token in the format: Bearer <token>'

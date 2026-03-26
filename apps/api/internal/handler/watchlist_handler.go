@@ -20,6 +20,21 @@ func NewWatchlistHandler(watchlistSvc service.WatchlistService) *WatchlistHandle
 	return &WatchlistHandler{watchlistSvc: watchlistSvc}
 }
 
+// AddToWatchlist godoc
+// @Summary Add movie to watchlist
+// @Description Add a movie to the authenticated user's watchlist
+// @Tags watchlist
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Param request body dto.AddToWatchlistRequest false "Optional notes and rank"
+// @Success 201 {object} object "Movie added to watchlist"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 404 {object} map[string]string "Movie not found"
+// @Failure 409 {object} map[string]string "Movie already in watchlist"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist [post]
 func (h *WatchlistHandler) AddToWatchlist(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
@@ -52,6 +67,18 @@ func (h *WatchlistHandler) AddToWatchlist(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"data": mapper.ToWatchlistEntryResponse(entry)})
 }
 
+// GetWatchlist godoc
+// @Summary Get my watchlist
+// @Description Get the authenticated user's watchlist with optional filtering
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Param filter query string false "Filter: all, watched, unwatched" default(all)
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Watchlist items"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/watchlist [get]
 func (h *WatchlistHandler) GetWatchlist(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -72,6 +99,15 @@ func (h *WatchlistHandler) GetWatchlist(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToWatchlistItemResponses(items)})
 }
 
+// GetWatchlistCount godoc
+// @Summary Get watchlist count
+// @Description Get count of movies in the authenticated user's watchlist
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} object "Watchlist count"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/watchlist/count [get]
 func (h *WatchlistHandler) GetWatchlistCount(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -85,6 +121,18 @@ func (h *WatchlistHandler) GetWatchlistCount(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToWatchlistCountResponse(count)})
 }
 
+// GetWatchlistEntry godoc
+// @Summary Get watchlist entry
+// @Description Get a specific movie's watchlist entry for the authenticated user
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Success 200 {object} object "Watchlist entry"
+// @Failure 400 {object} map[string]string "Invalid movie ID"
+// @Failure 404 {object} map[string]string "Movie not in watchlist"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist [get]
 func (h *WatchlistHandler) GetWatchlistEntry(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
@@ -108,6 +156,20 @@ func (h *WatchlistHandler) GetWatchlistEntry(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToWatchlistEntryResponse(entry)})
 }
 
+// UpdateWatchlistEntry godoc
+// @Summary Update watchlist entry
+// @Description Update notes or rank for a movie in the watchlist
+// @Tags watchlist
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Param request body dto.UpdateWatchlistRequest true "Update data"
+// @Success 200 {object} object "Updated entry"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 404 {object} map[string]string "Movie not in watchlist"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist [patch]
 func (h *WatchlistHandler) UpdateWatchlistEntry(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
@@ -137,6 +199,18 @@ func (h *WatchlistHandler) UpdateWatchlistEntry(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToWatchlistEntryResponse(entry)})
 }
 
+// MarkAsWatched godoc
+// @Summary Mark movie as watched
+// @Description Mark a movie in the watchlist as watched
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Success 200 {object} object "Updated entry"
+// @Failure 400 {object} map[string]string "Invalid movie ID"
+// @Failure 404 {object} map[string]string "Movie not in watchlist"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist/watched [post]
 func (h *WatchlistHandler) MarkAsWatched(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
@@ -160,6 +234,18 @@ func (h *WatchlistHandler) MarkAsWatched(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToWatchlistEntryResponse(entry)})
 }
 
+// MarkAsUnwatched godoc
+// @Summary Mark movie as unwatched
+// @Description Mark a movie in the watchlist as not watched
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Success 200 {object} object "Updated entry"
+// @Failure 400 {object} map[string]string "Invalid movie ID"
+// @Failure 404 {object} map[string]string "Movie not in watchlist"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist/watched [delete]
 func (h *WatchlistHandler) MarkAsUnwatched(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
@@ -183,6 +269,18 @@ func (h *WatchlistHandler) MarkAsUnwatched(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToWatchlistEntryResponse(entry)})
 }
 
+// RemoveFromWatchlist godoc
+// @Summary Remove from watchlist
+// @Description Remove a movie from the authenticated user's watchlist
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Success 200 {object} map[string]string "Removed successfully"
+// @Failure 400 {object} map[string]string "Invalid movie ID"
+// @Failure 404 {object} map[string]string "Movie not in watchlist"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist [delete]
 func (h *WatchlistHandler) RemoveFromWatchlist(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
@@ -205,6 +303,17 @@ func (h *WatchlistHandler) RemoveFromWatchlist(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "removed from watchlist"})
 }
 
+// CheckInWatchlist godoc
+// @Summary Check if movie is in watchlist
+// @Description Check if a movie is in the authenticated user's watchlist
+// @Tags watchlist
+// @Produce json
+// @Security BearerAuth
+// @Param movieId path int true "Movie ID"
+// @Success 200 {object} map[string]bool "In watchlist status"
+// @Failure 400 {object} map[string]string "Invalid movie ID"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /movies/{movieId}/watchlist/check [get]
 func (h *WatchlistHandler) CheckInWatchlist(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {

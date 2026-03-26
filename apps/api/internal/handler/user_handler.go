@@ -20,6 +20,17 @@ func NewUserHandler(userSvc service.UserService) *UserHandler {
 	return &UserHandler{userSvc: userSvc}
 }
 
+// GetProfile godoc
+// @Summary Get user profile
+// @Description Get a user's public profile by ID
+// @Tags users
+// @Produce json
+// @Param userId path int true "User ID"
+// @Success 200 {object} object "User profile"
+// @Failure 400 {object} map[string]string "Invalid user ID"
+// @Failure 404 {object} map[string]string "User not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users/{userId} [get]
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	userIDStr := c.Param("userId")
 	userID, err := strconv.Atoi(userIDStr)
@@ -42,6 +53,17 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToUserProfileResponse(profile)})
 }
 
+// GetProfileByUsername godoc
+// @Summary Get user profile by username
+// @Description Get a user's public profile by username
+// @Tags users
+// @Produce json
+// @Param username path string true "Username"
+// @Success 200 {object} object "User profile"
+// @Failure 400 {object} map[string]string "Username required"
+// @Failure 404 {object} map[string]string "User not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users/username/{username} [get]
 func (h *UserHandler) GetProfileByUsername(c *gin.Context) {
 	username := c.Param("username")
 	if username == "" {
@@ -63,6 +85,16 @@ func (h *UserHandler) GetProfileByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToUserProfileResponseFromUsername(profile)})
 }
 
+// GetMyProfile godoc
+// @Summary Get my profile
+// @Description Get the authenticated user's profile
+// @Tags users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} object "User profile"
+// @Failure 404 {object} map[string]string "User not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/profile [get]
 func (h *UserHandler) GetMyProfile(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -80,6 +112,18 @@ func (h *UserHandler) GetMyProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToUserProfileResponse(profile)})
 }
 
+// UpdateMyProfile godoc
+// @Summary Update my profile
+// @Description Update the authenticated user's profile
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.UpdateProfileRequest true "Profile updates"
+// @Success 200 {object} object "Updated user"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /me/profile [patch]
 func (h *UserHandler) UpdateMyProfile(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
@@ -99,6 +143,18 @@ func (h *UserHandler) UpdateMyProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": mapper.ToUserResponse(user)})
 }
 
+// SearchUsers godoc
+// @Summary Search users
+// @Description Search for users by username or display name
+// @Tags users
+// @Produce json
+// @Param q query string true "Search query"
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} object "Search results"
+// @Failure 400 {object} map[string]string "Search query required"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /users/search [get]
 func (h *UserHandler) SearchUsers(c *gin.Context) {
 	query := c.Query("q")
 	if query == "" {
