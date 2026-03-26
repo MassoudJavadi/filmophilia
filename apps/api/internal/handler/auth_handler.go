@@ -23,6 +23,18 @@ func NewAuthHandler(as *service.AuthService, os *service.OAuthService) *AuthHand
 	return &AuthHandler{authSvc: as, oauthSvc: os}
 }
 
+// Signup godoc
+// @Summary Register a new user
+// @Description Create a new user account with email, username, and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body dto.SignupRequest true "Signup credentials"
+// @Success 201 {object} dto.UserResponse
+// @Failure 400 {object} map[string]string "Invalid request body"
+// @Failure 409 {object} map[string]string "Email or username already exists"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /auth/signup [post]
 func (h *AuthHandler) Signup(c *gin.Context) {
 	var req dto.SignupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,6 +58,18 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 	c.JSON(http.StatusCreated, mapper.ToUserResponse(user))
 }
 
+// Login godoc
+// @Summary Authenticate user
+// @Description Login with email and password to get access and refresh tokens
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body dto.LoginRequest true "Login credentials"
+// @Success 200 {object} dto.AuthResponse
+// @Failure 400 {object} map[string]string "Invalid request body"
+// @Failure 401 {object} map[string]string "Invalid credentials or user banned"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -66,6 +90,18 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// Refresh godoc
+// @Summary Refresh access token
+// @Description Get a new access token using a valid refresh token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body dto.RefreshRequest true "Refresh token"
+// @Success 200 {object} dto.AuthResponse
+// @Failure 400 {object} map[string]string "Invalid request body"
+// @Failure 401 {object} map[string]string "Invalid or expired refresh token"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *gin.Context) {
 	var req dto.RefreshRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -86,6 +122,17 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// Logout godoc
+// @Summary Logout user
+// @Description Invalidate the refresh token to logout the user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body dto.RefreshRequest true "Refresh token to invalidate"
+// @Success 200 {object} map[string]string "Logged out successfully"
+// @Failure 400 {object} map[string]string "Refresh token required"
+// @Failure 500 {object} map[string]string "Failed to logout"
+// @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	var req dto.RefreshRequest //Get refresh token from body to invalidate it.
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -101,8 +148,16 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
 }
 
+// GetMe godoc
+// @Summary Get current user
+// @Description Get the authenticated user's information
+// @Tags auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} dto.UserResponse
+// @Failure 404 {object} map[string]string "User not found"
+// @Router /me [get]
 func (h *AuthHandler) GetMe(c *gin.Context) {
-
 	userID := c.MustGet("user_id").(int32)
 
 	user, err := h.authSvc.GetUser(c.Request.Context(), userID)

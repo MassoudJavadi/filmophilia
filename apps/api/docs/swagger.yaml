@@ -1,0 +1,735 @@
+basePath: /api/v1
+definitions:
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.AdvancedSearchResponse:
+    properties:
+      limit:
+        type: integer
+      movies:
+        items:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse:
+    properties:
+      backdrop_url:
+        type: string
+      content_rating:
+        type: string
+      country:
+        type: string
+      genres:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      imdb_id:
+        type: string
+      imdb_rating:
+        type: number
+      letterboxd_rating:
+        type: number
+      metacritic_score:
+        type: integer
+      original_language:
+        type: string
+      overview:
+        type: string
+      poster_url:
+        type: string
+      release_date:
+        type: string
+      rotten_tomatoes:
+        type: integer
+      runtime:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      tmdb_id:
+        type: integer
+      trailer_url:
+        type: string
+      user_avg_rating:
+        type: number
+      user_rating_count:
+        type: integer
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest:
+    properties:
+      score:
+        maximum: 10
+        minimum: 1
+        type: integer
+    required:
+    - score
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      score:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithMovieResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      poster_url:
+        type: string
+      score:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithUserResponse:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: integer
+      score:
+        type: integer
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.SignupRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse:
+    properties:
+      display_name:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@filmophilia.com
+    name: API Support
+  description: API for Filmophilia - A movie discovery and social platform
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Filmophilia API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password to get access and refresh tokens
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid credentials or user banned
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Authenticate user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidate the refresh token to logout the user
+      parameters:
+      - description: Refresh token to invalidate
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logged out successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Refresh token required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to logout
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Logout user
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using a valid refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid or expired refresh token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh access token
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with email, username, and password
+      parameters:
+      - description: Signup credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Email or username already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
+  /me:
+    get:
+      description: Get the authenticated user's information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+        "404":
+          description: User not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /me/ratings:
+    get:
+      description: Get all ratings made by the authenticated user
+      parameters:
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of ratings
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithMovieResponse'
+              type: array
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my ratings
+      tags:
+      - ratings
+  /movies:
+    get:
+      description: Get a paginated list of movies
+      parameters:
+      - default: 20
+        description: Number of movies per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of movies
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed to fetch movies
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List movies
+      tags:
+      - movies
+  /movies/{movieId}/rating:
+    delete:
+      description: Remove the authenticated user's rating for a movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rating deleted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Rating not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete my rating
+      tags:
+      - ratings
+    get:
+      description: Get the authenticated user's rating for a specific movie
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User's rating
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingResponse'
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Rating not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my rating for a movie
+      tags:
+      - ratings
+    put:
+      consumes:
+      - application/json
+      description: Add or update your rating for a movie (1-10)
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - description: Rating score
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rating created/updated
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingResponse'
+            type: object
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Movie not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Rate a movie
+      tags:
+      - ratings
+  /movies/{movieId}/ratings:
+    get:
+      description: Get all ratings for a specific movie with pagination
+      parameters:
+      - description: Movie ID
+        in: path
+        name: movieId
+        required: true
+        type: integer
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of ratings
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RatingWithUserResponse'
+              type: array
+            type: object
+        "400":
+          description: Invalid movie ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie ratings
+      tags:
+      - ratings
+  /movies/{slug}:
+    get:
+      description: Get detailed information about a specific movie
+      parameters:
+      - description: Movie slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Movie details
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse'
+            type: object
+        "404":
+          description: Movie not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie by slug
+      tags:
+      - movies
+  /movies/search:
+    get:
+      description: Search movies with various filters including genre, year, ratings,
+        and more
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      - description: Comma-separated genre IDs
+        in: query
+        name: genre_ids
+        type: string
+      - description: Minimum release year
+        in: query
+        name: year_from
+        type: integer
+      - description: Maximum release year
+        in: query
+        name: year_to
+        type: integer
+      - description: Minimum IMDB rating
+        in: query
+        name: imdb_min
+        type: number
+      - description: Maximum IMDB rating
+        in: query
+        name: imdb_max
+        type: number
+      - description: Minimum user rating
+        in: query
+        name: user_rating_min
+        type: number
+      - description: Maximum user rating
+        in: query
+        name: user_rating_max
+        type: number
+      - description: Minimum Rotten Tomatoes score
+        in: query
+        name: rt_min
+        type: integer
+      - description: Maximum Rotten Tomatoes score
+        in: query
+        name: rt_max
+        type: integer
+      - description: Minimum Metacritic score
+        in: query
+        name: metacritic_min
+        type: integer
+      - description: Maximum Metacritic score
+        in: query
+        name: metacritic_max
+        type: integer
+      - description: Sort field
+        enum:
+        - title_asc
+        - title_desc
+        - release_date_asc
+        - release_date_desc
+        - imdb_rating_asc
+        - imdb_rating_desc
+        - user_rating_asc
+        - user_rating_desc
+        in: query
+        name: sort_by
+        type: string
+      - default: 20
+        description: Results per page
+        in: query
+        name: limit
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AdvancedSearchResponse'
+            type: object
+        "500":
+          description: Search failed
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Search movies with filters
+      tags:
+      - movies
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter your bearer token in the format: Bearer <token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -20,6 +20,16 @@ func NewMovieHandler(movieSvc service.MovieService) *MovieHandler {
 	return &MovieHandler{movieSvc: movieSvc}
 }
 
+// GetMovies godoc
+// @Summary List movies
+// @Description Get a paginated list of movies
+// @Tags movies
+// @Produce json
+// @Param limit query int false "Number of movies per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} map[string]interface{} "List of movies"
+// @Failure 500 {object} map[string]string "Failed to fetch movies"
+// @Router /movies [get]
 func (h *MovieHandler) GetMovies(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -34,6 +44,15 @@ func (h *MovieHandler) GetMovies(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": movies})
 }
 
+// GetMovie godoc
+// @Summary Get movie by slug
+// @Description Get detailed information about a specific movie
+// @Tags movies
+// @Produce json
+// @Param slug path string true "Movie slug"
+// @Success 200 {object} map[string]dto.MovieResponse "Movie details"
+// @Failure 404 {object} map[string]string "Movie not found"
+// @Router /movies/{slug} [get]
 func (h *MovieHandler) GetMovie(c *gin.Context) {
 	slug := c.Param("slug")
 	movie, err := h.movieSvc.GetMovie(c.Request.Context(), slug)
@@ -45,6 +64,29 @@ func (h *MovieHandler) GetMovie(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": movie})
 }
 
+// AdvancedSearch godoc
+// @Summary Search movies with filters
+// @Description Search movies with various filters including genre, year, ratings, and more
+// @Tags movies
+// @Produce json
+// @Param q query string false "Search query"
+// @Param genre_ids query string false "Comma-separated genre IDs"
+// @Param year_from query int false "Minimum release year"
+// @Param year_to query int false "Maximum release year"
+// @Param imdb_min query number false "Minimum IMDB rating"
+// @Param imdb_max query number false "Maximum IMDB rating"
+// @Param user_rating_min query number false "Minimum user rating"
+// @Param user_rating_max query number false "Maximum user rating"
+// @Param rt_min query int false "Minimum Rotten Tomatoes score"
+// @Param rt_max query int false "Maximum Rotten Tomatoes score"
+// @Param metacritic_min query int false "Minimum Metacritic score"
+// @Param metacritic_max query int false "Maximum Metacritic score"
+// @Param sort_by query string false "Sort field" Enums(title_asc, title_desc, release_date_asc, release_date_desc, imdb_rating_asc, imdb_rating_desc, user_rating_asc, user_rating_desc)
+// @Param limit query int false "Results per page" default(20)
+// @Param page query int false "Page number" default(1)
+// @Success 200 {object} map[string]dto.AdvancedSearchResponse "Search results"
+// @Failure 500 {object} map[string]string "Search failed"
+// @Router /movies/search [get]
 func (h *MovieHandler) AdvancedSearch(c *gin.Context) {
 	var req dto.AdvancedSearchRequest
 

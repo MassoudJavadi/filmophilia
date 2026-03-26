@@ -14,7 +14,28 @@ import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/api"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+
+	_ "github.com/MassoudJavadi/filmophilia/api/docs"
 )
+
+// @title Filmophilia API
+// @version 1.0
+// @description API for Filmophilia - A movie discovery and social platform
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@filmophilia.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Enter your bearer token in the format: Bearer <token>
 
 func main() {
 	if err := godotenv.Load(); err != nil {

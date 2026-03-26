@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -70,6 +72,9 @@ func NewServer(db *pgxpool.Pool, cfg config.Config, authH *handler.AuthHandler, 
 
 	// Prometheus metrics endpoint
 	s.router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	// Swagger documentation endpoint
+	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	s.setupRoutes()
 	return s
