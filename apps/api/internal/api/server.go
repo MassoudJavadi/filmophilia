@@ -13,6 +13,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Server struct {
@@ -65,6 +66,11 @@ func NewServer(db *pgxpool.Pool, cfg config.Config, authH *handler.AuthHandler, 
 		MaxAge:           12 * time.Hour,
 	}))
 	s.router.Use(middleware.SecurityHeadersMiddleware())
+	s.router.Use(middleware.PrometheusMiddleware())
+
+	// Prometheus metrics endpoint
+	s.router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 	s.setupRoutes()
 	return s
 }
