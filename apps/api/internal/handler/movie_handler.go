@@ -52,7 +52,7 @@ func (h *MovieHandler) GetMovies(c *gin.Context) {
 // @Param slug path string true "Movie slug"
 // @Success 200 {object} map[string]dto.MovieResponse "Movie details"
 // @Failure 404 {object} map[string]string "Movie not found"
-// @Router /movies/{slug} [get]
+// @Router /movies/slug/{slug} [get]
 func (h *MovieHandler) GetMovie(c *gin.Context) {
 	slug := c.Param("slug")
 	movie, err := h.movieSvc.GetMovie(c.Request.Context(), slug)

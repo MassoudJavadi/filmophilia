@@ -112,7 +112,7 @@ func (s *Server) setupRoutes() {
 	movies.Use(ipRL(cfg.PublicReadLimit))
 	{
 		movies.GET("", s.movieH.GetMovies)
-		movies.GET("/:slug", s.movieH.GetMovie)
+		movies.GET("/slug/:slug", s.movieH.GetMovie)
 		movies.GET("/:movieId/ratings", s.ratingH.GetMovieRatings)
 		movies.GET("/:movieId/comments", s.commentH.GetMovieComments)
 		movies.GET("/:movieId/comments/count", s.commentH.GetMovieCommentCount)

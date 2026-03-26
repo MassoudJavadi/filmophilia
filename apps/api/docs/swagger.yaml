@@ -605,33 +605,6 @@ paths:
       summary: Get movie ratings
       tags:
       - ratings
-  /movies/{slug}:
-    get:
-      description: Get detailed information about a specific movie
-      parameters:
-      - description: Movie slug
-        in: path
-        name: slug
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Movie details
-          schema:
-            additionalProperties:
-              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse'
-            type: object
-        "404":
-          description: Movie not found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get movie by slug
-      tags:
-      - movies
   /movies/search:
     get:
       description: Search movies with various filters including genre, year, ratings,
@@ -724,6 +697,33 @@ paths:
               type: string
             type: object
       summary: Search movies with filters
+      tags:
+      - movies
+  /movies/slug/{slug}:
+    get:
+      description: Get detailed information about a specific movie
+      parameters:
+      - description: Movie slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Movie details
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse'
+            type: object
+        "404":
+          description: Movie not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get movie by slug
       tags:
       - movies
 securityDefinitions:

@@ -533,6 +533,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/movies/slug/{slug}": {
+            "get": {
+                "description": "Get detailed information about a specific movie",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movies"
+                ],
+                "summary": "Get movie by slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Movie slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Movie details",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Movie not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/movies/{movieId}/rating": {
             "get": {
                 "security": [
@@ -790,47 +831,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/movies/{slug}": {
-            "get": {
-                "description": "Get detailed information about a specific movie",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "movies"
-                ],
-                "summary": "Get movie by slug",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Movie slug",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Movie details",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.MovieResponse"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Movie not found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
