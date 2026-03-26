@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"crypto/subtle"
 	"errors"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
@@ -119,16 +121,16 @@ func (h *AuthHandler) GoogleRedirect(c *gin.Context) {
 		return
 	}
 
-	// ذخیره استیت در کوکی برای ۱۵ دقیقه
-	// Domain رو اگه روی لوکال هستی خالی بذار یا localhost بذار
-	c.SetCookie("oauth_state", state, 900, "/", "", false, true)
+	// Store state in cookie for 15 minutes
+	// Secure flag enabled in production (GIN_MODE=release)
+	secure := os.Getenv("GIN_MODE") == "release"
+	c.SetCookie("oauth_state", state, 900, "/", "", secure, true)
 
 	url := h.oauthSvc.GetGoogleAuthURL(state)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
-
 	cookieState, err := c.Cookie("oauth_state")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "state cookie not found"})
@@ -136,16 +138,27 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	}
 
 	queryState := c.Query("state")
-
-	if cookieState != queryState {
-		c.JSON(http.StatusForbidden, gin.H{"error": "invalid oauth state (CSRF detected!)"})
+	if queryState == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "state parameter missing"})
 		return
 	}
 
-	//Remove cookie after use
-	c.SetCookie("oauth_state", "", -1, "/", "", false, true)
+	// Use constant-time comparison to prevent timing attacks
+	if subtle.ConstantTimeCompare([]byte(cookieState), []byte(queryState)) != 1 {
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid oauth state"})
+		return
+	}
+
+	// Remove cookie after use (secure flag matches redirect)
+	secure := os.Getenv("GIN_MODE") == "release"
+	c.SetCookie("oauth_state", "", -1, "/", "", secure, true)
 
 	code := c.Query("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "authorization code missing"})
+		return
+	}
+
 	resp, err := h.oauthSvc.HandleGoogleCallback(c.Request.Context(), code)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
