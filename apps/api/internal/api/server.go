@@ -61,6 +61,7 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.Mov
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+	s.router.Use(middleware.SecurityHeadersMiddleware())
 	s.setupRoutes()
 	return s
 }
