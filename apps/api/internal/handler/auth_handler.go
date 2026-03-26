@@ -10,6 +10,7 @@ import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -30,15 +31,15 @@ func NewAuthHandler(as *service.AuthService, os *service.OAuthService) *AuthHand
 // @Accept json
 // @Produce json
 // @Param request body dto.SignupRequest true "Signup credentials"
-// @Success 201 {object} dto.UserResponse
-// @Failure 400 {object} map[string]string "Invalid request body"
-// @Failure 409 {object} map[string]string "Email or username already exists"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} dto.SuccessResponse{data=dto.UserResponse} "User created"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request body"
+// @Failure 409 {object} dto.ConflictErrorResponse "Email or username already exists"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /auth/signup [post]
 func (h *AuthHandler) Signup(c *gin.Context) {
 	var req dto.SignupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
@@ -46,16 +47,16 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrEmailExists):
-			c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
+			response.Error(c, http.StatusConflict, "EMAIL_ALREADY_REGISTERED", "email already registered")
 		case errors.Is(err, service.ErrUsernameExists):
-			c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
+			response.Error(c, http.StatusConflict, "USERNAME_ALREADY_TAKEN", "username already taken")
 		default:
 			log.Printf("signup error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
-	c.JSON(http.StatusCreated, mapper.ToUserResponse(user))
+	response.Created(c, mapper.ToUserResponse(user))
 }
 
 // Login godoc
@@ -65,29 +66,29 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body dto.LoginRequest true "Login credentials"
-// @Success 200 {object} dto.AuthResponse
-// @Failure 400 {object} map[string]string "Invalid request body"
-// @Failure 401 {object} map[string]string "Invalid credentials or user banned"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.AuthResponse} "Authenticated successfully"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request body"
+// @Failure 401 {object} dto.UnauthorizedErrorResponse "Invalid credentials or user banned"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
 	resp, err := h.authSvc.Login(c.Request.Context(), req)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidCredentials) || errors.Is(err, service.ErrUserBanned) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusUnauthorized, "INVALID_CREDENTIALS", err.Error())
 			return
 		}
 		log.Printf("login error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
-	c.JSON(http.StatusOK, resp)
+	response.OK(c, resp)
 }
 
 // Refresh godoc
@@ -97,29 +98,29 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body dto.RefreshRequest true "Refresh token"
-// @Success 200 {object} dto.AuthResponse
-// @Failure 400 {object} map[string]string "Invalid request body"
-// @Failure 401 {object} map[string]string "Invalid or expired refresh token"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.AuthResponse} "Token refreshed"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request body"
+// @Failure 401 {object} dto.UnauthorizedErrorResponse "Invalid or expired refresh token"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *gin.Context) {
 	var req dto.RefreshRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
 	resp, err := h.authSvc.Refresh(c.Request.Context(), req.RefreshToken)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidToken) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusUnauthorized, "INVALID_REFRESH_TOKEN", err.Error())
 			return
 		}
 		log.Printf("refresh error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
-	c.JSON(http.StatusOK, resp)
+	response.OK(c, resp)
 }
 
 // Logout godoc
@@ -129,23 +130,23 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body dto.RefreshRequest true "Refresh token to invalidate"
-// @Success 200 {object} map[string]string "Logged out successfully"
-// @Failure 400 {object} map[string]string "Refresh token required"
-// @Failure 500 {object} map[string]string "Failed to logout"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "Logged out successfully"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Refresh token required"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Failed to logout"
 // @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	var req dto.RefreshRequest //Get refresh token from body to invalidate it.
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "refresh token required"})
+		response.Error(c, http.StatusBadRequest, "REFRESH_TOKEN_REQUIRED", "refresh token required")
 		return
 	}
 
 	if err := h.authSvc.Logout(c.Request.Context(), req.RefreshToken); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to logout"})
+		response.Error(c, http.StatusInternalServerError, "LOGOUT_FAILED", "failed to logout")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "logged out successfully"})
+	response.Message(c, http.StatusOK, "logged out successfully")
 }
 
 // GetMe godoc
@@ -154,25 +155,25 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 // @Tags auth
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} dto.UserResponse
-// @Failure 404 {object} map[string]string "User not found"
+// @Success 200 {object} dto.SuccessResponse{data=dto.UserResponse} "Current user"
+// @Failure 404 {object} dto.NotFoundErrorResponse "User not found"
 // @Router /me [get]
 func (h *AuthHandler) GetMe(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
 	user, err := h.authSvc.GetUser(c.Request.Context(), userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		response.Error(c, http.StatusNotFound, "USER_NOT_FOUND", "user not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, mapper.ToUserResponse(user))
+	response.OK(c, mapper.ToUserResponse(user))
 }
 
 func (h *AuthHandler) GoogleRedirect(c *gin.Context) {
 	state, err := oauth.GenerateState(32)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate state"})
+		response.Error(c, http.StatusInternalServerError, "STATE_GENERATION_FAILED", "failed to generate state")
 		return
 	}
 
@@ -188,19 +189,19 @@ func (h *AuthHandler) GoogleRedirect(c *gin.Context) {
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	cookieState, err := c.Cookie("oauth_state")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "state cookie not found"})
+		response.Error(c, http.StatusBadRequest, "STATE_COOKIE_NOT_FOUND", "state cookie not found")
 		return
 	}
 
 	queryState := c.Query("state")
 	if queryState == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "state parameter missing"})
+		response.Error(c, http.StatusBadRequest, "STATE_PARAMETER_MISSING", "state parameter missing")
 		return
 	}
 
 	// Use constant-time comparison to prevent timing attacks
 	if subtle.ConstantTimeCompare([]byte(cookieState), []byte(queryState)) != 1 {
-		c.JSON(http.StatusForbidden, gin.H{"error": "invalid oauth state"})
+		response.Error(c, http.StatusForbidden, "INVALID_OAUTH_STATE", "invalid oauth state")
 		return
 	}
 
@@ -210,15 +211,15 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 
 	code := c.Query("code")
 	if code == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "authorization code missing"})
+		response.Error(c, http.StatusBadRequest, "AUTHORIZATION_CODE_MISSING", "authorization code missing")
 		return
 	}
 
 	resp, err := h.oauthSvc.HandleGoogleCallback(c.Request.Context(), code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusInternalServerError, "GOOGLE_CALLBACK_FAILED", err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	response.OK(c, resp)
 }

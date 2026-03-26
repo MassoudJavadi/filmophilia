@@ -9,6 +9,7 @@ import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -30,21 +31,21 @@ func NewReactionHandler(reactionSvc service.ReactionService) *ReactionHandler {
 // @Security BearerAuth
 // @Param commentId path int true "Comment ID"
 // @Param request body dto.AddReactionRequest true "Reaction type"
-// @Success 200 {object} map[string]interface{} "Reaction created/updated"
-// @Failure 400 {object} map[string]string "Invalid request"
-// @Failure 404 {object} map[string]string "Comment not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ReactionMutationData} "Reaction created or updated"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Comment not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId}/reactions [post]
 func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
 	var req dto.AddReactionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
@@ -53,19 +54,19 @@ func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 	reaction, err := h.reactionSvc.ReactToComment(c.Request.Context(), userID, commentID, db.ReactionType(req.Type))
 	if err != nil {
 		if errors.Is(err, service.ErrCommentNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
+			response.Error(c, http.StatusNotFound, "COMMENT_NOT_FOUND", "comment not found")
 			return
 		}
 		log.Printf("react to comment error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": gin.H{
-		"id":         reaction.ID,
-		"type":       reaction.Type,
-		"created_at": reaction.CreatedAt.Time,
-	}})
+	response.OK(c, dto.ReactionMutationData{
+		ID:        reaction.ID,
+		Type:      string(reaction.Type),
+		CreatedAt: reaction.CreatedAt.Time,
+	})
 }
 
 // RemoveCommentReaction godoc
@@ -75,15 +76,15 @@ func (h *ReactionHandler) ReactToComment(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param commentId path int true "Comment ID"
-// @Success 200 {object} map[string]string "Reaction removed"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
-// @Failure 404 {object} map[string]string "Reaction not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "Reaction removed"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid comment ID"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Reaction not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId}/reactions [delete]
 func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
@@ -91,15 +92,15 @@ func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 
 	if err := h.reactionSvc.RemoveCommentReaction(c.Request.Context(), userID, commentID); err != nil {
 		if errors.Is(err, service.ErrReactionNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "reaction not found"})
+			response.Error(c, http.StatusNotFound, "REACTION_NOT_FOUND", "reaction not found")
 			return
 		}
 		log.Printf("remove comment reaction error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "reaction removed"})
+	response.Message(c, http.StatusOK, "reaction removed")
 }
 
 // GetCommentReactions godoc
@@ -110,14 +111,14 @@ func (h *ReactionHandler) RemoveCommentReaction(c *gin.Context) {
 // @Param commentId path int true "Comment ID"
 // @Param limit query int false "Results per page" default(50)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of reactions"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.ReactionResponse} "List of reactions"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid comment ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId}/reactions [get]
 func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
@@ -128,11 +129,11 @@ func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 	reactions, err := h.reactionSvc.GetCommentReactions(c.Request.Context(), commentID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get comment reactions error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToReactionResponses(reactions)})
+	response.OK(c, mapper.ToReactionResponses(reactions))
 }
 
 // GetCommentReactionSummary godoc
@@ -141,25 +142,25 @@ func (h *ReactionHandler) GetCommentReactions(c *gin.Context) {
 // @Tags reactions
 // @Produce json
 // @Param commentId path int true "Comment ID"
-// @Success 200 {object} object "Reaction summary"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ReactionSummaryResponse} "Reaction summary"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid comment ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId}/reactions/summary [get]
 func (h *ReactionHandler) GetCommentReactionSummary(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
 	counts, err := h.reactionSvc.GetCommentReactionCounts(c.Request.Context(), commentID)
 	if err != nil {
 		log.Printf("get comment reaction counts error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	response := dto.ReactionSummaryResponse{
+	summary := dto.ReactionSummaryResponse{
 		Counts: mapper.ToReactionCounts(counts),
 	}
 
@@ -170,9 +171,9 @@ func (h *ReactionHandler) GetCommentReactionSummary(c *gin.Context) {
 			log.Printf("get user comment reaction error: %v", err)
 		} else if userReaction != nil {
 			reactionType := string(userReaction.Type)
-			response.UserReaction = &reactionType
+			summary.UserReaction = &reactionType
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": response})
+	response.OK(c, summary)
 }

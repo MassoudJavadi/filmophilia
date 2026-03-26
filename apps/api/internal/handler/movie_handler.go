@@ -8,6 +8,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -27,8 +28,8 @@ func NewMovieHandler(movieSvc service.MovieService) *MovieHandler {
 // @Produce json
 // @Param limit query int false "Number of movies per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} map[string]interface{} "List of movies"
-// @Failure 500 {object} map[string]string "Failed to fetch movies"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.MovieResponse} "List of movies"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Failed to fetch movies"
 // @Router /movies [get]
 func (h *MovieHandler) GetMovies(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
@@ -37,11 +38,11 @@ func (h *MovieHandler) GetMovies(c *gin.Context) {
 
 	movies, err := h.movieSvc.GetMovies(c.Request.Context(), int32(limit), int32(offset))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch movies"})
+		response.Error(c, http.StatusInternalServerError, "MOVIES_FETCH_FAILED", "failed to fetch movies")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": movies})
+	response.OK(c, mapper.ToMovieResponses(movies))
 }
 
 // GetMovie godoc
@@ -50,18 +51,18 @@ func (h *MovieHandler) GetMovies(c *gin.Context) {
 // @Tags movies
 // @Produce json
 // @Param slug path string true "Movie slug"
-// @Success 200 {object} object "Movie details"
-// @Failure 404 {object} map[string]string "Movie not found"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MovieResponse} "Movie details"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Movie not found"
 // @Router /movies/slug/{slug} [get]
 func (h *MovieHandler) GetMovie(c *gin.Context) {
 	slug := c.Param("slug")
 	movie, err := h.movieSvc.GetMovie(c.Request.Context(), slug)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Movie not found"})
+		response.Error(c, http.StatusNotFound, "MOVIE_NOT_FOUND", "movie not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": movie})
+	response.OK(c, mapper.ToMovieResponse(movie))
 }
 
 // AdvancedSearch godoc
@@ -84,8 +85,8 @@ func (h *MovieHandler) GetMovie(c *gin.Context) {
 // @Param sort_by query string false "Sort field" Enums(title_asc, title_desc, release_date_asc, release_date_desc, imdb_rating_asc, imdb_rating_desc, user_rating_asc, user_rating_desc)
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "Search results"
-// @Failure 500 {object} map[string]string "Search failed"
+// @Success 200 {object} dto.SuccessResponse{data=dto.AdvancedSearchResponse} "Search results"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Search failed"
 // @Router /movies/search [get]
 func (h *MovieHandler) AdvancedSearch(c *gin.Context) {
 	var req dto.AdvancedSearchRequest
@@ -194,7 +195,7 @@ func (h *MovieHandler) AdvancedSearch(c *gin.Context) {
 	movies, total, err := h.movieSvc.AdvancedSearch(c.Request.Context(), req)
 	if err != nil {
 		log.Printf("advanced search error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "search failed"})
+		response.Error(c, http.StatusInternalServerError, "SEARCH_FAILED", "search failed")
 		return
 	}
 
@@ -204,13 +205,11 @@ func (h *MovieHandler) AdvancedSearch(c *gin.Context) {
 		totalPages++
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": dto.AdvancedSearchResponse{
-			Movies:     mapper.ToMovieResponses(movies),
-			Total:      total,
-			Page:       req.Page,
-			Limit:      req.Limit,
-			TotalPages: totalPages,
-		},
+	response.OK(c, dto.AdvancedSearchResponse{
+		Movies:     mapper.ToMovieResponses(movies),
+		Total:      total,
+		Page:       req.Page,
+		Limit:      req.Limit,
+		TotalPages: totalPages,
 	})
 }

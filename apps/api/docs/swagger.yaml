@@ -1,6 +1,45 @@
 basePath: /api/v1
 definitions:
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.AddReactionRequest:
+  dto.ActivityFeedResponse:
+    properties:
+      activities:
+        items:
+          $ref: '#/definitions/dto.ActivityResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.ActivityResponse:
+    properties:
+      action:
+        type: string
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      entity_id:
+        type: integer
+      entity_type:
+        type: string
+      id:
+        type: integer
+      metadata:
+        additionalProperties: true
+        type: object
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.AddReactionRequest:
     properties:
       type:
         enum:
@@ -13,23 +52,126 @@ definitions:
     required:
     - type
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.AddToWatchlistRequest:
+  dto.AddToWatchlistRequest:
     properties:
       notes:
         type: string
       rank:
         type: number
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse:
+  dto.AdvancedSearchResponse:
+    properties:
+      limit:
+        type: integer
+      movies:
+        items:
+          $ref: '#/definitions/dto.MovieResponse'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.AuthResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
       user:
-        $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+        $ref: '#/definitions/dto.UserResponse'
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateActivityRequest:
+  dto.BadRequestError:
+    properties:
+      code:
+        example: BAD_REQUEST
+        type: string
+      message:
+        example: invalid request
+        type: string
+    type: object
+  dto.BadRequestErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.BadRequestError'
+      success:
+        example: false
+        type: boolean
+    type: object
+  dto.CommentResponse:
+    properties:
+      avatar_url:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: integer
+      like_count:
+        type: integer
+      movie_id:
+        type: integer
+      parent_id:
+        type: integer
+      reply_count:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.CommentWithMovieResponse:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      like_count:
+        type: integer
+      movie_id:
+        type: integer
+      movie_slug:
+        type: string
+      movie_title:
+        type: string
+      parent_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  dto.ConflictErrorInfo:
+    properties:
+      code:
+        example: CONFLICT
+        type: string
+      message:
+        example: resource already exists
+        type: string
+    type: object
+  dto.ConflictErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ConflictErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  dto.CountData:
+    properties:
+      count:
+        example: 12
+        type: integer
+    type: object
+  dto.CreateActivityRequest:
     properties:
       action:
         type: string
@@ -45,7 +187,7 @@ definitions:
     - entity_id
     - entity_type
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest:
+  dto.CreateCommentRequest:
     properties:
       content:
         maxLength: 2000
@@ -54,7 +196,89 @@ definitions:
     required:
     - content
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest:
+  dto.FollowStatsResponse:
+    properties:
+      follower_count:
+        type: integer
+      following_count:
+        type: integer
+    type: object
+  dto.FollowStatusData:
+    properties:
+      is_following:
+        example: true
+        type: boolean
+    type: object
+  dto.FollowUserResponse:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      display_name:
+        type: string
+      followed_at:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.ForbiddenErrorInfo:
+    properties:
+      code:
+        example: FORBIDDEN
+        type: string
+      message:
+        example: you are not allowed to perform this action
+        type: string
+    type: object
+  dto.ForbiddenErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.ForbiddenErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  dto.GenreResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
+  dto.GenreWithCountResponse:
+    properties:
+      id:
+        type: integer
+      movie_count:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
+  dto.InternalServerErrorInfo:
+    properties:
+      code:
+        example: INTERNAL_SERVER_ERROR
+        type: string
+      message:
+        example: internal server error
+        type: string
+    type: object
+  dto.InternalServerErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.InternalServerErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  dto.LoginRequest:
     properties:
       email:
         type: string
@@ -64,7 +288,114 @@ definitions:
     - email
     - password
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest:
+  dto.MessageData:
+    properties:
+      message:
+        example: operation completed successfully
+        type: string
+    type: object
+  dto.MovieResponse:
+    properties:
+      backdrop_url:
+        type: string
+      content_rating:
+        type: string
+      country:
+        type: string
+      genres:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      imdb_id:
+        type: string
+      imdb_rating:
+        type: number
+      letterboxd_rating:
+        type: number
+      metacritic_score:
+        type: integer
+      original_language:
+        type: string
+      overview:
+        type: string
+      poster_url:
+        type: string
+      release_date:
+        type: string
+      rotten_tomatoes:
+        type: integer
+      runtime:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      tmdb_id:
+        type: integer
+      trailer_url:
+        type: string
+      user_avg_rating:
+        type: number
+      user_rating_count:
+        type: integer
+    type: object
+  dto.NotFoundErrorInfo:
+    properties:
+      code:
+        example: NOT_FOUND
+        type: string
+      message:
+        example: resource not found
+        type: string
+    type: object
+  dto.NotFoundErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.NotFoundErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  dto.NotificationListResponse:
+    properties:
+      limit:
+        type: integer
+      notifications:
+        items:
+          $ref: '#/definitions/dto.NotificationResponse'
+        type: array
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+      unread_count:
+        type: integer
+    type: object
+  dto.NotificationResponse:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      metadata:
+        additionalProperties: true
+        type: object
+      title:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.RateMovieRequest:
     properties:
       score:
         maximum: 10
@@ -73,14 +404,107 @@ definitions:
     required:
     - score
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest:
+  dto.RatingResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      score:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dto.RatingWithMovieResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      poster_url:
+        type: string
+      score:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.RatingWithUserResponse:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: integer
+      score:
+        type: integer
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.ReactionCountResponse:
+    properties:
+      count:
+        type: integer
+      type:
+        type: string
+    type: object
+  dto.ReactionMutationData:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+    type: object
+  dto.ReactionResponse:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.ReactionSummaryResponse:
+    properties:
+      counts:
+        items:
+          $ref: '#/definitions/dto.ReactionCountResponse'
+        type: array
+      user_reaction:
+        type: string
+    type: object
+  dto.RefreshRequest:
     properties:
       refresh_token:
         type: string
     required:
     - refresh_token
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.SignupRequest:
+  dto.SignupRequest:
     properties:
       email:
         type: string
@@ -95,7 +519,37 @@ definitions:
     - password
     - username
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateCommentRequest:
+  dto.SuccessResponse:
+    properties:
+      data: {}
+      success:
+        example: true
+        type: boolean
+    type: object
+  dto.UnauthorizedErrorInfo:
+    properties:
+      code:
+        example: UNAUTHORIZED
+        type: string
+      message:
+        example: authentication required
+        type: string
+    type: object
+  dto.UnauthorizedErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/dto.UnauthorizedErrorInfo'
+      success:
+        example: false
+        type: boolean
+    type: object
+  dto.UnreadCountData:
+    properties:
+      unread_count:
+        example: 3
+        type: integer
+    type: object
+  dto.UpdateCommentRequest:
     properties:
       content:
         maxLength: 2000
@@ -104,7 +558,7 @@ definitions:
     required:
     - content
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateProfileRequest:
+  dto.UpdateProfileRequest:
     properties:
       avatar_url:
         type: string
@@ -115,14 +569,37 @@ definitions:
         maxLength: 100
         type: string
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateWatchlistRequest:
+  dto.UpdateWatchlistRequest:
     properties:
       notes:
         type: string
       rank:
         type: number
     type: object
-  github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse:
+  dto.UserProfileResponse:
+    properties:
+      avatar_url:
+        type: string
+      bio:
+        type: string
+      comment_count:
+        type: integer
+      created_at:
+        type: string
+      display_name:
+        type: string
+      follower_count:
+        type: integer
+      following_count:
+        type: integer
+      id:
+        type: integer
+      rating_count:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.UserResponse:
     properties:
       display_name:
         type: string
@@ -133,12 +610,81 @@ definitions:
       username:
         type: string
     type: object
+  dto.UserSearchResult:
+    properties:
+      avatar_url:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  dto.WatchlistCountResponse:
+    properties:
+      total:
+        type: integer
+      unwatched:
+        type: integer
+      watched:
+        type: integer
+    type: object
+  dto.WatchlistEntryResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      notes:
+        type: string
+      rank_position:
+        type: number
+      watched_at:
+        type: string
+    type: object
+  dto.WatchlistItemResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      movie_id:
+        type: integer
+      notes:
+        type: string
+      poster_url:
+        type: string
+      rank_position:
+        type: number
+      release_date:
+        type: string
+      runtime:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      user_avg_rating:
+        type: number
+      watched_at:
+        type: string
+    type: object
+  dto.WatchlistStatusData:
+    properties:
+      in_watchlist:
+        example: true
+        type: boolean
+    type: object
 host: localhost:8080
 info:
   contact:
     email: support@filmophilia.com
     name: API Support
-  description: API for Filmophilia - A movie discovery and social platform
+  description: API for Filmophilia - A movie discovery and social platform. JSON endpoints
+    return `{success,data}` on success and `{success,error}` on failure.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -157,28 +703,27 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateActivityRequest'
+          $ref: '#/definitions/dto.CreateActivityRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Activity created
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Create an activity
@@ -195,32 +740,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Authenticated successfully
           schema:
-            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse'
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponse'
+              type: object
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "401":
           description: Invalid credentials or user banned
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.UnauthorizedErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Authenticate user
       tags:
       - auth
@@ -235,28 +779,27 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest'
+          $ref: '#/definitions/dto.RefreshRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Logged out successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Refresh token required
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Failed to logout
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Logout user
       tags:
       - auth
@@ -271,32 +814,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest'
+          $ref: '#/definitions/dto.RefreshRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Token refreshed
           schema:
-            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse'
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthResponse'
+              type: object
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "401":
           description: Invalid or expired refresh token
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.UnauthorizedErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Refresh access token
       tags:
       - auth
@@ -311,32 +853,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.SignupRequest'
+          $ref: '#/definitions/dto.SignupRequest'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: User created
           schema:
-            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
         "400":
           description: Invalid request body
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "409":
           description: Email or username already exists
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ConflictErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Register a new user
       tags:
       - auth
@@ -355,33 +896,28 @@ paths:
         "200":
           description: Comment deleted
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "403":
           description: Not authorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ForbiddenErrorResponse'
         "404":
           description: Comment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a comment
@@ -401,25 +937,24 @@ paths:
         "200":
           description: Comment details
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CommentResponse'
+              type: object
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Comment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get a comment
       tags:
       - comments
@@ -438,38 +973,35 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateCommentRequest'
+          $ref: '#/definitions/dto.UpdateCommentRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Updated comment
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CommentResponse'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "403":
           description: Not authorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ForbiddenErrorResponse'
         "404":
           description: Comment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Update a comment
@@ -490,27 +1022,24 @@ paths:
         "200":
           description: Reaction removed
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Reaction not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Remove reaction from comment
@@ -540,19 +1069,22 @@ paths:
         "200":
           description: List of reactions
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ReactionResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get comment reactions
       tags:
       - reactions
@@ -571,33 +1103,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AddReactionRequest'
+          $ref: '#/definitions/dto.AddReactionRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Reaction created/updated
+          description: Reaction created or updated
           schema:
-            additionalProperties: true
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ReactionMutationData'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Comment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: React to a comment
@@ -619,19 +1149,20 @@ paths:
         "200":
           description: Reaction summary
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ReactionSummaryResponse'
+              type: object
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get reaction summary
       tags:
       - reactions
@@ -660,19 +1191,22 @@ paths:
         "200":
           description: List of replies
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CommentResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid comment ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get comment replies
       tags:
       - comments
@@ -685,13 +1219,18 @@ paths:
         "200":
           description: List of genres
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.GenreResponse'
+                  type: array
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get all genres
       tags:
       - genres
@@ -710,25 +1249,24 @@ paths:
         "200":
           description: Genre details
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GenreResponse'
+              type: object
         "400":
           description: Invalid genre ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Genre not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get genre by ID
       tags:
       - genres
@@ -757,19 +1295,22 @@ paths:
         "200":
           description: List of movies
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.MovieResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid genre ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get movies by genre
       tags:
       - genres
@@ -788,26 +1329,24 @@ paths:
         "200":
           description: Genre with movie count
           schema:
-            additionalProperties: true
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GenreWithCountResponse'
+              type: object
         "400":
           description: Invalid genre ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Genre not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get genre with movie count
       tags:
       - genres
@@ -826,25 +1365,24 @@ paths:
         "200":
           description: Genre details
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GenreResponse'
+              type: object
         "400":
           description: Slug required
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Genre not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get genre by slug
       tags:
       - genres
@@ -873,19 +1411,22 @@ paths:
         "200":
           description: List of movies
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.MovieResponse'
+                  type: array
+              type: object
         "400":
           description: Slug required
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get movies by genre slug
       tags:
       - genres
@@ -896,15 +1437,18 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Current user
           schema:
-            $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse'
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user
@@ -930,13 +1474,16 @@ paths:
         "200":
           description: Activity feed
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ActivityFeedResponse'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my activities
@@ -962,13 +1509,18 @@ paths:
         "200":
           description: List of comments
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CommentWithMovieResponse'
+                  type: array
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my comments
@@ -994,13 +1546,16 @@ paths:
         "200":
           description: Activity feed
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ActivityFeedResponse'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get following feed
@@ -1026,13 +1581,18 @@ paths:
         "200":
           description: List of followers
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.FollowUserResponse'
+                  type: array
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my followers
@@ -1058,13 +1618,18 @@ paths:
         "200":
           description: List of following
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.FollowUserResponse'
+                  type: array
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my following
@@ -1090,13 +1655,16 @@ paths:
         "200":
           description: Notifications
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NotificationListResponse'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my notifications
@@ -1122,13 +1690,16 @@ paths:
         "200":
           description: Unread notifications
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.NotificationListResponse'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get unread notifications
@@ -1143,13 +1714,16 @@ paths:
         "200":
           description: Unread count
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UnreadCountData'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get unread notification count
@@ -1164,19 +1738,20 @@ paths:
         "200":
           description: User profile
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserProfileResponse'
+              type: object
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my profile
@@ -1192,26 +1767,27 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateProfileRequest'
+          $ref: '#/definitions/dto.UpdateProfileRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Updated user
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResponse'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Update my profile
@@ -1237,13 +1813,18 @@ paths:
         "200":
           description: List of ratings
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.RatingWithMovieResponse'
+                  type: array
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my ratings
@@ -1274,13 +1855,18 @@ paths:
         "200":
           description: Watchlist items
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.WatchlistItemResponse'
+                  type: array
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my watchlist
@@ -1295,13 +1881,16 @@ paths:
         "200":
           description: Watchlist count
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistCountResponse'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get watchlist count
@@ -1327,14 +1916,18 @@ paths:
         "200":
           description: List of movies
           schema:
-            additionalProperties: true
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.MovieResponse'
+                  type: array
+              type: object
         "500":
           description: Failed to fetch movies
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: List movies
       tags:
       - movies
@@ -1363,19 +1956,22 @@ paths:
         "200":
           description: List of activities
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ActivityResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get movie activities
       tags:
       - activities
@@ -1404,19 +2000,22 @@ paths:
         "200":
           description: List of comments
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CommentResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get movie comments
       tags:
       - comments
@@ -1435,32 +2034,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest'
+          $ref: '#/definitions/dto.CreateCommentRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created comment
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CommentResponse'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a comment
@@ -1487,32 +2085,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest'
+          $ref: '#/definitions/dto.CreateCommentRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created reply
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CommentResponse'
+              type: object
         "400":
           description: Invalid request or cannot reply to reply
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie or parent comment not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Reply to a comment
@@ -1533,21 +2130,20 @@ paths:
         "200":
           description: Comment count
           schema:
-            additionalProperties:
-              type: integer
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CountData'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get movie comment count
       tags:
       - comments
@@ -1566,27 +2162,24 @@ paths:
         "200":
           description: Rating deleted
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Rating not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete my rating
@@ -1604,27 +2197,26 @@ paths:
       - application/json
       responses:
         "200":
-          description: User's rating
+          description: User rating
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RatingResponse'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Rating not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get my rating for a movie
@@ -1645,32 +2237,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest'
+          $ref: '#/definitions/dto.RateMovieRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Rating created/updated
+          description: Rating created or updated
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.RatingResponse'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Rate a movie
@@ -1701,19 +2292,22 @@ paths:
         "200":
           description: List of ratings
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.RatingWithUserResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get movie ratings
       tags:
       - ratings
@@ -1732,27 +2326,24 @@ paths:
         "200":
           description: Removed successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not in watchlist
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Remove from watchlist
@@ -1772,25 +2363,24 @@ paths:
         "200":
           description: Watchlist entry
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistEntryResponse'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not in watchlist
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Get watchlist entry
@@ -1811,32 +2401,31 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateWatchlistRequest'
+          $ref: '#/definitions/dto.UpdateWatchlistRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Updated entry
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistEntryResponse'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not in watchlist
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Update watchlist entry
@@ -1856,38 +2445,35 @@ paths:
         in: body
         name: request
         schema:
-          $ref: '#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AddToWatchlistRequest'
+          $ref: '#/definitions/dto.AddToWatchlistRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Movie added to watchlist
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistEntryResponse'
+              type: object
         "400":
           description: Invalid request
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "409":
           description: Movie already in watchlist
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ConflictErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Add movie to watchlist
@@ -1908,21 +2494,20 @@ paths:
         "200":
           description: In watchlist status
           schema:
-            additionalProperties:
-              type: boolean
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistStatusData'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Check if movie is in watchlist
@@ -1943,25 +2528,24 @@ paths:
         "200":
           description: Updated entry
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistEntryResponse'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not in watchlist
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Mark movie as unwatched
@@ -1981,25 +2565,24 @@ paths:
         "200":
           description: Updated entry
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.WatchlistEntryResponse'
+              type: object
         "400":
           description: Invalid movie ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Movie not in watchlist
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Mark movie as watched
@@ -2087,13 +2670,16 @@ paths:
         "200":
           description: Search results
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AdvancedSearchResponse'
+              type: object
         "500":
           description: Search failed
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Search movies with filters
       tags:
       - movies
@@ -2112,13 +2698,16 @@ paths:
         "200":
           description: Movie details
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MovieResponse'
+              type: object
         "404":
           description: Movie not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
       summary: Get movie by slug
       tags:
       - movies
@@ -2131,15 +2720,16 @@ paths:
         "200":
           description: All notifications deleted
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete all notifications
@@ -2160,33 +2750,28 @@ paths:
         "200":
           description: Notification deleted
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid notification ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "403":
           description: Unauthorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ForbiddenErrorResponse'
         "404":
           description: Notification not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a notification
@@ -2207,33 +2792,28 @@ paths:
         "200":
           description: Marked as read
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid notification ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "403":
           description: Unauthorized
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ForbiddenErrorResponse'
         "404":
           description: Notification not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Mark notification as read
@@ -2248,15 +2828,16 @@ paths:
         "200":
           description: All marked as read
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Mark all notifications as read
@@ -2277,25 +2858,24 @@ paths:
         "200":
           description: User profile
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserProfileResponse'
+              type: object
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get user profile
       tags:
       - users
@@ -2324,19 +2904,20 @@ paths:
         "200":
           description: Activity feed
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ActivityFeedResponse'
+              type: object
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get user activities
       tags:
       - activities
@@ -2355,27 +2936,24 @@ paths:
         "200":
           description: Unfollowed successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid user ID or cannot unfollow self
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: Not following this user
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Unfollow a user
@@ -2395,33 +2973,28 @@ paths:
         "201":
           description: Followed successfully
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MessageData'
+              type: object
         "400":
           description: Invalid user ID or cannot follow self
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "409":
           description: Already following
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.ConflictErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Follow a user
@@ -2442,19 +3015,20 @@ paths:
         "200":
           description: Follow stats
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.FollowStatsResponse'
+              type: object
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get follow stats
       tags:
       - follows
@@ -2483,19 +3057,22 @@ paths:
         "200":
           description: List of followers
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.FollowUserResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get user's followers
       tags:
       - follows
@@ -2524,19 +3101,22 @@ paths:
         "200":
           description: List of following
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.FollowUserResponse'
+                  type: array
+              type: object
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get user's following
       tags:
       - follows
@@ -2555,19 +3135,20 @@ paths:
         "200":
           description: Following status
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.FollowStatusData'
+              type: object
         "400":
           description: Invalid user ID
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       security:
       - BearerAuth: []
       summary: Check if following
@@ -2598,19 +3179,22 @@ paths:
         "200":
           description: Search results
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.UserSearchResult'
+                  type: array
+              type: object
         "400":
           description: Search query required
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Search users
       tags:
       - users
@@ -2629,25 +3213,24 @@ paths:
         "200":
           description: User profile
           schema:
-            type: object
+            allOf:
+            - $ref: '#/definitions/dto.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserProfileResponse'
+              type: object
         "400":
           description: Username required
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.BadRequestErrorResponse'
         "404":
           description: User not found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.NotFoundErrorResponse'
         "500":
           description: Internal server error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/dto.InternalServerErrorResponse'
       summary: Get user profile by username
       tags:
       - users

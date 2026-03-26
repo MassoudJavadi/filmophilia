@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/ratelimit"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,10 +23,7 @@ func RateLimitMiddleware(limiter *ratelimit.RateLimiter, limit int, window time.
 		if !result.Allowed {
 			retryAfter := result.RetryAfter()
 			c.Header("Retry-After", strconv.Itoa(retryAfter))
-			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
-				"error":       "rate limit exceeded",
-				"retry_after": retryAfter,
-			})
+			response.AbortRateLimitError(c, retryAfter)
 			return
 		}
 

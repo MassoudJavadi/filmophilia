@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -26,11 +28,11 @@ func NewFollowHandler(followSvc service.FollowService) *FollowHandler {
 // @Produce json
 // @Security BearerAuth
 // @Param userId path int true "User ID to follow"
-// @Success 201 {object} map[string]string "Followed successfully"
-// @Failure 400 {object} map[string]string "Invalid user ID or cannot follow self"
-// @Failure 404 {object} map[string]string "User not found"
-// @Failure 409 {object} map[string]string "Already following"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} dto.SuccessResponse{data=dto.MessageData} "Followed successfully"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID or cannot follow self"
+// @Failure 404 {object} dto.NotFoundErrorResponse "User not found"
+// @Failure 409 {object} dto.ConflictErrorResponse "Already following"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/follow [post]
 func (h *FollowHandler) Follow(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -38,26 +40,26 @@ func (h *FollowHandler) Follow(c *gin.Context) {
 	targetIDStr := c.Param("userId")
 	targetID, err := strconv.Atoi(targetIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
 	if err := h.followSvc.Follow(c.Request.Context(), userID, int32(targetID)); err != nil {
 		switch {
 		case errors.Is(err, service.ErrCannotFollowSelf):
-			c.JSON(http.StatusBadRequest, gin.H{"error": "cannot follow yourself"})
+			response.Error(c, http.StatusBadRequest, "CANNOT_FOLLOW_SELF", "cannot follow yourself")
 		case errors.Is(err, service.ErrAlreadyFollowing):
-			c.JSON(http.StatusConflict, gin.H{"error": "already following this user"})
+			response.Error(c, http.StatusConflict, "ALREADY_FOLLOWING", "already following this user")
 		case errors.Is(err, service.ErrUserNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+			response.Error(c, http.StatusNotFound, "USER_NOT_FOUND", "user not found")
 		default:
 			log.Printf("follow error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "followed successfully"})
+	response.Message(c, http.StatusCreated, "followed successfully")
 }
 
 // Unfollow godoc
@@ -67,10 +69,10 @@ func (h *FollowHandler) Follow(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param userId path int true "User ID to unfollow"
-// @Success 200 {object} map[string]string "Unfollowed successfully"
-// @Failure 400 {object} map[string]string "Invalid user ID or cannot unfollow self"
-// @Failure 404 {object} map[string]string "Not following this user"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "Unfollowed successfully"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID or cannot unfollow self"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Not following this user"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/follow [delete]
 func (h *FollowHandler) Unfollow(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -78,24 +80,24 @@ func (h *FollowHandler) Unfollow(c *gin.Context) {
 	targetIDStr := c.Param("userId")
 	targetID, err := strconv.Atoi(targetIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
 	if err := h.followSvc.Unfollow(c.Request.Context(), userID, int32(targetID)); err != nil {
 		switch {
 		case errors.Is(err, service.ErrCannotFollowSelf):
-			c.JSON(http.StatusBadRequest, gin.H{"error": "cannot unfollow yourself"})
+			response.Error(c, http.StatusBadRequest, "CANNOT_UNFOLLOW_SELF", "cannot unfollow yourself")
 		case errors.Is(err, service.ErrNotFollowing):
-			c.JSON(http.StatusNotFound, gin.H{"error": "not following this user"})
+			response.Error(c, http.StatusNotFound, "NOT_FOLLOWING", "not following this user")
 		default:
 			log.Printf("unfollow error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "unfollowed successfully"})
+	response.Message(c, http.StatusOK, "unfollowed successfully")
 }
 
 // IsFollowing godoc
@@ -105,9 +107,9 @@ func (h *FollowHandler) Unfollow(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param userId path int true "User ID to check"
-// @Success 200 {object} object "Following status"
-// @Failure 400 {object} map[string]string "Invalid user ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.FollowStatusData} "Following status"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/following/check [get]
 func (h *FollowHandler) IsFollowing(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -115,18 +117,18 @@ func (h *FollowHandler) IsFollowing(c *gin.Context) {
 	targetIDStr := c.Param("userId")
 	targetID, err := strconv.Atoi(targetIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
 	isFollowing, err := h.followSvc.IsFollowing(c.Request.Context(), userID, int32(targetID))
 	if err != nil {
 		log.Printf("is following error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": gin.H{"is_following": isFollowing}})
+	response.OK(c, dto.FollowStatusData{IsFollowing: isFollowing})
 }
 
 // GetFollowers godoc
@@ -137,15 +139,15 @@ func (h *FollowHandler) IsFollowing(c *gin.Context) {
 // @Param userId path int true "User ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of followers"
-// @Failure 400 {object} map[string]string "Invalid user ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.FollowUserResponse} "List of followers"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/followers [get]
 func (h *FollowHandler) GetFollowers(c *gin.Context) {
 	userIDStr := c.Param("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
@@ -156,11 +158,11 @@ func (h *FollowHandler) GetFollowers(c *gin.Context) {
 	followers, err := h.followSvc.GetFollowers(c.Request.Context(), int32(userID), int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get followers error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToFollowUserResponses(followers)})
+	response.OK(c, mapper.ToFollowUserResponses(followers))
 }
 
 // GetFollowing godoc
@@ -171,15 +173,15 @@ func (h *FollowHandler) GetFollowers(c *gin.Context) {
 // @Param userId path int true "User ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of following"
-// @Failure 400 {object} map[string]string "Invalid user ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.FollowUserResponse} "List of following"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/following [get]
 func (h *FollowHandler) GetFollowing(c *gin.Context) {
 	userIDStr := c.Param("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
@@ -190,11 +192,11 @@ func (h *FollowHandler) GetFollowing(c *gin.Context) {
 	following, err := h.followSvc.GetFollowing(c.Request.Context(), int32(userID), int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get following error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToFollowingUserResponses(following)})
+	response.OK(c, mapper.ToFollowingUserResponses(following))
 }
 
 // GetMyFollowers godoc
@@ -205,8 +207,8 @@ func (h *FollowHandler) GetFollowing(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of followers"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.FollowUserResponse} "List of followers"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/followers [get]
 func (h *FollowHandler) GetMyFollowers(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -218,11 +220,11 @@ func (h *FollowHandler) GetMyFollowers(c *gin.Context) {
 	followers, err := h.followSvc.GetFollowers(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get my followers error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToFollowUserResponses(followers)})
+	response.OK(c, mapper.ToFollowUserResponses(followers))
 }
 
 // GetMyFollowing godoc
@@ -233,8 +235,8 @@ func (h *FollowHandler) GetMyFollowers(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of following"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.FollowUserResponse} "List of following"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/following [get]
 func (h *FollowHandler) GetMyFollowing(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -246,11 +248,11 @@ func (h *FollowHandler) GetMyFollowing(c *gin.Context) {
 	following, err := h.followSvc.GetFollowing(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get my following error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToFollowingUserResponses(following)})
+	response.OK(c, mapper.ToFollowingUserResponses(following))
 }
 
 // GetStats godoc
@@ -259,29 +261,27 @@ func (h *FollowHandler) GetMyFollowing(c *gin.Context) {
 // @Tags follows
 // @Produce json
 // @Param userId path int true "User ID"
-// @Success 200 {object} object "Follow stats"
-// @Failure 400 {object} map[string]string "Invalid user ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.FollowStatsResponse} "Follow stats"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/follow-stats [get]
 func (h *FollowHandler) GetStats(c *gin.Context) {
 	userIDStr := c.Param("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
 	followerCount, followingCount, err := h.followSvc.GetStats(c.Request.Context(), int32(userID))
 	if err != nil {
 		log.Printf("get stats error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"follower_count":  followerCount,
-			"following_count": followingCount,
-		},
+	response.OK(c, dto.FollowStatsResponse{
+		FollowerCount:  followerCount,
+		FollowingCount: followingCount,
 	})
 }

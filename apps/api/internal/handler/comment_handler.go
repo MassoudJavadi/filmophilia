@@ -8,6 +8,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -29,21 +30,21 @@ func NewCommentHandler(commentSvc service.CommentService) *CommentHandler {
 // @Security BearerAuth
 // @Param movieId path int true "Movie ID"
 // @Param request body dto.CreateCommentRequest true "Comment content"
-// @Success 201 {object} object "Created comment"
-// @Failure 400 {object} map[string]string "Invalid request"
-// @Failure 404 {object} map[string]string "Movie not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} dto.SuccessResponse{data=dto.CommentResponse} "Created comment"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Movie not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /movies/{movieId}/comments [post]
 func (h *CommentHandler) CreateComment(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_MOVIE_ID", "invalid movie id")
 		return
 	}
 
 	var req dto.CreateCommentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
@@ -53,15 +54,15 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrMovieNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "movie not found"})
+			response.Error(c, http.StatusNotFound, "MOVIE_NOT_FOUND", "movie not found")
 		default:
 			log.Printf("create comment error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": mapper.ToCommentWithUserResponse(comment)})
+	response.Created(c, mapper.ToCommentWithUserResponse(comment))
 }
 
 // CreateReply godoc
@@ -74,27 +75,27 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 // @Param movieId path int true "Movie ID"
 // @Param commentId path int true "Parent Comment ID"
 // @Param request body dto.CreateCommentRequest true "Reply content"
-// @Success 201 {object} object "Created reply"
-// @Failure 400 {object} map[string]string "Invalid request or cannot reply to reply"
-// @Failure 404 {object} map[string]string "Movie or parent comment not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} dto.SuccessResponse{data=dto.CommentResponse} "Created reply"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request or cannot reply to reply"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Movie or parent comment not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /movies/{movieId}/comments/{commentId}/replies [post]
 func (h *CommentHandler) CreateReply(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_MOVIE_ID", "invalid movie id")
 		return
 	}
 
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
 	var req dto.CreateCommentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
@@ -105,19 +106,19 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrMovieNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "movie not found"})
+			response.Error(c, http.StatusNotFound, "MOVIE_NOT_FOUND", "movie not found")
 		case errors.Is(err, service.ErrParentNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "parent comment not found"})
+			response.Error(c, http.StatusNotFound, "PARENT_COMMENT_NOT_FOUND", "parent comment not found")
 		case errors.Is(err, service.ErrCannotReplyReply):
-			c.JSON(http.StatusBadRequest, gin.H{"error": "cannot reply to a reply"})
+			response.Error(c, http.StatusBadRequest, "CANNOT_REPLY_TO_REPLY", "cannot reply to a reply")
 		default:
 			log.Printf("create reply error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": mapper.ToCommentWithUserResponse(comment)})
+	response.Created(c, mapper.ToCommentWithUserResponse(comment))
 }
 
 // GetComment godoc
@@ -126,30 +127,30 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 // @Tags comments
 // @Produce json
 // @Param commentId path int true "Comment ID"
-// @Success 200 {object} object "Comment details"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
-// @Failure 404 {object} map[string]string "Comment not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.CommentResponse} "Comment details"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid comment ID"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Comment not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId} [get]
 func (h *CommentHandler) GetComment(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
 	comment, err := h.commentSvc.GetByID(c.Request.Context(), commentID)
 	if err != nil {
 		if errors.Is(err, service.ErrCommentNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
+			response.Error(c, http.StatusNotFound, "COMMENT_NOT_FOUND", "comment not found")
 			return
 		}
 		log.Printf("get comment error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToCommentWithUserResponse(comment)})
+	response.OK(c, mapper.ToCommentWithUserResponse(comment))
 }
 
 // GetMovieComments godoc
@@ -160,14 +161,14 @@ func (h *CommentHandler) GetComment(c *gin.Context) {
 // @Param movieId path int true "Movie ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of comments"
-// @Failure 400 {object} map[string]string "Invalid movie ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.CommentResponse} "List of comments"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid movie ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /movies/{movieId}/comments [get]
 func (h *CommentHandler) GetMovieComments(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_MOVIE_ID", "invalid movie id")
 		return
 	}
 
@@ -178,11 +179,11 @@ func (h *CommentHandler) GetMovieComments(c *gin.Context) {
 	comments, err := h.commentSvc.GetMovieComments(c.Request.Context(), int32(movieID), int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get movie comments error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToCommentResponses(comments)})
+	response.OK(c, mapper.ToCommentResponses(comments))
 }
 
 // GetReplies godoc
@@ -193,14 +194,14 @@ func (h *CommentHandler) GetMovieComments(c *gin.Context) {
 // @Param commentId path int true "Comment ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of replies"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.CommentResponse} "List of replies"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid comment ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId}/replies [get]
 func (h *CommentHandler) GetReplies(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
@@ -211,11 +212,11 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 	replies, err := h.commentSvc.GetReplies(c.Request.Context(), commentID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get replies error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToReplyResponses(replies)})
+	response.OK(c, mapper.ToReplyResponses(replies))
 }
 
 // GetMyComments godoc
@@ -226,8 +227,8 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of comments"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.CommentWithMovieResponse} "List of comments"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/comments [get]
 func (h *CommentHandler) GetMyComments(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -239,11 +240,11 @@ func (h *CommentHandler) GetMyComments(c *gin.Context) {
 	comments, err := h.commentSvc.GetUserComments(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get my comments error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToCommentWithMovieResponses(comments)})
+	response.OK(c, mapper.ToCommentWithMovieResponses(comments))
 }
 
 // UpdateComment godoc
@@ -255,22 +256,22 @@ func (h *CommentHandler) GetMyComments(c *gin.Context) {
 // @Security BearerAuth
 // @Param commentId path int true "Comment ID"
 // @Param request body dto.UpdateCommentRequest true "New content"
-// @Success 200 {object} object "Updated comment"
-// @Failure 400 {object} map[string]string "Invalid request"
-// @Failure 403 {object} map[string]string "Not authorized"
-// @Failure 404 {object} map[string]string "Comment not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.CommentResponse} "Updated comment"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request"
+// @Failure 403 {object} dto.ForbiddenErrorResponse "Not authorized"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Comment not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId} [patch]
 func (h *CommentHandler) UpdateComment(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
 	var req dto.UpdateCommentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
@@ -280,17 +281,17 @@ func (h *CommentHandler) UpdateComment(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, service.ErrCommentNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
+			response.Error(c, http.StatusNotFound, "COMMENT_NOT_FOUND", "comment not found")
 		case errors.Is(err, service.ErrNotCommentOwner):
-			c.JSON(http.StatusForbidden, gin.H{"error": "not authorized to edit this comment"})
+			response.Error(c, http.StatusForbidden, "NOT_COMMENT_OWNER", "not authorized to edit this comment")
 		default:
 			log.Printf("update comment error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToCommentWithUserResponse(comment)})
+	response.OK(c, mapper.ToCommentWithUserResponse(comment))
 }
 
 // DeleteComment godoc
@@ -300,16 +301,16 @@ func (h *CommentHandler) UpdateComment(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param commentId path int true "Comment ID"
-// @Success 200 {object} map[string]string "Comment deleted"
-// @Failure 400 {object} map[string]string "Invalid comment ID"
-// @Failure 403 {object} map[string]string "Not authorized"
-// @Failure 404 {object} map[string]string "Comment not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "Comment deleted"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid comment ID"
+// @Failure 403 {object} dto.ForbiddenErrorResponse "Not authorized"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Comment not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /comments/{commentId} [delete]
 func (h *CommentHandler) DeleteComment(c *gin.Context) {
 	commentID, err := strconv.ParseInt(c.Param("commentId"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid comment id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_COMMENT_ID", "invalid comment id")
 		return
 	}
 
@@ -318,17 +319,17 @@ func (h *CommentHandler) DeleteComment(c *gin.Context) {
 	if err := h.commentSvc.Delete(c.Request.Context(), userID, commentID); err != nil {
 		switch {
 		case errors.Is(err, service.ErrCommentNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "comment not found"})
+			response.Error(c, http.StatusNotFound, "COMMENT_NOT_FOUND", "comment not found")
 		case errors.Is(err, service.ErrNotCommentOwner):
-			c.JSON(http.StatusForbidden, gin.H{"error": "not authorized to delete this comment"})
+			response.Error(c, http.StatusForbidden, "NOT_COMMENT_OWNER", "not authorized to delete this comment")
 		default:
 			log.Printf("delete comment error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "comment deleted"})
+	response.Message(c, http.StatusOK, "comment deleted")
 }
 
 // GetMovieCommentCount godoc
@@ -337,23 +338,23 @@ func (h *CommentHandler) DeleteComment(c *gin.Context) {
 // @Tags comments
 // @Produce json
 // @Param movieId path int true "Movie ID"
-// @Success 200 {object} map[string]int "Comment count"
-// @Failure 400 {object} map[string]string "Invalid movie ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.CountData} "Comment count"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid movie ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /movies/{movieId}/comments/count [get]
 func (h *CommentHandler) GetMovieCommentCount(c *gin.Context) {
 	movieID, err := strconv.Atoi(c.Param("movieId"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_MOVIE_ID", "invalid movie id")
 		return
 	}
 
 	count, err := h.commentSvc.CountMovieComments(c.Request.Context(), int32(movieID))
 	if err != nil {
 		log.Printf("get movie comment count error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"count": count})
+	response.OK(c, dto.CountData{Count: count})
 }

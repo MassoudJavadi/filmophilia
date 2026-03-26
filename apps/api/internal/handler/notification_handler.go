@@ -8,6 +8,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -28,8 +29,8 @@ func NewNotificationHandler(notifSvc service.NotificationService) *NotificationH
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "Notifications"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.NotificationListResponse} "Notifications"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/notifications [get]
 func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -41,7 +42,7 @@ func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 	notifications, total, unreadCount, err := h.notifSvc.GetUserNotifications(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get notifications error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch notifications"})
+		response.Error(c, http.StatusInternalServerError, "NOTIFICATIONS_FETCH_FAILED", "failed to fetch notifications")
 		return
 	}
 
@@ -50,15 +51,13 @@ func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 		totalPages++
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": dto.NotificationListResponse{
-			Notifications: mapper.ToNotificationResponses(notifications),
-			Total:         total,
-			UnreadCount:   unreadCount,
-			Page:          int32(page),
-			Limit:         int32(limit),
-			TotalPages:    totalPages,
-		},
+	response.OK(c, dto.NotificationListResponse{
+		Notifications: mapper.ToNotificationResponses(notifications),
+		Total:         total,
+		UnreadCount:   unreadCount,
+		Page:          int32(page),
+		Limit:         int32(limit),
+		TotalPages:    totalPages,
 	})
 }
 
@@ -70,8 +69,8 @@ func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "Unread notifications"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.NotificationListResponse} "Unread notifications"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/notifications/unread [get]
 func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -83,7 +82,7 @@ func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
 	notifications, count, err := h.notifSvc.GetUnreadNotifications(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get unread notifications error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch notifications"})
+		response.Error(c, http.StatusInternalServerError, "NOTIFICATIONS_FETCH_FAILED", "failed to fetch notifications")
 		return
 	}
 
@@ -92,15 +91,13 @@ func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
 		totalPages++
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": dto.NotificationListResponse{
-			Notifications: mapper.ToNotificationResponses(notifications),
-			Total:         count,
-			UnreadCount:   count,
-			Page:          int32(page),
-			Limit:         int32(limit),
-			TotalPages:    totalPages,
-		},
+	response.OK(c, dto.NotificationListResponse{
+		Notifications: mapper.ToNotificationResponses(notifications),
+		Total:         count,
+		UnreadCount:   count,
+		Page:          int32(page),
+		Limit:         int32(limit),
+		TotalPages:    totalPages,
 	})
 }
 
@@ -110,8 +107,8 @@ func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
 // @Tags notifications
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} object "Unread count"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.UnreadCountData} "Unread count"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/notifications/unread/count [get]
 func (h *NotificationHandler) GetUnreadCount(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -119,11 +116,11 @@ func (h *NotificationHandler) GetUnreadCount(c *gin.Context) {
 	_, _, unreadCount, err := h.notifSvc.GetUserNotifications(c.Request.Context(), userID, 1, 0)
 	if err != nil {
 		log.Printf("get unread count error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch count"})
+		response.Error(c, http.StatusInternalServerError, "COUNT_FETCH_FAILED", "failed to fetch count")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": gin.H{"unread_count": unreadCount}})
+	response.OK(c, dto.UnreadCountData{UnreadCount: unreadCount})
 }
 
 // MarkAsRead godoc
@@ -133,11 +130,11 @@ func (h *NotificationHandler) GetUnreadCount(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param notificationId path int true "Notification ID"
-// @Success 200 {object} map[string]string "Marked as read"
-// @Failure 400 {object} map[string]string "Invalid notification ID"
-// @Failure 403 {object} map[string]string "Unauthorized"
-// @Failure 404 {object} map[string]string "Notification not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "Marked as read"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid notification ID"
+// @Failure 403 {object} dto.ForbiddenErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Notification not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /notifications/{notificationId}/read [patch]
 func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -145,24 +142,24 @@ func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 	notifIDStr := c.Param("notificationId")
 	notifID, err := strconv.ParseInt(notifIDStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid notification id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_NOTIFICATION_ID", "invalid notification id")
 		return
 	}
 
 	if err := h.notifSvc.MarkNotificationAsRead(c.Request.Context(), userID, notifID); err != nil {
 		switch {
 		case errors.Is(err, service.ErrNotificationNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "notification not found"})
+			response.Error(c, http.StatusNotFound, "NOTIFICATION_NOT_FOUND", "notification not found")
 		case errors.Is(err, service.ErrUnauthorized):
-			c.JSON(http.StatusForbidden, gin.H{"error": "unauthorized"})
+			response.Error(c, http.StatusForbidden, "FORBIDDEN", "unauthorized")
 		default:
 			log.Printf("mark as read error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update notification"})
+			response.Error(c, http.StatusInternalServerError, "NOTIFICATION_UPDATE_FAILED", "failed to update notification")
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "notification marked as read"})
+	response.Message(c, http.StatusOK, "notification marked as read")
 }
 
 // MarkAllAsRead godoc
@@ -171,19 +168,19 @@ func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
 // @Tags notifications
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} map[string]string "All marked as read"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "All marked as read"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /notifications/read-all [post]
 func (h *NotificationHandler) MarkAllAsRead(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
 	if err := h.notifSvc.MarkAllAsRead(c.Request.Context(), userID); err != nil {
 		log.Printf("mark all as read error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update notifications"})
+		response.Error(c, http.StatusInternalServerError, "NOTIFICATIONS_UPDATE_FAILED", "failed to update notifications")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "all notifications marked as read"})
+	response.Message(c, http.StatusOK, "all notifications marked as read")
 }
 
 // DeleteNotification godoc
@@ -193,11 +190,11 @@ func (h *NotificationHandler) MarkAllAsRead(c *gin.Context) {
 // @Produce json
 // @Security BearerAuth
 // @Param notificationId path int true "Notification ID"
-// @Success 200 {object} map[string]string "Notification deleted"
-// @Failure 400 {object} map[string]string "Invalid notification ID"
-// @Failure 403 {object} map[string]string "Unauthorized"
-// @Failure 404 {object} map[string]string "Notification not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "Notification deleted"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid notification ID"
+// @Failure 403 {object} dto.ForbiddenErrorResponse "Unauthorized"
+// @Failure 404 {object} dto.NotFoundErrorResponse "Notification not found"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /notifications/{notificationId} [delete]
 func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -205,24 +202,24 @@ func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 	notifIDStr := c.Param("notificationId")
 	notifID, err := strconv.ParseInt(notifIDStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid notification id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_NOTIFICATION_ID", "invalid notification id")
 		return
 	}
 
 	if err := h.notifSvc.DeleteNotification(c.Request.Context(), userID, notifID); err != nil {
 		switch {
 		case errors.Is(err, service.ErrNotificationNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "notification not found"})
+			response.Error(c, http.StatusNotFound, "NOTIFICATION_NOT_FOUND", "notification not found")
 		case errors.Is(err, service.ErrUnauthorized):
-			c.JSON(http.StatusForbidden, gin.H{"error": "unauthorized"})
+			response.Error(c, http.StatusForbidden, "FORBIDDEN", "unauthorized")
 		default:
 			log.Printf("delete notification error: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete notification"})
+			response.Error(c, http.StatusInternalServerError, "NOTIFICATION_DELETE_FAILED", "failed to delete notification")
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "notification deleted"})
+	response.Message(c, http.StatusOK, "notification deleted")
 }
 
 // DeleteAllNotifications godoc
@@ -231,17 +228,17 @@ func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
 // @Tags notifications
 // @Produce json
 // @Security BearerAuth
-// @Success 200 {object} map[string]string "All notifications deleted"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.MessageData} "All notifications deleted"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /notifications [delete]
 func (h *NotificationHandler) DeleteAllNotifications(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
 	if err := h.notifSvc.DeleteAllNotifications(c.Request.Context(), userID); err != nil {
 		log.Printf("delete all notifications error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete notifications"})
+		response.Error(c, http.StatusInternalServerError, "NOTIFICATIONS_DELETE_FAILED", "failed to delete notifications")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "all notifications deleted"})
+	response.Message(c, http.StatusOK, "all notifications deleted")
 }

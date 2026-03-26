@@ -7,6 +7,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -27,26 +28,26 @@ func NewActivityHandler(activitySvc service.ActivityService) *ActivityHandler {
 // @Produce json
 // @Security BearerAuth
 // @Param request body dto.CreateActivityRequest true "Activity details"
-// @Success 201 {object} map[string]string "Activity created"
-// @Failure 400 {object} map[string]string "Invalid request"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 201 {object} dto.SuccessResponse{data=dto.MessageData} "Activity created"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid request"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /activities [post]
 func (h *ActivityHandler) CreateActivity(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
 	var req dto.CreateActivityRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, "INVALID_REQUEST_BODY", err.Error())
 		return
 	}
 
 	if err := h.activitySvc.CreateActivity(c.Request.Context(), userID, req.Action, req.EntityType, req.EntityID, req.Metadata); err != nil {
 		log.Printf("create activity error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create activity"})
+		response.Error(c, http.StatusInternalServerError, "ACTIVITY_CREATION_FAILED", "failed to create activity")
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "activity created"})
+	response.Message(c, http.StatusCreated, "activity created")
 }
 
 // GetMyActivities godoc
@@ -57,8 +58,8 @@ func (h *ActivityHandler) CreateActivity(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "Activity feed"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ActivityFeedResponse} "Activity feed"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/activities [get]
 func (h *ActivityHandler) GetMyActivities(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -70,7 +71,7 @@ func (h *ActivityHandler) GetMyActivities(c *gin.Context) {
 	activities, total, err := h.activitySvc.GetUserActivities(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get my activities error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch activities"})
+		response.Error(c, http.StatusInternalServerError, "ACTIVITIES_FETCH_FAILED", "failed to fetch activities")
 		return
 	}
 
@@ -79,14 +80,12 @@ func (h *ActivityHandler) GetMyActivities(c *gin.Context) {
 		totalPages++
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": dto.ActivityFeedResponse{
-			Activities: mapper.ToActivityResponses(activities),
-			Total:      total,
-			Page:       int32(page),
-			Limit:      int32(limit),
-			TotalPages: totalPages,
-		},
+	response.OK(c, dto.ActivityFeedResponse{
+		Activities: mapper.ToActivityResponses(activities),
+		Total:      total,
+		Page:       int32(page),
+		Limit:      int32(limit),
+		TotalPages: totalPages,
 	})
 }
 
@@ -98,15 +97,15 @@ func (h *ActivityHandler) GetMyActivities(c *gin.Context) {
 // @Param userId path int true "User ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "Activity feed"
-// @Failure 400 {object} map[string]string "Invalid user ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ActivityFeedResponse} "Activity feed"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid user ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /users/{userId}/activities [get]
 func (h *ActivityHandler) GetUserActivities(c *gin.Context) {
 	userIDStr := c.Param("userId")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_USER_ID", "invalid user id")
 		return
 	}
 
@@ -117,7 +116,7 @@ func (h *ActivityHandler) GetUserActivities(c *gin.Context) {
 	activities, total, err := h.activitySvc.GetUserActivities(c.Request.Context(), int32(userID), int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get user activities error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch activities"})
+		response.Error(c, http.StatusInternalServerError, "ACTIVITIES_FETCH_FAILED", "failed to fetch activities")
 		return
 	}
 
@@ -126,14 +125,12 @@ func (h *ActivityHandler) GetUserActivities(c *gin.Context) {
 		totalPages++
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": dto.ActivityFeedResponse{
-			Activities: mapper.ToActivityResponses(activities),
-			Total:      total,
-			Page:       int32(page),
-			Limit:      int32(limit),
-			TotalPages: totalPages,
-		},
+	response.OK(c, dto.ActivityFeedResponse{
+		Activities: mapper.ToActivityResponses(activities),
+		Total:      total,
+		Page:       int32(page),
+		Limit:      int32(limit),
+		TotalPages: totalPages,
 	})
 }
 
@@ -145,8 +142,8 @@ func (h *ActivityHandler) GetUserActivities(c *gin.Context) {
 // @Security BearerAuth
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "Activity feed"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=dto.ActivityFeedResponse} "Activity feed"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /me/feed [get]
 func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
@@ -158,7 +155,7 @@ func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 	activities, total, err := h.activitySvc.GetFollowingActivities(c.Request.Context(), userID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get following feed error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch feed"})
+		response.Error(c, http.StatusInternalServerError, "FEED_FETCH_FAILED", "failed to fetch feed")
 		return
 	}
 
@@ -167,14 +164,12 @@ func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 		totalPages++
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": dto.ActivityFeedResponse{
-			Activities: mapper.ToFollowingActivityResponses(activities),
-			Total:      total,
-			Page:       int32(page),
-			Limit:      int32(limit),
-			TotalPages: totalPages,
-		},
+	response.OK(c, dto.ActivityFeedResponse{
+		Activities: mapper.ToFollowingActivityResponses(activities),
+		Total:      total,
+		Page:       int32(page),
+		Limit:      int32(limit),
+		TotalPages: totalPages,
 	})
 }
 
@@ -186,15 +181,15 @@ func (h *ActivityHandler) GetFollowingFeed(c *gin.Context) {
 // @Param movieId path int true "Movie ID"
 // @Param limit query int false "Results per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} object "List of activities"
-// @Failure 400 {object} map[string]string "Invalid movie ID"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.ActivityResponse} "List of activities"
+// @Failure 400 {object} dto.BadRequestErrorResponse "Invalid movie ID"
+// @Failure 500 {object} dto.InternalServerErrorResponse "Internal server error"
 // @Router /movies/{movieId}/activities [get]
 func (h *ActivityHandler) GetMovieActivities(c *gin.Context) {
 	movieIDStr := c.Param("movieId")
 	movieID, err := strconv.ParseInt(movieIDStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid movie id"})
+		response.Error(c, http.StatusBadRequest, "INVALID_MOVIE_ID", "invalid movie id")
 		return
 	}
 
@@ -206,9 +201,9 @@ func (h *ActivityHandler) GetMovieActivities(c *gin.Context) {
 	activities, err := h.activitySvc.GetActivitiesByEntity(c.Request.Context(), 1, movieID, int32(limit), int32(offset))
 	if err != nil {
 		log.Printf("get movie activities error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch activities"})
+		response.Error(c, http.StatusInternalServerError, "ACTIVITIES_FETCH_FAILED", "failed to fetch activities")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": mapper.ToEntityActivityResponses(activities)})
+	response.OK(c, mapper.ToEntityActivityResponses(activities))
 }

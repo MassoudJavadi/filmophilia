@@ -20,7 +20,7 @@ import (
 
 // @title Filmophilia API
 // @version 1.0
-// @description API for Filmophilia - A movie discovery and social platform
+// @description API for Filmophilia - A movie discovery and social platform. JSON endpoints return `{success,data}` on success and `{success,error}` on failure.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support

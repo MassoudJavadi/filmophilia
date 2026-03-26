@@ -48,7 +48,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateActivityRequest"
+                            "$ref": "#/definitions/dto.CreateActivityRequest"
                         }
                     }
                 ],
@@ -56,28 +56,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Activity created",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -103,42 +106,45 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Authenticated successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AuthResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credentials or user banned",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.UnauthorizedErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -164,7 +170,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest"
+                            "$ref": "#/definitions/dto.RefreshRequest"
                         }
                     }
                 ],
@@ -172,28 +178,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Logged out successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Refresh token required",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to logout",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -219,42 +228,45 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest"
+                            "$ref": "#/definitions/dto.RefreshRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Token refreshed",
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AuthResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid or expired refresh token",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.UnauthorizedErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -280,42 +292,45 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.SignupRequest"
+                            "$ref": "#/definitions/dto.SignupRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "User created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Email or username already exists",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ConflictErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -344,34 +359,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Comment details",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CommentResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -403,46 +421,43 @@ const docTemplate = `{
                     "200": {
                         "description": "Comment deleted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Not authorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ForbiddenErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -478,7 +493,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateCommentRequest"
+                            "$ref": "#/definitions/dto.UpdateCommentRequest"
                         }
                     }
                 ],
@@ -486,43 +501,43 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated comment",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CommentResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Not authorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ForbiddenErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -565,25 +580,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of reactions",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.ReactionResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -619,43 +643,45 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AddReactionRequest"
+                            "$ref": "#/definitions/dto.AddReactionRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Reaction created/updated",
+                        "description": "Reaction created or updated",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ReactionMutationData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -687,37 +713,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Reaction removed",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Reaction not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -746,25 +772,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Reaction summary",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ReactionSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -807,25 +839,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of replies",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.CommentResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -845,16 +886,28 @@ const docTemplate = `{
                     "200": {
                         "description": "List of genres",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.GenreResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -883,34 +936,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Genre details",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.GenreResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Slug required",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Genre not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -953,25 +1009,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of movies",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.MovieResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Slug required",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1000,34 +1065,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Genre details",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.GenreResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid genre ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Genre not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1070,25 +1138,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of movies",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.MovieResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid genre ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1117,35 +1194,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Genre with movie count",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.GenreWithCountResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid genre ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Genre not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1168,18 +1247,27 @@ const docTemplate = `{
                 "summary": "Get current user",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Current user",
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     }
                 }
@@ -1220,16 +1308,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Activity feed",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ActivityFeedResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1270,16 +1367,28 @@ const docTemplate = `{
                     "200": {
                         "description": "List of comments",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.CommentWithMovieResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1320,16 +1429,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Activity feed",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ActivityFeedResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1370,16 +1488,28 @@ const docTemplate = `{
                     "200": {
                         "description": "List of followers",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.FollowUserResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1420,16 +1550,28 @@ const docTemplate = `{
                     "200": {
                         "description": "List of following",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.FollowUserResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1470,16 +1612,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Notifications",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.NotificationListResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1520,16 +1671,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Unread notifications",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.NotificationListResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1554,16 +1714,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Unread count",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UnreadCountData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1588,25 +1757,31 @@ const docTemplate = `{
                     "200": {
                         "description": "User profile",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserProfileResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1635,7 +1810,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateProfileRequest"
+                            "$ref": "#/definitions/dto.UpdateProfileRequest"
                         }
                     }
                 ],
@@ -1643,25 +1818,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated user",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1702,16 +1883,28 @@ const docTemplate = `{
                     "200": {
                         "description": "List of ratings",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.RatingWithMovieResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1759,16 +1952,28 @@ const docTemplate = `{
                     "200": {
                         "description": "Watchlist items",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.WatchlistItemResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1793,16 +1998,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Watchlist count",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistCountResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1838,17 +2052,28 @@ const docTemplate = `{
                     "200": {
                         "description": "List of movies",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.MovieResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Failed to fetch movies",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -1972,16 +2197,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Search results",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AdvancedSearchResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Search failed",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2010,16 +2244,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Movie details",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MovieResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
                         "description": "Movie not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     }
                 }
@@ -2062,25 +2305,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of activities",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.ActivityResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2123,25 +2375,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of comments",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.CommentResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2177,7 +2438,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest"
+                            "$ref": "#/definitions/dto.CreateCommentRequest"
                         }
                     }
                 ],
@@ -2185,34 +2446,37 @@ const docTemplate = `{
                     "201": {
                         "description": "Created comment",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CommentResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2241,28 +2505,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Comment count",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "integer"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CountData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2307,7 +2574,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest"
+                            "$ref": "#/definitions/dto.CreateCommentRequest"
                         }
                     }
                 ],
@@ -2315,34 +2582,37 @@ const docTemplate = `{
                     "201": {
                         "description": "Created reply",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CommentResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request or cannot reply to reply",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie or parent comment not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2374,36 +2644,39 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "User's rating",
+                        "description": "User rating",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.RatingResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Rating not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2439,42 +2712,45 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest"
+                            "$ref": "#/definitions/dto.RateMovieRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Rating created/updated",
+                        "description": "Rating created or updated",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.RatingResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2506,37 +2782,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Rating deleted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Rating not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2579,25 +2855,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of ratings",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.RatingWithUserResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2631,34 +2916,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Watchlist entry",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistEntryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not in watchlist",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2693,7 +2981,7 @@ const docTemplate = `{
                         "name": "request",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.AddToWatchlistRequest"
+                            "$ref": "#/definitions/dto.AddToWatchlistRequest"
                         }
                     }
                 ],
@@ -2701,43 +2989,43 @@ const docTemplate = `{
                     "201": {
                         "description": "Movie added to watchlist",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistEntryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Movie already in watchlist",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ConflictErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2769,37 +3057,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Removed successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not in watchlist",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2835,7 +3123,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateWatchlistRequest"
+                            "$ref": "#/definitions/dto.UpdateWatchlistRequest"
                         }
                     }
                 ],
@@ -2843,34 +3131,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated entry",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistEntryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not in watchlist",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2904,28 +3195,31 @@ const docTemplate = `{
                     "200": {
                         "description": "In watchlist status",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "boolean"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistStatusData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -2959,34 +3253,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated entry",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistEntryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not in watchlist",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3018,34 +3315,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Updated entry",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.WatchlistEntryResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid movie ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Movie not in watchlist",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3070,19 +3370,25 @@ const docTemplate = `{
                     "200": {
                         "description": "All notifications deleted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3107,19 +3413,25 @@ const docTemplate = `{
                     "200": {
                         "description": "All marked as read",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3153,46 +3465,43 @@ const docTemplate = `{
                     "200": {
                         "description": "Notification deleted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid notification ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ForbiddenErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Notification not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3226,46 +3535,43 @@ const docTemplate = `{
                     "200": {
                         "description": "Marked as read",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid notification ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ForbiddenErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Notification not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3308,25 +3614,34 @@ const docTemplate = `{
                     "200": {
                         "description": "Search results",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.UserSearchResult"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Search query required",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3355,34 +3670,37 @@ const docTemplate = `{
                     "200": {
                         "description": "User profile",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserProfileResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Username required",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3411,34 +3729,37 @@ const docTemplate = `{
                     "200": {
                         "description": "User profile",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserProfileResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3481,25 +3802,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Activity feed",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.ActivityFeedResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3533,46 +3860,43 @@ const docTemplate = `{
                     "201": {
                         "description": "Followed successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID or cannot follow self",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Already following",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.ConflictErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3604,37 +3928,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Unfollowed successfully",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MessageData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID or cannot unfollow self",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not following this user",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.NotFoundErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3663,25 +3987,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Follow stats",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.FollowStatsResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3724,25 +4054,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of followers",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.FollowUserResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3785,25 +4124,34 @@ const docTemplate = `{
                     "200": {
                         "description": "List of following",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.FollowUserResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3837,25 +4185,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Following status",
                         "schema": {
-                            "type": "object"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.FollowStatusData"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.BadRequestErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/dto.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -3863,7 +4217,66 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.AddReactionRequest": {
+        "dto.ActivityFeedResponse": {
+            "type": "object",
+            "properties": {
+                "activities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ActivityResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.ActivityResponse": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "avatar_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "integer"
+                },
+                "entity_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AddReactionRequest": {
             "type": "object",
             "required": [
                 "type"
@@ -3881,7 +4294,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.AddToWatchlistRequest": {
+        "dto.AddToWatchlistRequest": {
             "type": "object",
             "properties": {
                 "notes": {
@@ -3892,7 +4305,30 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.AuthResponse": {
+        "dto.AdvancedSearchResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "movies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MovieResponse"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.AuthResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -3902,11 +4338,143 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse"
+                    "$ref": "#/definitions/dto.UserResponse"
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateActivityRequest": {
+        "dto.BadRequestError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "BAD_REQUEST"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "invalid request"
+                }
+            }
+        },
+        "dto.BadRequestErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.BadRequestError"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.CommentResponse": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "reply_count": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CommentWithMovieResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "movie_slug": {
+                    "type": "string"
+                },
+                "movie_title": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ConflictErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "CONFLICT"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "resource already exists"
+                }
+            }
+        },
+        "dto.ConflictErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ConflictErrorInfo"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.CountData": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "example": 12
+                }
+            }
+        },
+        "dto.CreateActivityRequest": {
             "type": "object",
             "required": [
                 "action",
@@ -3929,7 +4497,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.CreateCommentRequest": {
+        "dto.CreateCommentRequest": {
             "type": "object",
             "required": [
                 "content"
@@ -3942,7 +4510,131 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.LoginRequest": {
+        "dto.FollowStatsResponse": {
+            "type": "object",
+            "properties": {
+                "follower_count": {
+                    "type": "integer"
+                },
+                "following_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.FollowStatusData": {
+            "type": "object",
+            "properties": {
+                "is_following": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.FollowUserResponse": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "followed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ForbiddenErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "FORBIDDEN"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "you are not allowed to perform this action"
+                }
+            }
+        },
+        "dto.ForbiddenErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.ForbiddenErrorInfo"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.GenreResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GenreWithCountResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "movie_count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.InternalServerErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "INTERNAL_SERVER_ERROR"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "internal server error"
+                }
+            }
+        },
+        "dto.InternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.InternalServerErrorInfo"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -3957,7 +4649,168 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.RateMovieRequest": {
+        "dto.MessageData": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "operation completed successfully"
+                }
+            }
+        },
+        "dto.MovieResponse": {
+            "type": "object",
+            "properties": {
+                "backdrop_url": {
+                    "type": "string"
+                },
+                "content_rating": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "genres": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "imdb_id": {
+                    "type": "string"
+                },
+                "imdb_rating": {
+                    "type": "number"
+                },
+                "letterboxd_rating": {
+                    "type": "number"
+                },
+                "metacritic_score": {
+                    "type": "integer"
+                },
+                "original_language": {
+                    "type": "string"
+                },
+                "overview": {
+                    "type": "string"
+                },
+                "poster_url": {
+                    "type": "string"
+                },
+                "release_date": {
+                    "type": "string"
+                },
+                "rotten_tomatoes": {
+                    "type": "integer"
+                },
+                "runtime": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tmdb_id": {
+                    "type": "integer"
+                },
+                "trailer_url": {
+                    "type": "string"
+                },
+                "user_avg_rating": {
+                    "type": "number"
+                },
+                "user_rating_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.NotFoundErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "NOT_FOUND"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "resource not found"
+                }
+            }
+        },
+        "dto.NotFoundErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.NotFoundErrorInfo"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.NotificationListResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.NotificationResponse"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "unread_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.NotificationResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.RateMovieRequest": {
             "type": "object",
             "required": [
                 "score"
@@ -3970,7 +4823,150 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.RefreshRequest": {
+        "dto.RatingResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.RatingWithMovieResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "poster_url": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RatingWithUserResponse": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ReactionCountResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ReactionMutationData": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ReactionResponse": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ReactionSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "counts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ReactionCountResponse"
+                    }
+                },
+                "user_reaction": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RefreshRequest": {
             "type": "object",
             "required": [
                 "refresh_token"
@@ -3981,7 +4977,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.SignupRequest": {
+        "dto.SignupRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -4002,7 +4998,51 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateCommentRequest": {
+        "dto.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dto.UnauthorizedErrorInfo": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "UNAUTHORIZED"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "authentication required"
+                }
+            }
+        },
+        "dto.UnauthorizedErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/dto.UnauthorizedErrorInfo"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "dto.UnreadCountData": {
+            "type": "object",
+            "properties": {
+                "unread_count": {
+                    "type": "integer",
+                    "example": 3
+                }
+            }
+        },
+        "dto.UpdateCommentRequest": {
             "type": "object",
             "required": [
                 "content"
@@ -4015,7 +5055,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateProfileRequest": {
+        "dto.UpdateProfileRequest": {
             "type": "object",
             "properties": {
                 "avatar_url": {
@@ -4031,7 +5071,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.UpdateWatchlistRequest": {
+        "dto.UpdateWatchlistRequest": {
             "type": "object",
             "properties": {
                 "notes": {
@@ -4042,7 +5082,42 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MassoudJavadi_filmophilia_api_internal_dto.UserResponse": {
+        "dto.UserProfileResponse": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "comment_count": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "follower_count": {
+                    "type": "integer"
+                },
+                "following_count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "rating_count": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserResponse": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -4056,6 +5131,110 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.UserSearchResult": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.WatchlistCountResponse": {
+            "type": "object",
+            "properties": {
+                "total": {
+                    "type": "integer"
+                },
+                "unwatched": {
+                    "type": "integer"
+                },
+                "watched": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.WatchlistEntryResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "rank_position": {
+                    "type": "number"
+                },
+                "watched_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.WatchlistItemResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "movie_id": {
+                    "type": "integer"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "poster_url": {
+                    "type": "string"
+                },
+                "rank_position": {
+                    "type": "number"
+                },
+                "release_date": {
+                    "type": "string"
+                },
+                "runtime": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_avg_rating": {
+                    "type": "number"
+                },
+                "watched_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.WatchlistStatusData": {
+            "type": "object",
+            "properties": {
+                "in_watchlist": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         }
@@ -4077,7 +5256,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Filmophilia API",
-	Description:      "API for Filmophilia - A movie discovery and social platform",
+	Description:      "API for Filmophilia - A movie discovery and social platform. JSON endpoints return `{success,data}` on success and `{success,error}` on failure.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
