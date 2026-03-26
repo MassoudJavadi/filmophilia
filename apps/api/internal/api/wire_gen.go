@@ -9,19 +9,20 @@ package api
 import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/config"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/ratelimit"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"os"
 )
 
 // Injectors from wire.go:
 
 func InitializeServer(dbPool *pgxpool.Pool) *Server {
+	config := provideConfig()
 	queries := db.New(dbPool)
-	jwtManager := provideJWTManager()
+	jwtManager := provideJWTManager(config)
 	authService := service.NewAuthService(queries, jwtManager)
 	googleManager := oauth.NewGoogleManager()
 	oAuthService := service.NewOAuthService(queries, authService, googleManager)
@@ -47,19 +48,19 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	notificationService := service.NewNotificationService(queries)
 	notificationHandler := handler.NewNotificationHandler(notificationService)
 	rateLimiter := provideRateLimiter()
-	config := provideRateLimitConfig()
-	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, followHandler, genreHandler, activityHandler, notificationHandler, jwtManager, rateLimiter, config)
+	ratelimitConfig := provideRateLimitConfig()
+	server := NewServer(dbPool, config, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, followHandler, genreHandler, activityHandler, notificationHandler, jwtManager, rateLimiter, ratelimitConfig)
 	return server
 }
 
 // wire.go:
 
-func provideJWTManager() *token.JWTManager {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		secret = "dev-secret-change-in-production"
-	}
-	return token.NewJWTManager(secret)
+func provideConfig() config.Config {
+	return config.Load()
+}
+
+func provideJWTManager(cfg config.Config) *token.JWTManager {
+	return token.NewJWTManager(cfg.JWTSecret)
 }
 
 func provideRateLimiter() *ratelimit.RateLimiter {

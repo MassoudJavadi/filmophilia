@@ -7,6 +7,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
 	"github.com/MassoudJavadi/filmophilia/api/internal/middleware"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/config"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/ratelimit"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/gin-contrib/cors"
@@ -18,6 +19,7 @@ type Server struct {
 	httpServer  *http.Server
 	router      *gin.Engine
 	db          *pgxpool.Pool
+	config      config.Config
 	authH       *handler.AuthHandler
 	movieH      *handler.MovieHandler
 	ratingH     *handler.RatingHandler
@@ -34,10 +36,11 @@ type Server struct {
 	rlConfig    ratelimit.Config
 }
 
-func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, followH *handler.FollowHandler, genreH *handler.GenreHandler, activityH *handler.ActivityHandler, notifH *handler.NotificationHandler, jwt *token.JWTManager, rateLimiter *ratelimit.RateLimiter, rlConfig ratelimit.Config) *Server {
+func NewServer(db *pgxpool.Pool, cfg config.Config, authH *handler.AuthHandler, movieH *handler.MovieHandler, ratingH *handler.RatingHandler, watchlistH *handler.WatchlistHandler, commentH *handler.CommentHandler, reactionH *handler.ReactionHandler, userH *handler.UserHandler, followH *handler.FollowHandler, genreH *handler.GenreHandler, activityH *handler.ActivityHandler, notifH *handler.NotificationHandler, jwt *token.JWTManager, rateLimiter *ratelimit.RateLimiter, rlConfig ratelimit.Config) *Server {
 	s := &Server{
 		router:      gin.Default(),
 		db:          db,
+		config:      cfg,
 		authH:       authH,
 		movieH:      movieH,
 		ratingH:     ratingH,
@@ -55,7 +58,7 @@ func NewServer(db *pgxpool.Pool, authH *handler.AuthHandler, movieH *handler.Mov
 	}
 
 	s.router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"}, //Client(Next.js) url
+		AllowOrigins:     cfg.CORSOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
 		AllowCredentials: true,

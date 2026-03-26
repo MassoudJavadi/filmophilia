@@ -4,10 +4,9 @@
 package api
 
 import (
-	"os"
-
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/config"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/ratelimit"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
@@ -16,12 +15,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func provideJWTManager() *token.JWTManager {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		secret = "dev-secret-change-in-production"
-	}
-	return token.NewJWTManager(secret)
+func provideConfig() config.Config {
+	return config.Load()
+}
+
+func provideJWTManager(cfg config.Config) *token.JWTManager {
+	return token.NewJWTManager(cfg.JWTSecret)
 }
 
 func provideRateLimiter() *ratelimit.RateLimiter {
@@ -37,6 +36,7 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	wire.Build(
 		wire.Bind(new(db.DBTX), new(*pgxpool.Pool)),
 		db.New,
+		provideConfig,
 		provideJWTManager,
 		provideRateLimiter,
 		provideRateLimitConfig,
