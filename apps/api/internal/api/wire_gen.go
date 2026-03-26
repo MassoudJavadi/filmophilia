@@ -10,6 +10,7 @@ import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/ratelimit"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -45,7 +46,9 @@ func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	activityHandler := handler.NewActivityHandler(activityService)
 	notificationService := service.NewNotificationService(queries)
 	notificationHandler := handler.NewNotificationHandler(notificationService)
-	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, followHandler, genreHandler, activityHandler, notificationHandler, jwtManager)
+	rateLimiter := provideRateLimiter()
+	config := provideRateLimitConfig()
+	server := NewServer(dbPool, authHandler, movieHandler, ratingHandler, watchlistHandler, commentHandler, reactionHandler, userHandler, followHandler, genreHandler, activityHandler, notificationHandler, jwtManager, rateLimiter, config)
 	return server
 }
 
@@ -57,4 +60,13 @@ func provideJWTManager() *token.JWTManager {
 		secret = "dev-secret-change-in-production"
 	}
 	return token.NewJWTManager(secret)
+}
+
+func provideRateLimiter() *ratelimit.RateLimiter {
+	client := ratelimit.NewRedisClient()
+	return ratelimit.NewRateLimiter(client)
+}
+
+func provideRateLimitConfig() ratelimit.Config {
+	return ratelimit.LoadFromEnv()
 }

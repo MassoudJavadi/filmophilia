@@ -9,6 +9,7 @@ import (
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/handler"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/oauth"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/ratelimit"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/token"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/google/wire"
@@ -23,11 +24,22 @@ func provideJWTManager() *token.JWTManager {
 	return token.NewJWTManager(secret)
 }
 
+func provideRateLimiter() *ratelimit.RateLimiter {
+	client := ratelimit.NewRedisClient()
+	return ratelimit.NewRateLimiter(client)
+}
+
+func provideRateLimitConfig() ratelimit.Config {
+	return ratelimit.LoadFromEnv()
+}
+
 func InitializeServer(dbPool *pgxpool.Pool) *Server {
 	wire.Build(
 		wire.Bind(new(db.DBTX), new(*pgxpool.Pool)),
 		db.New,
 		provideJWTManager,
+		provideRateLimiter,
+		provideRateLimitConfig,
 		oauth.NewGoogleManager,
 		service.NewAuthService,
 		service.NewOAuthService,
