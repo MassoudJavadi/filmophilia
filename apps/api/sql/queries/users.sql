@@ -23,10 +23,10 @@ SELECT
     u.avatar_url,
     u.bio,
     u.created_at,
-    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
-    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
-    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
-    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+    u.follower_count,
+    u.following_count,
+    u.rating_count,
+    u.comment_count
 FROM users u
 WHERE u.id = $1 AND u.status = 'ACTIVE';
 
@@ -38,10 +38,10 @@ SELECT
     u.avatar_url,
     u.bio,
     u.created_at,
-    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
-    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
-    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
-    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+    u.follower_count,
+    u.following_count,
+    u.rating_count,
+    u.comment_count
 FROM users u
 WHERE u.username = $1 AND u.status = 'ACTIVE';
 

@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict XMZmwbhkNgBc8lykI5NHicXcq6yJoLKgIU634iV58DF12R9iy2ZKJV2c5DDDTu5
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
@@ -327,6 +326,98 @@ CREATE FUNCTION public.update_updated_at() RETURNS trigger
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: update_user_comment_count(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_user_comment_count() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        -- Only count if not soft-deleted
+        IF NEW.deleted_at IS NULL THEN
+            UPDATE users SET comment_count = comment_count + 1
+            WHERE id = NEW.user_id;
+        END IF;
+        RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        -- Handle soft delete transition
+        IF OLD.deleted_at IS NULL AND NEW.deleted_at IS NOT NULL THEN
+            -- Comment was soft-deleted
+            UPDATE users SET comment_count = GREATEST(0, comment_count - 1)
+            WHERE id = NEW.user_id;
+        ELSIF OLD.deleted_at IS NOT NULL AND NEW.deleted_at IS NULL THEN
+            -- Comment was restored
+            UPDATE users SET comment_count = comment_count + 1
+            WHERE id = NEW.user_id;
+        END IF;
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Only decrement if wasn't already soft-deleted
+        IF OLD.deleted_at IS NULL THEN
+            UPDATE users SET comment_count = GREATEST(0, comment_count - 1)
+            WHERE id = OLD.user_id;
+        END IF;
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: update_user_follow_counts(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_user_follow_counts() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        -- Increment follower_count for the user being followed
+        UPDATE users SET follower_count = follower_count + 1
+        WHERE id = NEW.following_id;
+        -- Increment following_count for the user who follows
+        UPDATE users SET following_count = following_count + 1
+        WHERE id = NEW.follower_id;
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Decrement follower_count for the user being unfollowed
+        UPDATE users SET follower_count = GREATEST(0, follower_count - 1)
+        WHERE id = OLD.following_id;
+        -- Decrement following_count for the user who unfollows
+        UPDATE users SET following_count = GREATEST(0, following_count - 1)
+        WHERE id = OLD.follower_id;
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: update_user_rating_count(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_user_rating_count() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE users SET rating_count = rating_count + 1
+        WHERE id = NEW.user_id;
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE users SET rating_count = GREATEST(0, rating_count - 1)
+        WHERE id = OLD.user_id;
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
 END;
 $$;
 
@@ -1575,6 +1666,10 @@ CREATE TABLE public.users (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     deleted_at timestamp with time zone,
     anonymized_at timestamp with time zone,
+    follower_count integer DEFAULT 0 NOT NULL,
+    following_count integer DEFAULT 0 NOT NULL,
+    rating_count integer DEFAULT 0 NOT NULL,
+    comment_count integer DEFAULT 0 NOT NULL,
     CONSTRAINT users_anonymization_after_deletion_check CHECK (((anonymized_at IS NULL) OR (deleted_at IS NOT NULL))),
     CONSTRAINT users_password_hash_nonempty_chk CHECK (((password_hash IS NULL) OR (length((password_hash)::text) > 0)))
 );
@@ -3177,6 +3272,13 @@ CREATE INDEX movies_release_date_idx ON public.movies USING btree (release_date 
 
 
 --
+-- Name: movies_release_year_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX movies_release_year_idx ON public.movies USING btree (EXTRACT(year FROM release_date));
+
+
+--
 -- Name: movies_title_trgm_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3415,6 +3517,13 @@ CREATE INDEX sessions_expires_at_idx ON public.sessions USING btree (expires_at)
 
 
 --
+-- Name: sessions_refresh_token_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX sessions_refresh_token_idx ON public.sessions USING btree (refresh_token);
+
+
+--
 -- Name: sessions_user_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3440,6 +3549,13 @@ CREATE INDEX users_active_idx ON public.users USING btree (id) WHERE (deleted_at
 --
 
 CREATE INDEX users_deleted_at_idx ON public.users USING btree (deleted_at) WHERE (deleted_at IS NOT NULL);
+
+
+--
+-- Name: users_id_status_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX users_id_status_idx ON public.users USING btree (id) WHERE (status = 'ACTIVE'::public.user_status);
 
 
 --
@@ -4346,6 +4462,41 @@ CREATE TRIGGER comments_updated_at BEFORE UPDATE ON public.comments FOR EACH ROW
 
 
 --
+-- Name: comments comments_user_count_delete; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER comments_user_count_delete AFTER DELETE ON public.comments FOR EACH ROW EXECUTE FUNCTION public.update_user_comment_count();
+
+
+--
+-- Name: comments comments_user_count_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER comments_user_count_insert AFTER INSERT ON public.comments FOR EACH ROW EXECUTE FUNCTION public.update_user_comment_count();
+
+
+--
+-- Name: comments comments_user_count_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER comments_user_count_update AFTER UPDATE OF deleted_at ON public.comments FOR EACH ROW EXECUTE FUNCTION public.update_user_comment_count();
+
+
+--
+-- Name: follows follows_user_counts_delete; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER follows_user_counts_delete AFTER DELETE ON public.follows FOR EACH ROW EXECUTE FUNCTION public.update_user_follow_counts();
+
+
+--
+-- Name: follows follows_user_counts_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER follows_user_counts_insert AFTER INSERT ON public.follows FOR EACH ROW EXECUTE FUNCTION public.update_user_follow_counts();
+
+
+--
 -- Name: movies movies_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -4385,6 +4536,20 @@ CREATE TRIGGER ratings_stats_update AFTER UPDATE ON public.ratings FOR EACH ROW 
 --
 
 CREATE TRIGGER ratings_updated_at BEFORE UPDATE ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+
+--
+-- Name: ratings ratings_user_count_delete; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER ratings_user_count_delete AFTER DELETE ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_user_rating_count();
+
+
+--
+-- Name: ratings ratings_user_count_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER ratings_user_count_insert AFTER INSERT ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_user_rating_count();
 
 
 --
@@ -4601,5 +4766,4 @@ ALTER TABLE ONLY public.watchlists
 -- PostgreSQL database dump complete
 --
 
-\unrestrict XMZmwbhkNgBc8lykI5NHicXcq6yJoLKgIU634iV58DF12R9iy2ZKJV2c5DDDTu5
 

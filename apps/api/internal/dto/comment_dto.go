@@ -18,8 +18,8 @@ type CommentResponse struct {
 	LikeCount   int32     `json:"like_count"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	UserID      int32     `json:"user_id"`
-	Username    string    `json:"username"`
+	UserID      *int32    `json:"user_id,omitempty"`
+	Username    string    `json:"username,omitempty"`
 	DisplayName string    `json:"display_name,omitempty"`
 	AvatarURL   string    `json:"avatar_url,omitempty"`
 	ReplyCount  int32     `json:"reply_count,omitempty"`

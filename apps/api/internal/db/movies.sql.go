@@ -12,7 +12,7 @@ import (
 )
 
 const advancedSearchMovies = `-- name: AdvancedSearchMovies :many
-SELECT DISTINCT m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating
+SELECT DISTINCT m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum
 FROM movies m
 LEFT JOIN movie_genres mg ON mg.movie_id = m.id
 WHERE
@@ -120,6 +120,7 @@ func (q *Queries) AdvancedSearchMovies(ctx context.Context, arg AdvancedSearchMo
 			&i.RottenTomatoes,
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
+			&i.RatingSum,
 		); err != nil {
 			return nil, err
 		}
@@ -262,7 +263,7 @@ func (q *Queries) CreateMovie(ctx context.Context, arg CreateMovieParams) (int32
 }
 
 const getMovieBySlug = `-- name: GetMovieBySlug :one
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
 WHERE slug = $1 LIMIT 1
 `
 
@@ -293,12 +294,13 @@ func (q *Queries) GetMovieBySlug(ctx context.Context, slug string) (Movie, error
 		&i.RottenTomatoes,
 		&i.MetacriticScore,
 		&i.LetterboxdRating,
+		&i.RatingSum,
 	)
 	return i, err
 }
 
 const listMovies = `-- name: ListMovies :many
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -341,6 +343,7 @@ func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]Movie
 			&i.RottenTomatoes,
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
+			&i.RatingSum,
 		); err != nil {
 			return nil, err
 		}
@@ -353,7 +356,7 @@ func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]Movie
 }
 
 const searchMovies = `-- name: SearchMovies :many
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
 WHERE title ILIKE '%' || $1 || '%' OR slug ILIKE '%' || $1 || '%'
 ORDER BY imdb_rating DESC
 LIMIT $2 OFFSET $3
@@ -398,6 +401,7 @@ func (q *Queries) SearchMovies(ctx context.Context, arg SearchMoviesParams) ([]M
 			&i.RottenTomatoes,
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
+			&i.RatingSum,
 		); err != nil {
 			return nil, err
 		}

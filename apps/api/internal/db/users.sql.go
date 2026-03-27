@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, username, password_hash, display_name)
 VALUES ($1, $2, $3, $4)
-RETURNING id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at
+RETURNING id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at, deleted_at, anonymized_at, follower_count, following_count, rating_count, comment_count
 `
 
 type CreateUserParams struct {
@@ -45,12 +45,18 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.IsVerified,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AnonymizedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at, deleted_at, anonymized_at, follower_count, following_count, rating_count, comment_count FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -69,12 +75,18 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.IsVerified,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AnonymizedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at FROM users WHERE id = $1
+SELECT id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at, deleted_at, anonymized_at, follower_count, following_count, rating_count, comment_count FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
@@ -93,12 +105,18 @@ func (q *Queries) GetUserByID(ctx context.Context, id int32) (User, error) {
 		&i.IsVerified,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AnonymizedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at FROM users WHERE username = $1
+SELECT id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at, deleted_at, anonymized_at, follower_count, following_count, rating_count, comment_count FROM users WHERE username = $1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -117,6 +135,12 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.IsVerified,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AnonymizedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
 	)
 	return i, err
 }
@@ -129,10 +153,10 @@ SELECT
     u.avatar_url,
     u.bio,
     u.created_at,
-    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
-    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
-    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
-    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+    u.follower_count,
+    u.following_count,
+    u.rating_count,
+    u.comment_count
 FROM users u
 WHERE u.id = $1 AND u.status = 'ACTIVE'
 `
@@ -176,10 +200,10 @@ SELECT
     u.avatar_url,
     u.bio,
     u.created_at,
-    (SELECT COUNT(*) FROM follows WHERE following_id = u.id)::INT as follower_count,
-    (SELECT COUNT(*) FROM follows WHERE follower_id = u.id)::INT as following_count,
-    (SELECT COUNT(*) FROM ratings WHERE user_id = u.id)::INT as rating_count,
-    (SELECT COUNT(*) FROM comments WHERE user_id = u.id AND deleted_at IS NULL)::INT as comment_count
+    u.follower_count,
+    u.following_count,
+    u.rating_count,
+    u.comment_count
 FROM users u
 WHERE u.username = $1 AND u.status = 'ACTIVE'
 `
@@ -276,7 +300,7 @@ SET
     bio = COALESCE($4, bio),
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at
+RETURNING id, email, username, password_hash, display_name, avatar_url, bio, role, status, is_verified, created_at, updated_at, deleted_at, anonymized_at, follower_count, following_count, rating_count, comment_count
 `
 
 type UpdateUserProfileParams struct {
@@ -307,6 +331,12 @@ func (q *Queries) UpdateUserProfile(ctx context.Context, arg UpdateUserProfilePa
 		&i.IsVerified,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.AnonymizedAt,
+		&i.FollowerCount,
+		&i.FollowingCount,
+		&i.RatingCount,
+		&i.CommentCount,
 	)
 	return i, err
 }

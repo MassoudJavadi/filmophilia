@@ -243,6 +243,7 @@ const (
 	UserStatusACTIVE    UserStatus = "ACTIVE"
 	UserStatusSUSPENDED UserStatus = "SUSPENDED"
 	UserStatusBANNED    UserStatus = "BANNED"
+	UserStatusDELETED   UserStatus = "DELETED"
 )
 
 func (e *UserStatus) Scan(src interface{}) error {
@@ -291,6 +292,256 @@ type Account struct {
 	CreatedAt         pgtype.Timestamptz `json:"created_at"`
 }
 
+type Activities202601 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202602 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202603 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202604 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202605 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202606 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202607 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202608 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202609 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202610 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202611 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202612 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202701 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202702 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202703 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202704 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202705 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202706 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202707 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202708 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202709 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202710 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202711 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Activities202712 struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type ActivitiesDefault struct {
+	ID         int64              `json:"id"`
+	UserID     int32              `json:"user_id"`
+	Action     string             `json:"action"`
+	EntityType EntityType         `json:"entity_type"`
+	EntityID   int64              `json:"entity_id"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
 type Activity struct {
 	ID         int64              `json:"id"`
 	UserID     int32              `json:"user_id"`
@@ -303,7 +554,7 @@ type Activity struct {
 
 type Comment struct {
 	ID        int64              `json:"id"`
-	UserID    int32              `json:"user_id"`
+	UserID    pgtype.Int4        `json:"user_id"`
 	MovieID   int32              `json:"movie_id"`
 	ParentID  pgtype.Int8        `json:"parent_id"`
 	Content   string             `json:"content"`
@@ -360,6 +611,7 @@ type Movie struct {
 	RottenTomatoes   pgtype.Int4        `json:"rotten_tomatoes"`
 	MetacriticScore  pgtype.Int4        `json:"metacritic_score"`
 	LetterboxdRating pgtype.Numeric     `json:"letterboxd_rating"`
+	RatingSum        pgtype.Int8        `json:"rating_sum"`
 }
 
 type MovieGenre struct {
@@ -368,6 +620,281 @@ type MovieGenre struct {
 }
 
 type Notification struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202601 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202602 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202603 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202604 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202605 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202606 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202607 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202608 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202609 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202610 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202611 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202612 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202701 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202702 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202703 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202704 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202705 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202706 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202707 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202708 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202709 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202710 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202711 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Notifications202712 struct {
+	ID        int64              `json:"id"`
+	UserID    int32              `json:"user_id"`
+	Type      NotificationType   `json:"type"`
+	Title     string             `json:"title"`
+	Content   pgtype.Text        `json:"content"`
+	IsRead    bool               `json:"is_read"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type NotificationsDefault struct {
 	ID        int64              `json:"id"`
 	UserID    int32              `json:"user_id"`
 	Type      NotificationType   `json:"type"`
@@ -395,7 +922,7 @@ type Person struct {
 
 type Rating struct {
 	ID        int64              `json:"id"`
-	UserID    int32              `json:"user_id"`
+	UserID    pgtype.Int4        `json:"user_id"`
 	MovieID   int32              `json:"movie_id"`
 	Score     int32              `json:"score"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
@@ -421,18 +948,24 @@ type Session struct {
 }
 
 type User struct {
-	ID           int32              `json:"id"`
-	Email        string             `json:"email"`
-	Username     string             `json:"username"`
-	PasswordHash pgtype.Text        `json:"password_hash"`
-	DisplayName  pgtype.Text        `json:"display_name"`
-	AvatarUrl    pgtype.Text        `json:"avatar_url"`
-	Bio          pgtype.Text        `json:"bio"`
-	Role         Role               `json:"role"`
-	Status       UserStatus         `json:"status"`
-	IsVerified   bool               `json:"is_verified"`
-	CreatedAt    pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+	ID             int32              `json:"id"`
+	Email          string             `json:"email"`
+	Username       string             `json:"username"`
+	PasswordHash   pgtype.Text        `json:"password_hash"`
+	DisplayName    pgtype.Text        `json:"display_name"`
+	AvatarUrl      pgtype.Text        `json:"avatar_url"`
+	Bio            pgtype.Text        `json:"bio"`
+	Role           Role               `json:"role"`
+	Status         UserStatus         `json:"status"`
+	IsVerified     bool               `json:"is_verified"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt      pgtype.Timestamptz `json:"deleted_at"`
+	AnonymizedAt   pgtype.Timestamptz `json:"anonymized_at"`
+	FollowerCount  int32              `json:"follower_count"`
+	FollowingCount int32              `json:"following_count"`
+	RatingCount    int32              `json:"rating_count"`
+	CommentCount   int32              `json:"comment_count"`
 }
 
 type UserStatusLog struct {

@@ -44,7 +44,7 @@ RETURNING id, user_id, movie_id, parent_id, content, like_count, deleted_at, cre
 `
 
 type CreateCommentParams struct {
-	UserID   int32       `json:"user_id"`
+	UserID   pgtype.Int4 `json:"user_id"`
 	MovieID  int32       `json:"movie_id"`
 	ParentID pgtype.Int8 `json:"parent_id"`
 	Content  string      `json:"content"`
@@ -115,7 +115,7 @@ type GetCommentRepliesParams struct {
 
 type GetCommentRepliesRow struct {
 	ID          int64              `json:"id"`
-	UserID      int32              `json:"user_id"`
+	UserID      pgtype.Int4        `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
 	ParentID    pgtype.Int8        `json:"parent_id"`
 	Content     string             `json:"content"`
@@ -174,7 +174,7 @@ WHERE c.id = $1 AND c.deleted_at IS NULL
 
 type GetCommentWithUserRow struct {
 	ID          int64              `json:"id"`
-	UserID      int32              `json:"user_id"`
+	UserID      pgtype.Int4        `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
 	ParentID    pgtype.Int8        `json:"parent_id"`
 	Content     string             `json:"content"`
@@ -231,7 +231,7 @@ type GetMovieCommentsParams struct {
 
 type GetMovieCommentsRow struct {
 	ID          int64              `json:"id"`
-	UserID      int32              `json:"user_id"`
+	UserID      pgtype.Int4        `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
 	ParentID    pgtype.Int8        `json:"parent_id"`
 	Content     string             `json:"content"`
@@ -292,14 +292,14 @@ LIMIT $2 OFFSET $3
 `
 
 type GetUserCommentsParams struct {
-	UserID int32 `json:"user_id"`
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	UserID pgtype.Int4 `json:"user_id"`
+	Limit  int32       `json:"limit"`
+	Offset int32       `json:"offset"`
 }
 
 type GetUserCommentsRow struct {
 	ID         int64              `json:"id"`
-	UserID     int32              `json:"user_id"`
+	UserID     pgtype.Int4        `json:"user_id"`
 	MovieID    int32              `json:"movie_id"`
 	ParentID   pgtype.Int8        `json:"parent_id"`
 	Content    string             `json:"content"`

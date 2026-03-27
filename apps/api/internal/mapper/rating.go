@@ -6,26 +6,32 @@ import (
 )
 
 func ToRatingResponse(r db.Rating) dto.RatingResponse {
-	return dto.RatingResponse{
+	resp := dto.RatingResponse{
 		ID:        r.ID,
-		UserID:    r.UserID,
 		MovieID:   r.MovieID,
 		Score:     r.Score,
 		CreatedAt: r.CreatedAt.Time,
 		UpdatedAt: r.UpdatedAt.Time,
 	}
+	if r.UserID.Valid {
+		resp.UserID = &r.UserID.Int32
+	}
+	return resp
 }
 
 func ToRatingWithUserResponse(r db.GetMovieRatingsRow) dto.RatingWithUserResponse {
-	return dto.RatingWithUserResponse{
+	resp := dto.RatingWithUserResponse{
 		ID:          r.ID,
 		Score:       r.Score,
 		CreatedAt:   r.CreatedAt.Time,
-		UserID:      r.UserID,
 		Username:    r.Username,
 		DisplayName: r.DisplayName.String,
 		AvatarURL:   r.AvatarUrl.String,
 	}
+	if r.UserID.Valid {
+		resp.UserID = &r.UserID.Int32
+	}
+	return resp
 }
 
 func ToRatingWithUserResponses(rows []db.GetMovieRatingsRow) []dto.RatingWithUserResponse {

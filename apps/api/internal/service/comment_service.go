@@ -44,7 +44,7 @@ func (s *commentService) Create(ctx context.Context, userID, movieID int32, pare
 	}
 
 	params := db.CreateCommentParams{
-		UserID:  userID,
+		UserID:  pgtype.Int4{Int32: userID, Valid: true},
 		MovieID: movieID,
 		Content: content,
 	}
@@ -103,7 +103,7 @@ func (s *commentService) GetReplies(ctx context.Context, parentID int64, limit, 
 
 func (s *commentService) GetUserComments(ctx context.Context, userID, limit, offset int32) ([]db.GetUserCommentsRow, error) {
 	return s.queries.GetUserComments(ctx, db.GetUserCommentsParams{
-		UserID: userID,
+		UserID: pgtype.Int4{Int32: userID, Valid: true},
 		Limit:  limit,
 		Offset: offset,
 	})
@@ -118,7 +118,7 @@ func (s *commentService) Update(ctx context.Context, userID int32, commentID int
 		return db.GetCommentWithUserRow{}, err
 	}
 
-	if comment.UserID != userID {
+	if !comment.UserID.Valid || comment.UserID.Int32 != userID {
 		return db.GetCommentWithUserRow{}, ErrNotCommentOwner
 	}
 
@@ -141,7 +141,7 @@ func (s *commentService) Delete(ctx context.Context, userID int32, commentID int
 		return err
 	}
 
-	if comment.UserID != userID {
+	if !comment.UserID.Valid || comment.UserID.Int32 != userID {
 		return ErrNotCommentOwner
 	}
 

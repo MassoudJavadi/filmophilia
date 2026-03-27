@@ -13,11 +13,13 @@ func ToCommentResponse(c db.GetMovieCommentsRow) dto.CommentResponse {
 		LikeCount:   c.LikeCount.Int32,
 		CreatedAt:   c.CreatedAt.Time,
 		UpdatedAt:   c.UpdatedAt.Time,
-		UserID:      c.UserID,
 		Username:    c.Username,
 		DisplayName: c.DisplayName.String,
 		AvatarURL:   c.AvatarUrl.String,
 		ReplyCount:  c.ReplyCount,
+	}
+	if c.UserID.Valid {
+		resp.UserID = &c.UserID.Int32
 	}
 	if c.ParentID.Valid {
 		parentID := c.ParentID.Int64
@@ -42,10 +44,12 @@ func ToReplyResponse(c db.GetCommentRepliesRow) dto.CommentResponse {
 		LikeCount:   c.LikeCount.Int32,
 		CreatedAt:   c.CreatedAt.Time,
 		UpdatedAt:   c.UpdatedAt.Time,
-		UserID:      c.UserID,
 		Username:    c.Username,
 		DisplayName: c.DisplayName.String,
 		AvatarURL:   c.AvatarUrl.String,
+	}
+	if c.UserID.Valid {
+		resp.UserID = &c.UserID.Int32
 	}
 	if c.ParentID.Valid {
 		parentID := c.ParentID.Int64
@@ -70,10 +74,12 @@ func ToCommentWithUserResponse(c db.GetCommentWithUserRow) dto.CommentResponse {
 		LikeCount:   c.LikeCount.Int32,
 		CreatedAt:   c.CreatedAt.Time,
 		UpdatedAt:   c.UpdatedAt.Time,
-		UserID:      c.UserID,
 		Username:    c.Username,
 		DisplayName: c.DisplayName.String,
 		AvatarURL:   c.AvatarUrl.String,
+	}
+	if c.UserID.Valid {
+		resp.UserID = &c.UserID.Int32
 	}
 	if c.ParentID.Valid {
 		parentID := c.ParentID.Int64

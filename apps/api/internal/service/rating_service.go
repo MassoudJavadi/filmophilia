@@ -6,6 +6,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var (
@@ -38,7 +39,7 @@ func (s *ratingService) RateMovie(ctx context.Context, userID, movieID, score in
 	}
 
 	rating, err := s.queries.UpsertRating(ctx, db.UpsertRatingParams{
-		UserID:  userID,
+		UserID:  pgtype.Int4{Int32: userID, Valid: true},
 		MovieID: movieID,
 		Score:   score,
 	})
@@ -55,7 +56,7 @@ func (s *ratingService) RateMovie(ctx context.Context, userID, movieID, score in
 
 func (s *ratingService) GetUserRating(ctx context.Context, userID, movieID int32) (db.Rating, error) {
 	rating, err := s.queries.GetUserRatingForMovie(ctx, db.GetUserRatingForMovieParams{
-		UserID:  userID,
+		UserID:  pgtype.Int4{Int32: userID, Valid: true},
 		MovieID: movieID,
 	})
 	if err != nil {
@@ -77,7 +78,7 @@ func (s *ratingService) GetMovieRatings(ctx context.Context, movieID, limit, off
 
 func (s *ratingService) GetUserRatings(ctx context.Context, userID, limit, offset int32) ([]db.GetUserRatingsRow, error) {
 	return s.queries.GetUserRatings(ctx, db.GetUserRatingsParams{
-		UserID: userID,
+		UserID: pgtype.Int4{Int32: userID, Valid: true},
 		Limit:  limit,
 		Offset: offset,
 	})
@@ -89,7 +90,7 @@ func (s *ratingService) DeleteRating(ctx context.Context, userID, movieID int32)
 	}
 
 	if err := s.queries.DeleteRating(ctx, db.DeleteRatingParams{
-		UserID:  userID,
+		UserID:  pgtype.Int4{Int32: userID, Valid: true},
 		MovieID: movieID,
 	}); err != nil {
 		return err

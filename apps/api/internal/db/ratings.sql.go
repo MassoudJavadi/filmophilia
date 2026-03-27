@@ -17,8 +17,8 @@ WHERE user_id = $1 AND movie_id = $2
 `
 
 type DeleteRatingParams struct {
-	UserID  int32 `json:"user_id"`
-	MovieID int32 `json:"movie_id"`
+	UserID  pgtype.Int4 `json:"user_id"`
+	MovieID int32       `json:"movie_id"`
 }
 
 func (q *Queries) DeleteRating(ctx context.Context, arg DeleteRatingParams) error {
@@ -27,7 +27,7 @@ func (q *Queries) DeleteRating(ctx context.Context, arg DeleteRatingParams) erro
 }
 
 const getMovieByID = `-- name: GetMovieByID :one
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating FROM movies WHERE id = $1
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies WHERE id = $1
 `
 
 func (q *Queries) GetMovieByID(ctx context.Context, id int32) (Movie, error) {
@@ -56,6 +56,7 @@ func (q *Queries) GetMovieByID(ctx context.Context, id int32) (Movie, error) {
 		&i.RottenTomatoes,
 		&i.MetacriticScore,
 		&i.LetterboxdRating,
+		&i.RatingSum,
 	)
 	return i, err
 }
@@ -81,7 +82,7 @@ type GetMovieRatingsParams struct {
 
 type GetMovieRatingsRow struct {
 	ID          int64              `json:"id"`
-	UserID      int32              `json:"user_id"`
+	UserID      pgtype.Int4        `json:"user_id"`
 	MovieID     int32              `json:"movie_id"`
 	Score       int32              `json:"score"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
@@ -127,8 +128,8 @@ WHERE user_id = $1 AND movie_id = $2
 `
 
 type GetUserRatingForMovieParams struct {
-	UserID  int32 `json:"user_id"`
-	MovieID int32 `json:"movie_id"`
+	UserID  pgtype.Int4 `json:"user_id"`
+	MovieID int32       `json:"movie_id"`
 }
 
 func (q *Queries) GetUserRatingForMovie(ctx context.Context, arg GetUserRatingForMovieParams) (Rating, error) {
@@ -159,14 +160,14 @@ LIMIT $2 OFFSET $3
 `
 
 type GetUserRatingsParams struct {
-	UserID int32 `json:"user_id"`
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	UserID pgtype.Int4 `json:"user_id"`
+	Limit  int32       `json:"limit"`
+	Offset int32       `json:"offset"`
 }
 
 type GetUserRatingsRow struct {
 	ID        int64              `json:"id"`
-	UserID    int32              `json:"user_id"`
+	UserID    pgtype.Int4        `json:"user_id"`
 	MovieID   int32              `json:"movie_id"`
 	Score     int32              `json:"score"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
@@ -229,9 +230,9 @@ RETURNING id, user_id, movie_id, score, created_at, updated_at
 `
 
 type UpsertRatingParams struct {
-	UserID  int32 `json:"user_id"`
-	MovieID int32 `json:"movie_id"`
-	Score   int32 `json:"score"`
+	UserID  pgtype.Int4 `json:"user_id"`
+	MovieID int32       `json:"movie_id"`
+	Score   int32       `json:"score"`
 }
 
 func (q *Queries) UpsertRating(ctx context.Context, arg UpsertRatingParams) (Rating, error) {
