@@ -135,23 +135,28 @@ func (s *AuthService) IssueTokens(ctx context.Context, user db.User, meta Sessio
 
 // Helper to bundle token issuance
 func (s *AuthService) issueTokens(ctx context.Context, user db.User, meta SessionMeta) (*dto.AuthResponse, error) {
-	access, err := s.jwt.Generate(user.ID, string(user.Role), token.AccessTokenDuration)
-	if err != nil {
-		return nil, err
-	}
-
+	// Create session first to ensure we don't issue tokens without a valid session
 	refresh := uuid.New().String()
-	_, err = s.queries.CreateSession(ctx, db.CreateSessionParams{
+	_, err := s.queries.CreateSession(ctx, db.CreateSessionParams{
 		UserID:    user.ID,
 		Digest:    refresh,
 		UserAgent: pgtype.Text{String: meta.UserAgent, Valid: meta.UserAgent != ""},
 		IpAddress: pgtype.Text{String: meta.IPAddress, Valid: meta.IPAddress != ""},
 		ExpiresAt: pgtype.Timestamptz{Time: time.Now().Add(token.RefreshTokenDuration), Valid: true},
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Generate access token only after session is successfully created
+	access, err := s.jwt.Generate(user.ID, string(user.Role), token.AccessTokenDuration)
+	if err != nil {
+		return nil, err
+	}
 
 	return &dto.AuthResponse{
 		AccessToken:  access,
 		RefreshToken: refresh,
 		User:         mapper.ToUserResponse(user),
-	}, err
+	}, nil
 }
