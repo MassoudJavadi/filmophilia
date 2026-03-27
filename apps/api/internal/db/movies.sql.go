@@ -299,6 +299,42 @@ func (q *Queries) GetMovieBySlug(ctx context.Context, slug string) (Movie, error
 	return i, err
 }
 
+const getMovieByTmdbID = `-- name: GetMovieByTmdbID :one
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies WHERE tmdb_id = $1 LIMIT 1
+`
+
+// Get a movie by its TMDB ID
+func (q *Queries) GetMovieByTmdbID(ctx context.Context, tmdbID pgtype.Int4) (Movie, error) {
+	row := q.db.QueryRow(ctx, getMovieByTmdbID, tmdbID)
+	var i Movie
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Overview,
+		&i.PosterUrl,
+		&i.BackdropUrl,
+		&i.TrailerUrl,
+		&i.ReleaseDate,
+		&i.Runtime,
+		&i.ContentRating,
+		&i.OriginalLanguage,
+		&i.Country,
+		&i.ImdbID,
+		&i.TmdbID,
+		&i.UserAvgRating,
+		&i.UserRatingCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ImdbRating,
+		&i.RottenTomatoes,
+		&i.MetacriticScore,
+		&i.LetterboxdRating,
+		&i.RatingSum,
+	)
+	return i, err
+}
+
 const listMovies = `-- name: ListMovies :many
 SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
 ORDER BY created_at DESC
@@ -411,6 +447,34 @@ func (q *Queries) SearchMovies(ctx context.Context, arg SearchMoviesParams) ([]M
 		return nil, err
 	}
 	return items, nil
+}
+
+const upsertCredit = `-- name: UpsertCredit :exec
+INSERT INTO credits (movie_id, person_id, department, role, character, "order")
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT DO NOTHING
+`
+
+type UpsertCreditParams struct {
+	MovieID    int32       `json:"movie_id"`
+	PersonID   int32       `json:"person_id"`
+	Department Department  `json:"department"`
+	Role       string      `json:"role"`
+	Character  pgtype.Text `json:"character"`
+	Order      pgtype.Int4 `json:"order"`
+}
+
+// Create a credit or ignore if it already exists
+func (q *Queries) UpsertCredit(ctx context.Context, arg UpsertCreditParams) error {
+	_, err := q.db.Exec(ctx, upsertCredit,
+		arg.MovieID,
+		arg.PersonID,
+		arg.Department,
+		arg.Role,
+		arg.Character,
+		arg.Order,
+	)
+	return err
 }
 
 const upsertPerson = `-- name: UpsertPerson :one

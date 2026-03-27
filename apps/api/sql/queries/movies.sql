@@ -108,3 +108,13 @@ WHERE
 -- Create a link between a movie and a person (cast/crew)
 INSERT INTO credits (movie_id, person_id, department, role, character)
 VALUES ($1, $2, $3, $4, $5);
+
+-- name: UpsertCredit :exec
+-- Create a credit or ignore if it already exists
+INSERT INTO credits (movie_id, person_id, department, role, character, "order")
+VALUES ($1, $2, $3, $4, $5, $6)
+ON CONFLICT DO NOTHING;
+
+-- name: GetMovieByTmdbID :one
+-- Get a movie by its TMDB ID
+SELECT * FROM movies WHERE tmdb_id = $1 LIMIT 1;

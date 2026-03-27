@@ -8,13 +8,15 @@ import (
 	"os"
 )
 
-var (
-	tmdbKey = os.Getenv("TMDB_API_KEY")
-	omdbKey = os.Getenv("OMDB_API_KEY")
-)
+// getAPIKeys reads keys at call time (after .env is loaded)
+func getAPIKeys() (tmdbKey, omdbKey string) {
+	return os.Getenv("TMDB_API_KEY"), os.Getenv("OMDB_API_KEY")
+}
 
 // FetchFullMovieData coordinates API calls to get complete movie data
 func FetchFullMovieData(title string, year int) (*TMDBMovie, *TMDBCredits, *OMDBResponse, error) {
+	tmdbKey, omdbKey := getAPIKeys()
+
 	// 1. Search TMDB to get movie ID
 	searchURL := fmt.Sprintf("https://api.themoviedb.org/3/search/movie?api_key=%s&query=%s&year=%d",
 		tmdbKey, url.QueryEscape(title), year)

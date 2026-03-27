@@ -128,27 +128,37 @@ func main() {
 			}
 		}
 
-		// Create Movie
-		movieID, err := queries.CreateMovie(ctx, db.CreateMovieParams{
-			Title:           tmdb.Title,
-			Slug:            slug,
-			Overview:        pgtype.Text{String: tmdb.Overview, Valid: tmdb.Overview != ""},
-			PosterUrl:       pgtype.Text{String: "https://image.tmdb.org/t/p/w500" + tmdb.PosterPath, Valid: tmdb.PosterPath != ""},
-			ReleaseDate:     releaseDate,
-			Runtime:         pgtype.Int4{Int32: int32(tmdb.Runtime), Valid: tmdb.Runtime > 0},
-			ImdbID:          pgtype.Text{String: tmdb.IMDBID, Valid: tmdb.IMDBID != ""},
-			TmdbID:          pgtype.Int4{Int32: int32(tmdb.ID), Valid: true},
-			ImdbRating:      imdbRating,
-			RottenTomatoes:  rottenTomatoes,
-			MetacriticScore: metacriticScore,
-		})
-		if err != nil {
-			fmt.Printf("FAILED to insert: %v\n", err)
-			failed++
-			continue
+		// Check if movie already exists by TMDB ID
+		var movieID int32
+		existingMovie, err := queries.GetMovieByTmdbID(ctx, pgtype.Int4{Int32: int32(tmdb.ID), Valid: true})
+		if err == nil {
+			// Movie exists, use its ID
+			movieID = existingMovie.ID
+			fmt.Printf("(exists) ")
+		} else {
+			// Create new movie
+			movieID, err = queries.CreateMovie(ctx, db.CreateMovieParams{
+				Title:           tmdb.Title,
+				Slug:            slug,
+				Overview:        pgtype.Text{String: tmdb.Overview, Valid: tmdb.Overview != ""},
+				PosterUrl:       pgtype.Text{String: "https://image.tmdb.org/t/p/w500" + tmdb.PosterPath, Valid: tmdb.PosterPath != ""},
+				ReleaseDate:     releaseDate,
+				Runtime:         pgtype.Int4{Int32: int32(tmdb.Runtime), Valid: tmdb.Runtime > 0},
+				ImdbID:          pgtype.Text{String: tmdb.IMDBID, Valid: tmdb.IMDBID != ""},
+				TmdbID:          pgtype.Int4{Int32: int32(tmdb.ID), Valid: true},
+				ImdbRating:      imdbRating,
+				RottenTomatoes:  rottenTomatoes,
+				MetacriticScore: metacriticScore,
+			})
+			if err != nil {
+				fmt.Printf("FAILED to insert: %v\n", err)
+				failed++
+				continue
+			}
 		}
 
-		// Handle Crew (Director)
+		// Handle Crew (Directors)
+		directorOrder := 0
 		for _, person := range credits.Crew {
 			if person.Job == "Director" {
 				pID, err := queries.UpsertPerson(ctx, db.UpsertPersonParams{
@@ -156,21 +166,44 @@ func main() {
 					Slug: generateSlug(person.Name, 0),
 				})
 				if err != nil {
-					fmt.Printf("Warning: Failed to upsert person %s: %v\n", person.Name, err)
 					continue
 				}
 
-				err = queries.CreateCredit(ctx, db.CreateCreditParams{
+				queries.UpsertCredit(ctx, db.UpsertCreditParams{
 					MovieID:    movieID,
 					PersonID:   pID,
 					Department: db.DepartmentDIRECTING,
 					Role:       "Director",
 					Character:  pgtype.Text{},
+					Order:      pgtype.Int4{Int32: int32(directorOrder), Valid: true},
 				})
-				if err != nil {
-					fmt.Printf("Warning: Failed to create credit: %v\n", err)
-				}
+				directorOrder++
 			}
+		}
+
+		// Handle Cast (top 10 actors)
+		maxActors := 10
+		if len(credits.Cast) < maxActors {
+			maxActors = len(credits.Cast)
+		}
+		for i := 0; i < maxActors; i++ {
+			actor := credits.Cast[i]
+			pID, err := queries.UpsertPerson(ctx, db.UpsertPersonParams{
+				Name: actor.Name,
+				Slug: generateSlug(actor.Name, 0),
+			})
+			if err != nil {
+				continue
+			}
+
+			queries.UpsertCredit(ctx, db.UpsertCreditParams{
+				MovieID:    movieID,
+				PersonID:   pID,
+				Department: db.DepartmentACTING,
+				Role:       "Actor",
+				Character:  pgtype.Text{String: actor.Character, Valid: actor.Character != ""},
+				Order:      pgtype.Int4{Int32: int32(i), Valid: true},
+			})
 		}
 
 		fmt.Printf("OK\n")
