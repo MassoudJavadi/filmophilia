@@ -26,6 +26,19 @@ type AdvancedSearchResponse struct {
 	TotalPages int32           `json:"total_pages"`
 }
 
+type MovieCardResponse struct {
+	ID              int32    `json:"id"`
+	Title           string   `json:"title"`
+	Slug            string   `json:"slug"`
+	PosterURL       string   `json:"poster_url,omitempty"`
+	Directors       []string `json:"directors"`
+	UserAvgRating   float32  `json:"user_avg_rating,omitempty"`
+	ImdbRating      float64  `json:"imdb_rating,omitempty"`
+	RottenTomatoes  int32    `json:"rotten_tomatoes,omitempty"`
+	MetacriticScore int32    `json:"metacritic_score,omitempty"`
+	ReleaseDate     string   `json:"release_date,omitempty"`
+}
+
 type MovieResponse struct {
 	ID               int32    `json:"id"`
 	Title            string   `json:"title"`

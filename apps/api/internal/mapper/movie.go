@@ -70,6 +70,44 @@ func ToMovieResponse(m db.Movie) dto.MovieResponse {
 	return resp
 }
 
+func ToMovieCardResponse(m db.ListMoviesRow) dto.MovieCardResponse {
+	resp := dto.MovieCardResponse{
+		ID:        m.ID,
+		Title:     m.Title,
+		Slug:      m.Slug,
+		Directors: m.Directors,
+	}
+
+	if m.PosterUrl.Valid {
+		resp.PosterURL = m.PosterUrl.String
+	}
+	if m.ReleaseDate.Valid {
+		resp.ReleaseDate = m.ReleaseDate.Time.Format("2006-01-02")
+	}
+	if m.UserAvgRating.Valid {
+		resp.UserAvgRating = m.UserAvgRating.Float32
+	}
+	if m.ImdbRating.Valid {
+		resp.ImdbRating = numericToFloat64(m.ImdbRating)
+	}
+	if m.RottenTomatoes.Valid {
+		resp.RottenTomatoes = m.RottenTomatoes.Int32
+	}
+	if m.MetacriticScore.Valid {
+		resp.MetacriticScore = m.MetacriticScore.Int32
+	}
+
+	return resp
+}
+
+func ToMovieCardResponses(movies []db.ListMoviesRow) []dto.MovieCardResponse {
+	result := make([]dto.MovieCardResponse, len(movies))
+	for i, m := range movies {
+		result[i] = ToMovieCardResponse(m)
+	}
+	return result
+}
+
 func ToMovieResponses(movies []db.Movie) []dto.MovieResponse {
 	result := make([]dto.MovieResponse, len(movies))
 	for i, m := range movies {

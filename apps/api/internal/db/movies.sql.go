@@ -336,9 +336,56 @@ func (q *Queries) GetMovieByTmdbID(ctx context.Context, tmdbID pgtype.Int4) (Mov
 }
 
 const listMovies = `-- name: ListMovies :many
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
-ORDER BY created_at DESC
-LIMIT $1 OFFSET $2
+WITH paged_movies AS (
+    SELECT
+        m.id,
+        m.title,
+        m.slug,
+        m.poster_url,
+        m.release_date,
+        m.user_avg_rating,
+        m.imdb_rating,
+        m.rotten_tomatoes,
+        m.metacritic_score,
+        m.created_at
+    FROM movies m
+    ORDER BY m.created_at DESC
+    LIMIT $1 OFFSET $2
+)
+SELECT
+    pm.id,
+    pm.title,
+    pm.slug,
+    pm.poster_url,
+    pm.release_date,
+    pm.user_avg_rating,
+    pm.imdb_rating,
+    pm.rotten_tomatoes,
+    pm.metacritic_score,
+    COALESCE(
+        (
+            ARRAY_AGG(DISTINCT p.name ORDER BY p.name)
+            FILTER (WHERE p.name IS NOT NULL)
+        )::TEXT[],
+        ARRAY[]::TEXT[]
+    )::TEXT[] AS directors
+FROM paged_movies pm
+LEFT JOIN credits c
+    ON c.movie_id = pm.id
+    AND c.department = 'DIRECTING'
+LEFT JOIN persons p ON p.id = c.person_id
+GROUP BY
+    pm.id,
+    pm.title,
+    pm.slug,
+    pm.poster_url,
+    pm.release_date,
+    pm.user_avg_rating,
+    pm.imdb_rating,
+    pm.rotten_tomatoes,
+    pm.metacritic_score,
+    pm.created_at
+ORDER BY pm.created_at DESC
 `
 
 type ListMoviesParams struct {
@@ -346,40 +393,40 @@ type ListMoviesParams struct {
 	Offset int32 `json:"offset"`
 }
 
-// Get a paginated list of movies ordered by creation date
-func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]Movie, error) {
+type ListMoviesRow struct {
+	ID              int32          `json:"id"`
+	Title           string         `json:"title"`
+	Slug            string         `json:"slug"`
+	PosterUrl       pgtype.Text    `json:"poster_url"`
+	ReleaseDate     pgtype.Date    `json:"release_date"`
+	UserAvgRating   pgtype.Float4  `json:"user_avg_rating"`
+	ImdbRating      pgtype.Numeric `json:"imdb_rating"`
+	RottenTomatoes  pgtype.Int4    `json:"rotten_tomatoes"`
+	MetacriticScore pgtype.Int4    `json:"metacritic_score"`
+	Directors       []string       `json:"directors"`
+}
+
+// Get a paginated list of movies for landing-page cards, including directors
+func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]ListMoviesRow, error) {
 	rows, err := q.db.Query(ctx, listMovies, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Movie
+	var items []ListMoviesRow
 	for rows.Next() {
-		var i Movie
+		var i ListMoviesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
 			&i.Slug,
-			&i.Overview,
 			&i.PosterUrl,
-			&i.BackdropUrl,
-			&i.TrailerUrl,
 			&i.ReleaseDate,
-			&i.Runtime,
-			&i.ContentRating,
-			&i.OriginalLanguage,
-			&i.Country,
-			&i.ImdbID,
-			&i.TmdbID,
 			&i.UserAvgRating,
-			&i.UserRatingCount,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 			&i.ImdbRating,
 			&i.RottenTomatoes,
 			&i.MetacriticScore,
-			&i.LetterboxdRating,
-			&i.RatingSum,
+			&i.Directors,
 		); err != nil {
 			return nil, err
 		}

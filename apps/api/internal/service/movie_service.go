@@ -24,7 +24,7 @@ func float64ToNumeric(f *float64) pgtype.Numeric {
 }
 
 type MovieService interface {
-	GetMovies(ctx context.Context, limit, offset int32) ([]db.Movie, error)
+	GetMovies(ctx context.Context, limit, offset int32) ([]db.ListMoviesRow, error)
 	GetMovie(ctx context.Context, slug string) (db.Movie, error)
 	Search(ctx context.Context, query string, limit, offset int32) ([]db.Movie, error)
 	AdvancedSearch(ctx context.Context, req dto.AdvancedSearchRequest) ([]db.Movie, int32, error)
@@ -38,7 +38,7 @@ func NewMovieService(queries *db.Queries) MovieService {
 	return &movieService{queries: queries}
 }
 
-func (s *movieService) GetMovies(ctx context.Context, limit, offset int32) ([]db.Movie, error) {
+func (s *movieService) GetMovies(ctx context.Context, limit, offset int32) ([]db.ListMoviesRow, error) {
 	return s.queries.ListMovies(ctx, db.ListMoviesParams{
 		Limit:  limit,
 		Offset: offset,

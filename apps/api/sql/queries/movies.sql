@@ -22,10 +22,57 @@ INSERT INTO movies (
 RETURNING id;
 
 -- name: ListMovies :many
--- Get a paginated list of movies ordered by creation date
-SELECT * FROM movies
-ORDER BY created_at DESC
-LIMIT $1 OFFSET $2;
+-- Get a paginated list of movies for landing-page cards, including directors
+WITH paged_movies AS (
+    SELECT
+        m.id,
+        m.title,
+        m.slug,
+        m.poster_url,
+        m.release_date,
+        m.user_avg_rating,
+        m.imdb_rating,
+        m.rotten_tomatoes,
+        m.metacritic_score,
+        m.created_at
+    FROM movies m
+    ORDER BY m.created_at DESC
+    LIMIT $1 OFFSET $2
+)
+SELECT
+    pm.id,
+    pm.title,
+    pm.slug,
+    pm.poster_url,
+    pm.release_date,
+    pm.user_avg_rating,
+    pm.imdb_rating,
+    pm.rotten_tomatoes,
+    pm.metacritic_score,
+    COALESCE(
+        (
+            ARRAY_AGG(DISTINCT p.name ORDER BY p.name)
+            FILTER (WHERE p.name IS NOT NULL)
+        )::TEXT[],
+        ARRAY[]::TEXT[]
+    )::TEXT[] AS directors
+FROM paged_movies pm
+LEFT JOIN credits c
+    ON c.movie_id = pm.id
+    AND c.department = 'DIRECTING'
+LEFT JOIN persons p ON p.id = c.person_id
+GROUP BY
+    pm.id,
+    pm.title,
+    pm.slug,
+    pm.poster_url,
+    pm.release_date,
+    pm.user_avg_rating,
+    pm.imdb_rating,
+    pm.rotten_tomatoes,
+    pm.metacritic_score,
+    pm.created_at
+ORDER BY pm.created_at DESC;
 
 -- name: GetMovieBySlug :one
 -- Get a single movie by its unique slug

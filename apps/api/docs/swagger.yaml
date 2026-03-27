@@ -294,6 +294,31 @@ definitions:
         example: operation completed successfully
         type: string
     type: object
+  dto.MovieCardResponse:
+    properties:
+      directors:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      imdb_rating:
+        type: number
+      metacritic_score:
+        type: integer
+      poster_url:
+        type: string
+      release_date:
+        type: string
+      rotten_tomatoes:
+        type: integer
+      slug:
+        type: string
+      title:
+        type: string
+      user_avg_rating:
+        type: number
+    type: object
   dto.MovieResponse:
     properties:
       backdrop_url:
@@ -507,11 +532,14 @@ definitions:
   dto.SignupRequest:
     properties:
       email:
+        maxLength: 255
         type: string
       password:
-        minLength: 6
+        maxLength: 72
+        minLength: 8
         type: string
       username:
+        maxLength: 30
         minLength: 3
         type: string
     required:
@@ -1898,7 +1926,8 @@ paths:
       - watchlist
   /movies:
     get:
-      description: Get a paginated list of movies
+      description: Get a paginated list of movie cards for the landing page, including
+        poster, directors, community rating, and external ratings
       parameters:
       - default: 20
         description: Number of movies per page
@@ -1914,21 +1943,21 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of movies
+          description: List of landing-page movie cards
           schema:
             allOf:
             - $ref: '#/definitions/dto.SuccessResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/dto.MovieResponse'
+                    $ref: '#/definitions/dto.MovieCardResponse'
                   type: array
               type: object
         "500":
           description: Failed to fetch movies
           schema:
             $ref: '#/definitions/dto.InternalServerErrorResponse'
-      summary: List movies
+      summary: List landing-page movies
       tags:
       - movies
   /movies/{movieId}/activities:

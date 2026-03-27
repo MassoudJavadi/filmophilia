@@ -2024,14 +2024,14 @@ const docTemplate = `{
         },
         "/movies": {
             "get": {
-                "description": "Get a paginated list of movies",
+                "description": "Get a paginated list of movie cards for the landing page, including poster, directors, community rating, and external ratings",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "movies"
                 ],
-                "summary": "List movies",
+                "summary": "List landing-page movies",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2050,7 +2050,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of movies",
+                        "description": "List of landing-page movie cards",
                         "schema": {
                             "allOf": [
                                 {
@@ -2062,7 +2062,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/dto.MovieResponse"
+                                                "$ref": "#/definitions/dto.MovieCardResponse"
                                             }
                                         }
                                     }
@@ -4658,6 +4658,44 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.MovieCardResponse": {
+            "type": "object",
+            "properties": {
+                "directors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "imdb_rating": {
+                    "type": "number"
+                },
+                "metacritic_score": {
+                    "type": "integer"
+                },
+                "poster_url": {
+                    "type": "string"
+                },
+                "release_date": {
+                    "type": "string"
+                },
+                "rotten_tomatoes": {
+                    "type": "integer"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_avg_rating": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.MovieResponse": {
             "type": "object",
             "properties": {
@@ -4986,14 +5024,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 255
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 6
+                    "maxLength": 72,
+                    "minLength": 8
                 },
                 "username": {
                     "type": "string",
+                    "maxLength": 30,
                     "minLength": 3
                 }
             }

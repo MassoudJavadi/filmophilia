@@ -22,13 +22,13 @@ func NewMovieHandler(movieSvc service.MovieService) *MovieHandler {
 }
 
 // GetMovies godoc
-// @Summary List movies
-// @Description Get a paginated list of movies
+// @Summary List landing-page movies
+// @Description Get a paginated list of movie cards for the landing page, including poster, directors, community rating, and external ratings
 // @Tags movies
 // @Produce json
 // @Param limit query int false "Number of movies per page" default(20)
 // @Param page query int false "Page number" default(1)
-// @Success 200 {object} dto.SuccessResponse{data=[]dto.MovieResponse} "List of movies"
+// @Success 200 {object} dto.SuccessResponse{data=[]dto.MovieCardResponse} "List of landing-page movie cards"
 // @Failure 500 {object} dto.InternalServerErrorResponse "Failed to fetch movies"
 // @Router /movies [get]
 func (h *MovieHandler) GetMovies(c *gin.Context) {
@@ -42,7 +42,7 @@ func (h *MovieHandler) GetMovies(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, mapper.ToMovieResponses(movies))
+	response.OK(c, mapper.ToMovieCardResponses(movies))
 }
 
 // GetMovie godoc
