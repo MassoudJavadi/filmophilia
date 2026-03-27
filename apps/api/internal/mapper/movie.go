@@ -51,7 +51,7 @@ func ToMovieResponse(m db.Movie) dto.MovieResponse {
 	if m.UserRatingCount.Valid {
 		resp.UserRatingCount = m.UserRatingCount.Int32
 	}
-	if m.UserRatingCount.Valid && m.UserRatingCount.Int32 > 0 && m.UserAvgRating.Valid {
+	if m.UserAvgRating.Valid {
 		userAvgRating := m.UserAvgRating.Float32
 		resp.UserAvgRating = &userAvgRating
 	}
@@ -89,7 +89,7 @@ func ToMovieCardResponse(m db.ListMoviesRow) dto.MovieCardResponse {
 	if m.ReleaseDate.Valid {
 		resp.ReleaseDate = m.ReleaseDate.Time.Format("2006-01-02")
 	}
-	if m.UserRatingCount.Valid && m.UserRatingCount.Int32 > 0 && m.UserAvgRating.Valid {
+	if m.UserAvgRating.Valid {
 		userAvgRating := m.UserAvgRating.Float32
 		resp.UserAvgRating = &userAvgRating
 	}
