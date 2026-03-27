@@ -261,7 +261,7 @@ BEGIN
             user_avg_rating = CASE
                 WHEN user_rating_count - 1 > 0
                 THEN (rating_sum - OLD.score)::REAL / (user_rating_count - 1)
-                ELSE 0
+                ELSE NULL
             END
         WHERE id = OLD.movie_id;
         RETURN OLD;
@@ -283,7 +283,7 @@ BEGIN
                 user_avg_rating = CASE
                     WHEN user_rating_count > 0
                     THEN (rating_sum - OLD.score + NEW.score)::REAL / user_rating_count
-                    ELSE 0
+                    ELSE NULL
                 END
             WHERE id = NEW.movie_id;
         END IF;
@@ -298,7 +298,7 @@ BEGIN
                 user_avg_rating = CASE
                     WHEN user_rating_count - 1 > 0
                     THEN (rating_sum - OLD.score)::REAL / (user_rating_count - 1)
-                    ELSE 0
+                    ELSE NULL
                 END
             WHERE id = OLD.movie_id;
 
@@ -1030,7 +1030,7 @@ CREATE TABLE public.movies (
     country character varying(100),
     imdb_id character varying(20),
     tmdb_id integer,
-    user_avg_rating real DEFAULT 0,
+    user_avg_rating real,
     user_rating_count integer DEFAULT 0,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -4765,5 +4765,4 @@ ALTER TABLE ONLY public.watchlists
 --
 -- PostgreSQL database dump complete
 --
-
 

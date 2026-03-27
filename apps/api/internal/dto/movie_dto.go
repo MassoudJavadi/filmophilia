@@ -54,12 +54,12 @@ type MovieResponse struct {
 	Country          string   `json:"country,omitempty"`
 	ImdbID           string   `json:"imdb_id,omitempty"`
 	TmdbID           int32    `json:"tmdb_id,omitempty"`
-	UserAvgRating    float32  `json:"user_avg_rating,omitempty"`
+	UserAvgRating    *float32 `json:"user_avg_rating"`
 	UserRatingCount  int32    `json:"user_rating_count,omitempty"`
-	ImdbRating       float64  `json:"imdb_rating,omitempty"`
-	RottenTomatoes   int32    `json:"rotten_tomatoes,omitempty"`
-	MetacriticScore  int32    `json:"metacritic_score,omitempty"`
-	LetterboxdRating float64  `json:"letterboxd_rating,omitempty"`
+	ImdbRating       *float64 `json:"imdb_rating"`
+	RottenTomatoes   *int32   `json:"rotten_tomatoes"`
+	MetacriticScore  *int32   `json:"metacritic_score"`
+	LetterboxdRating *float64 `json:"letterboxd_rating"`
 	Genres           []string `json:"genres,omitempty"`
 }
 
