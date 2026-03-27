@@ -7,13 +7,16 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/db"
 	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/importer"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -22,6 +25,7 @@ func main() {
 	// Load .env file if it exists (try multiple paths)
 	loadEnvFile(".env")
 	loadEnvFile("../../.env")
+	loadEnvFile("apps/api/.env")
 
 	ctx := context.Background()
 
@@ -46,8 +50,12 @@ func main() {
 
 	queries := db.New(pool)
 
-	// Open CSV
-	f, err := os.Open("movies.csv")
+	// Load user average ratings from Beta - Film.csv
+	userRatings := loadUserRatings(resolveInputPath("Beta - Film.csv"))
+	fmt.Printf("Loaded %d user avg ratings from 'Beta - Film.csv'\n", len(userRatings))
+
+	// Open movies.csv
+	f, err := os.Open(resolveInputPath("movies.csv"))
 	if err != nil {
 		log.Fatalf("Failed to open movies.csv: %v", err)
 	}
@@ -61,6 +69,8 @@ func main() {
 	total := len(lines) - 1 // Exclude header
 	success := 0
 	failed := 0
+	skipped := 0
+	skipUnmatched := true
 
 	fmt.Printf("Found %d movies to import\n\n", total)
 
@@ -83,7 +93,36 @@ func main() {
 
 		fmt.Printf("[%d/%d] Processing: %s (%d)... ", i, total, title, year)
 
-		tmdb, credits, omdb, err := importer.FetchFullMovieData(title, year)
+		// Parse user avg rating from Beta - Film.csv
+		var userAvgRating pgtype.Float4
+		if avg, ok := userRatings[normalizeTitle(title)]; ok {
+			userAvgRating = pgtype.Float4{
+				Float32: avg,
+				Valid:   true,
+			}
+		}
+
+		if movieID, found, err := findMovieIDByTitleAndYear(ctx, pool, title, year); err != nil {
+			fmt.Printf("FAILED to match existing movie: %v\n", err)
+			failed++
+			continue
+		} else if found {
+			if err := updateMovieUserAvgRating(ctx, pool, movieID, userAvgRating); err != nil {
+				fmt.Printf("FAILED to update user_avg_rating: %v\n", err)
+				failed++
+				continue
+			}
+			fmt.Printf("OK (updated existing movie)\n")
+			success++
+			continue
+		} else if skipUnmatched {
+			fmt.Printf("SKIPPED (unmatched in DB)\n")
+			skipped++
+			continue
+		}
+
+		// Fetch extra movie data with retry for TMDB/OMDB rate limit
+		tmdb, credits, omdb, err := fetchWithRetry(title, year, 3)
 		if err != nil {
 			fmt.Printf("FAILED: %v\n", err)
 			failed++
@@ -117,7 +156,6 @@ func main() {
 					metacriticScore = pgtype.Int4{Int32: int32(val), Valid: true}
 				}
 			}
-			// Parse Rotten Tomatoes from Ratings array
 			for _, rating := range omdb.Ratings {
 				if rating.Source == "Rotten Tomatoes" {
 					rtStr := strings.TrimSuffix(rating.Value, "%")
@@ -157,6 +195,14 @@ func main() {
 			}
 		}
 
+		if userAvgRating.Valid {
+			if err := updateMovieUserAvgRating(ctx, pool, movieID, userAvgRating); err != nil {
+				fmt.Printf("FAILED to update user_avg_rating: %v\n", err)
+				failed++
+				continue
+			}
+		}
+
 		// Handle Crew (Directors)
 		directorOrder := 0
 		for _, person := range credits.Crew {
@@ -168,7 +214,6 @@ func main() {
 				if err != nil {
 					continue
 				}
-
 				queries.UpsertCredit(ctx, db.UpsertCreditParams{
 					MovieID:    movieID,
 					PersonID:   pID,
@@ -195,7 +240,6 @@ func main() {
 			if err != nil {
 				continue
 			}
-
 			queries.UpsertCredit(ctx, db.UpsertCreditParams{
 				MovieID:    movieID,
 				PersonID:   pID,
@@ -209,24 +253,189 @@ func main() {
 		fmt.Printf("OK\n")
 		success++
 
-		// Small delay to avoid rate limiting
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond) // slight delay to avoid hammering APIs
 	}
 
 	fmt.Printf("\n========================================\n")
 	fmt.Printf("Import completed!\n")
 	fmt.Printf("Success: %d\n", success)
+	fmt.Printf("Skipped: %d\n", skipped)
 	fmt.Printf("Failed: %d\n", failed)
 	fmt.Printf("Total: %d\n", total)
+}
+
+// Advanced TMDB/OMDB fetcher with retry logic
+func fetchWithRetry(title string, year int, maxTry int) (tmdb *importer.TMDBMovie, credits *importer.TMDBCredits, omdb *importer.OMDBResponse, err error) {
+	for attempt := 0; attempt < maxTry; attempt++ {
+		tmdb, credits, omdb, err = importer.FetchFullMovieData(title, year)
+		if err == nil {
+			return
+		}
+		dur := time.Duration(1000+attempt*500) * time.Millisecond
+		time.Sleep(dur)
+	}
+	return
+}
+
+func updateMovieUserAvgRating(ctx context.Context, pool *pgxpool.Pool, movieID int32, userAvgRating pgtype.Float4) error {
+	if !userAvgRating.Valid {
+		return nil
+	}
+
+	_, err := pool.Exec(ctx, "UPDATE movies SET user_avg_rating = $1 WHERE id = $2", userAvgRating, movieID)
+	return err
+}
+
+func findMovieIDByTitleAndYear(ctx context.Context, pool *pgxpool.Pool, title string, year int) (int32, bool, error) {
+	var movieID int32
+	err := pool.QueryRow(ctx, `
+		SELECT id
+		FROM movies
+		WHERE (
+			lower(title) = lower($3)
+			OR regexp_replace(
+				translate(lower(title), 'åáàâäãāéèêëēíìîïīóòôöõōúùûüūñçø', 'aaaaaaaeeeeeiiiiioooooouuuuunco'),
+				'[^a-z0-9]+',
+				'',
+				'g'
+			) = $1
+		)
+		  AND ($2 = 0 OR EXTRACT(YEAR FROM release_date) = $2)
+		LIMIT 1
+	`, normalizeLookupKey(title), year, title).Scan(&movieID)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return 0, false, nil
+		}
+		return 0, false, err
+	}
+
+	return movieID, true, nil
+}
+
+// Helper: load AVG column from Beta - Film.csv into map[normalizedTitle]float32
+func loadUserRatings(path string) map[string]float32 {
+	f, err := os.Open(path)
+	if err != nil {
+		log.Printf("[WARN] Could not open ratings file: %v", err)
+		return map[string]float32{}
+	}
+	defer f.Close()
+
+	rows, err := csv.NewReader(f).ReadAll()
+	if err != nil {
+		log.Printf("[WARN] Failed reading ratings csv: %v", err)
+		return map[string]float32{}
+	}
+
+	ratings := make(map[string]float32)
+	for i, row := range rows {
+		if i == 0 {
+			continue
+		}
+		if len(row) < 4 {
+			continue
+		}
+		title := normalizeTitle(row[0])
+		avgStr := strings.TrimSpace(row[3])
+		if avgStr == "" {
+			continue
+		}
+		val, err := strconv.ParseFloat(avgStr, 32)
+		if err != nil {
+			continue
+		}
+		ratings[title] = float32(val)
+	}
+	return ratings
+}
+
+func resolveInputPath(name string) string {
+	candidates := []string{
+		name,
+		filepath.Join("cmd", "importer", name),
+		filepath.Join("apps", "api", "cmd", "importer", name),
+	}
+
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+
+	return name
+}
+
+func normalizeTitle(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	s = strings.ReplaceAll(s, ":", "")
+	s = strings.ReplaceAll(s, "'", "")
+	s = strings.ReplaceAll(s, ",", "")
+	s = strings.ReplaceAll(s, ".", "")
+	s = strings.ReplaceAll(s, "!", "")
+	s = strings.ReplaceAll(s, "?", "")
+	s = strings.ReplaceAll(s, "-", " ")
+	s = strings.ReplaceAll(s, "  ", " ")
+	return s
+}
+
+func normalizeLookupKey(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+
+	replacer := strings.NewReplacer(
+		"&", "and",
+		"æ", "ae",
+		"œ", "oe",
+		"ß", "ss",
+		"ø", "o",
+		"å", "a",
+		"á", "a",
+		"à", "a",
+		"â", "a",
+		"ä", "a",
+		"ã", "a",
+		"ā", "a",
+		"é", "e",
+		"è", "e",
+		"ê", "e",
+		"ë", "e",
+		"ē", "e",
+		"í", "i",
+		"ì", "i",
+		"î", "i",
+		"ï", "i",
+		"ī", "i",
+		"ó", "o",
+		"ò", "o",
+		"ô", "o",
+		"ö", "o",
+		"õ", "o",
+		"ō", "o",
+		"ú", "u",
+		"ù", "u",
+		"û", "u",
+		"ü", "u",
+		"ū", "u",
+		"ñ", "n",
+		"ç", "c",
+	)
+	s = replacer.Replace(s)
+
+	var builder strings.Builder
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		}
+	}
+
+	return builder.String()
 }
 
 // generateSlug creates a URL-friendly slug from a title
 func generateSlug(title string, year int) string {
 	slug := strings.ToLower(title)
-	// Replace common special characters
 	replacer := strings.NewReplacer(
 		" ", "-",
-		"'", "",
 		"'", "",
 		":", "",
 		",", "",
@@ -239,7 +448,6 @@ func generateSlug(title string, year int) string {
 		")", "",
 	)
 	slug = replacer.Replace(slug)
-	// Remove multiple dashes
 	for strings.Contains(slug, "--") {
 		slug = strings.ReplaceAll(slug, "--", "-")
 	}
@@ -250,11 +458,10 @@ func generateSlug(title string, year int) string {
 	return slug
 }
 
-// loadEnvFile loads environment variables from a file
 func loadEnvFile(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return // File doesn't exist, skip
+		return
 	}
 	defer file.Close()
 
@@ -268,7 +475,7 @@ func loadEnvFile(filename string) {
 		if len(parts) == 2 {
 			key := strings.TrimSpace(parts[0])
 			value := strings.TrimSpace(parts[1])
-			if os.Getenv(key) == "" { // Don't override existing env vars
+			if os.Getenv(key) == "" {
 				os.Setenv(key, value)
 			}
 		}
