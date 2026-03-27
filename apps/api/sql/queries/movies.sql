@@ -22,8 +22,8 @@ INSERT INTO movies (
 RETURNING id;
 
 -- name: ListMovies :many
--- Get a paginated list of movies for landing-page cards, including directors
-WITH paged_movies AS (
+-- Get a paginated list of movies for landing-page cards, ordered by weighted rating
+WITH scored_movies AS (
     SELECT
         m.id,
         m.title,
@@ -31,12 +31,78 @@ WITH paged_movies AS (
         m.poster_url,
         m.release_date,
         m.user_avg_rating,
+        m.user_rating_count,
         m.imdb_rating,
         m.rotten_tomatoes,
         m.metacritic_score,
-        m.created_at
+        m.created_at,
+        CASE
+            WHEN
+                (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END) > 0
+            THEN (
+                COALESCE(m.imdb_rating::NUMERIC, 0) +
+                COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
+                COALESCE((m.metacritic_score::NUMERIC / 10.0), 0)
+            ) / (
+                (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
+            )::NUMERIC
+            ELSE NULL
+        END AS community_rating,
+        CASE
+            WHEN m.user_rating_count > 0
+                 AND (
+                    m.imdb_rating IS NOT NULL OR
+                    m.rotten_tomatoes IS NOT NULL OR
+                    m.metacritic_score IS NOT NULL
+                 )
+                THEN (m.user_avg_rating::NUMERIC * 0.7) + (
+                    (
+                        COALESCE(m.imdb_rating::NUMERIC, 0) +
+                        COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
+                        COALESCE((m.metacritic_score::NUMERIC / 10.0), 0)
+                    ) / (
+                        (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                        (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                        (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
+                    )::NUMERIC
+                ) * 0.3
+            WHEN m.user_rating_count > 0
+                THEN m.user_avg_rating::NUMERIC
+            WHEN
+                m.imdb_rating IS NOT NULL OR
+                m.rotten_tomatoes IS NOT NULL OR
+                m.metacritic_score IS NOT NULL
+                THEN (
+                    COALESCE(m.imdb_rating::NUMERIC, 0) +
+                    COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
+                    COALESCE((m.metacritic_score::NUMERIC / 10.0), 0)
+                ) / (
+                    (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
+                )::NUMERIC
+            ELSE 0
+        END AS landing_sort_score
     FROM movies m
-    ORDER BY m.created_at DESC
+), paged_movies AS (
+    SELECT
+        sm.id,
+        sm.title,
+        sm.slug,
+        sm.poster_url,
+        sm.release_date,
+        sm.user_avg_rating,
+        sm.user_rating_count,
+        sm.imdb_rating,
+        sm.rotten_tomatoes,
+        sm.metacritic_score,
+        sm.created_at
+    FROM scored_movies sm
+    ORDER BY sm.landing_sort_score DESC, sm.created_at DESC
     LIMIT $1 OFFSET $2
 )
 SELECT
@@ -46,6 +112,7 @@ SELECT
     pm.poster_url,
     pm.release_date,
     pm.user_avg_rating,
+    pm.user_rating_count,
     pm.imdb_rating,
     pm.rotten_tomatoes,
     pm.metacritic_score,
@@ -68,11 +135,48 @@ GROUP BY
     pm.poster_url,
     pm.release_date,
     pm.user_avg_rating,
+    pm.user_rating_count,
     pm.imdb_rating,
     pm.rotten_tomatoes,
     pm.metacritic_score,
     pm.created_at
-ORDER BY pm.created_at DESC;
+ORDER BY
+    CASE
+        WHEN pm.user_rating_count > 0
+             AND (
+                pm.imdb_rating IS NOT NULL OR
+                pm.rotten_tomatoes IS NOT NULL OR
+                pm.metacritic_score IS NOT NULL
+             )
+            THEN (pm.user_avg_rating::NUMERIC * 0.7) + (
+                (
+                    COALESCE(pm.imdb_rating::NUMERIC, 0) +
+                    COALESCE((pm.rotten_tomatoes::NUMERIC / 10.0), 0) +
+                    COALESCE((pm.metacritic_score::NUMERIC / 10.0), 0)
+                ) / (
+                    (CASE WHEN pm.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN pm.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN pm.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
+                )::NUMERIC
+            ) * 0.3
+        WHEN pm.user_rating_count > 0
+            THEN pm.user_avg_rating::NUMERIC
+        WHEN
+            pm.imdb_rating IS NOT NULL OR
+            pm.rotten_tomatoes IS NOT NULL OR
+            pm.metacritic_score IS NOT NULL
+            THEN (
+                COALESCE(pm.imdb_rating::NUMERIC, 0) +
+                COALESCE((pm.rotten_tomatoes::NUMERIC / 10.0), 0) +
+                COALESCE((pm.metacritic_score::NUMERIC / 10.0), 0)
+            ) / (
+                (CASE WHEN pm.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                (CASE WHEN pm.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                (CASE WHEN pm.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
+            )::NUMERIC
+        ELSE 0
+    END DESC,
+    pm.created_at DESC;
 
 -- name: GetMovieBySlug :one
 -- Get a single movie by its unique slug

@@ -85,16 +85,20 @@ func ToMovieCardResponse(m db.ListMoviesRow) dto.MovieCardResponse {
 		resp.ReleaseDate = m.ReleaseDate.Time.Format("2006-01-02")
 	}
 	if m.UserAvgRating.Valid {
-		resp.UserAvgRating = m.UserAvgRating.Float32
+		userAvgRating := m.UserAvgRating.Float32
+		resp.UserAvgRating = &userAvgRating
 	}
 	if m.ImdbRating.Valid {
-		resp.ImdbRating = numericToFloat64(m.ImdbRating)
+		imdbRating := numericToFloat64(m.ImdbRating)
+		resp.ImdbRating = &imdbRating
 	}
 	if m.RottenTomatoes.Valid {
-		resp.RottenTomatoes = m.RottenTomatoes.Int32
+		rottenTomatoes := m.RottenTomatoes.Int32
+		resp.RottenTomatoes = &rottenTomatoes
 	}
 	if m.MetacriticScore.Valid {
-		resp.MetacriticScore = m.MetacriticScore.Int32
+		metacriticScore := m.MetacriticScore.Int32
+		resp.MetacriticScore = &metacriticScore
 	}
 
 	return resp

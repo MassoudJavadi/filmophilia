@@ -32,10 +32,10 @@ type MovieCardResponse struct {
 	Slug            string   `json:"slug"`
 	PosterURL       string   `json:"poster_url,omitempty"`
 	Directors       []string `json:"directors"`
-	UserAvgRating   float32  `json:"user_avg_rating,omitempty"`
-	ImdbRating      float64  `json:"imdb_rating,omitempty"`
-	RottenTomatoes  int32    `json:"rotten_tomatoes,omitempty"`
-	MetacriticScore int32    `json:"metacritic_score,omitempty"`
+	UserAvgRating   *float32 `json:"user_avg_rating"`
+	ImdbRating      *float64 `json:"imdb_rating"`
+	RottenTomatoes  *int32   `json:"rotten_tomatoes"`
+	MetacriticScore *int32   `json:"metacritic_score"`
 	ReleaseDate     string   `json:"release_date,omitempty"`
 }
 
