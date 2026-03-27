@@ -23,7 +23,7 @@ func (s *OAuthService) GetGoogleAuthURL(state string) string {
 	return s.googleMgr.GetAuthURL(state)
 }
 
-func (s *OAuthService) HandleGoogleCallback(ctx context.Context, code string) (*dto.AuthResponse, error) {
+func (s *OAuthService) HandleGoogleCallback(ctx context.Context, code string, meta SessionMeta) (*dto.AuthResponse, error) {
 	// 1. Get info from Google API
 	gUser, err := s.googleMgr.GetUserInfo(ctx, code)
 	if err != nil {
@@ -44,6 +44,14 @@ func (s *OAuthService) HandleGoogleCallback(ctx context.Context, code string) (*
 		}
 	}
 
-	// 3. Reuse our standard token issuance logic
-	return s.authSvc.issueTokens(ctx, user)
+	// 3. Check if existing user is banned or suspended
+	if user.Status == db.UserStatusBANNED {
+		return nil, ErrUserBanned
+	}
+	if user.Status == db.UserStatusSUSPENDED {
+		return nil, ErrUserSuspended
+	}
+
+	// 4. Issue tokens with session metadata
+	return s.authSvc.IssueTokens(ctx, user, meta)
 }

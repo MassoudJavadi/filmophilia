@@ -8,6 +8,7 @@ import (
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/dto"
 	"github.com/MassoudJavadi/filmophilia/api/internal/mapper"
+	"github.com/MassoudJavadi/filmophilia/api/internal/pkg/pagination"
 	"github.com/MassoudJavadi/filmophilia/api/internal/response"
 	"github.com/MassoudJavadi/filmophilia/api/internal/service"
 	"github.com/gin-gonic/gin"
@@ -172,11 +173,9 @@ func (h *CommentHandler) GetMovieComments(c *gin.Context) {
 		return
 	}
 
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	offset := (page - 1) * limit
+	p := pagination.Parse(c)
 
-	comments, err := h.commentSvc.GetMovieComments(c.Request.Context(), int32(movieID), int32(limit), int32(offset))
+	comments, err := h.commentSvc.GetMovieComments(c.Request.Context(), int32(movieID), p.Limit, p.Offset)
 	if err != nil {
 		log.Printf("get movie comments error: %v", err)
 		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
@@ -205,11 +204,9 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 		return
 	}
 
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	offset := (page - 1) * limit
+	p := pagination.Parse(c)
 
-	replies, err := h.commentSvc.GetReplies(c.Request.Context(), commentID, int32(limit), int32(offset))
+	replies, err := h.commentSvc.GetReplies(c.Request.Context(), commentID, p.Limit, p.Offset)
 	if err != nil {
 		log.Printf("get replies error: %v", err)
 		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
@@ -233,11 +230,9 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 func (h *CommentHandler) GetMyComments(c *gin.Context) {
 	userID := c.MustGet("user_id").(int32)
 
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	offset := (page - 1) * limit
+	p := pagination.Parse(c)
 
-	comments, err := h.commentSvc.GetUserComments(c.Request.Context(), userID, int32(limit), int32(offset))
+	comments, err := h.commentSvc.GetUserComments(c.Request.Context(), userID, p.Limit, p.Offset)
 	if err != nil {
 		log.Printf("get my comments error: %v", err)
 		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")

@@ -4,9 +4,9 @@ import "time"
 
 // SignupRequest is what we expect from the frontend
 type SignupRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Username string `json:"username" binding:"required,min=3"`
-	Password string `json:"password" binding:"required,min=6"`
+	Email    string `json:"email" binding:"required,email,max=255"`
+	Username string `json:"username" binding:"required,min=3,max=30,alphanum"`
+	Password string `json:"password" binding:"required,min=8,max=72"`
 }
 
 // LoginRequest is what we expect for login

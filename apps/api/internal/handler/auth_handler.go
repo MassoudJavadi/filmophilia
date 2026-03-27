@@ -78,14 +78,24 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.authSvc.Login(c.Request.Context(), req)
+	meta := service.SessionMeta{
+		UserAgent: c.GetHeader("User-Agent"),
+		IPAddress: c.ClientIP(),
+	}
+
+	resp, err := h.authSvc.Login(c.Request.Context(), req, meta)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidCredentials) || errors.Is(err, service.ErrUserBanned) {
-			response.Error(c, http.StatusUnauthorized, "INVALID_CREDENTIALS", err.Error())
-			return
+		switch {
+		case errors.Is(err, service.ErrInvalidCredentials):
+			response.Error(c, http.StatusUnauthorized, "INVALID_CREDENTIALS", "invalid email or password")
+		case errors.Is(err, service.ErrUserBanned):
+			response.Error(c, http.StatusUnauthorized, "USER_BANNED", "user account is banned")
+		case errors.Is(err, service.ErrUserSuspended):
+			response.Error(c, http.StatusUnauthorized, "USER_SUSPENDED", "user account is suspended")
+		default:
+			log.Printf("login error: %v", err)
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
-		log.Printf("login error: %v", err)
-		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 	response.OK(c, resp)
@@ -110,14 +120,24 @@ func (h *AuthHandler) Refresh(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.authSvc.Refresh(c.Request.Context(), req.RefreshToken)
+	meta := service.SessionMeta{
+		UserAgent: c.GetHeader("User-Agent"),
+		IPAddress: c.ClientIP(),
+	}
+
+	resp, err := h.authSvc.Refresh(c.Request.Context(), req.RefreshToken, meta)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidToken) {
-			response.Error(c, http.StatusUnauthorized, "INVALID_REFRESH_TOKEN", err.Error())
-			return
+		switch {
+		case errors.Is(err, service.ErrInvalidToken):
+			response.Error(c, http.StatusUnauthorized, "INVALID_REFRESH_TOKEN", "invalid or expired refresh token")
+		case errors.Is(err, service.ErrUserBanned):
+			response.Error(c, http.StatusUnauthorized, "USER_BANNED", "user account is banned")
+		case errors.Is(err, service.ErrUserSuspended):
+			response.Error(c, http.StatusUnauthorized, "USER_SUSPENDED", "user account is suspended")
+		default:
+			log.Printf("refresh error: %v", err)
+			response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		}
-		log.Printf("refresh error: %v", err)
-		response.Error(c, http.StatusInternalServerError, "INTERNAL_SERVER_ERROR", "internal server error")
 		return
 	}
 	response.OK(c, resp)
@@ -215,9 +235,21 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.oauthSvc.HandleGoogleCallback(c.Request.Context(), code)
+	meta := service.SessionMeta{
+		UserAgent: c.GetHeader("User-Agent"),
+		IPAddress: c.ClientIP(),
+	}
+
+	resp, err := h.oauthSvc.HandleGoogleCallback(c.Request.Context(), code, meta)
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "GOOGLE_CALLBACK_FAILED", err.Error())
+		switch {
+		case errors.Is(err, service.ErrUserBanned):
+			response.Error(c, http.StatusUnauthorized, "USER_BANNED", "user account is banned")
+		case errors.Is(err, service.ErrUserSuspended):
+			response.Error(c, http.StatusUnauthorized, "USER_SUSPENDED", "user account is suspended")
+		default:
+			response.Error(c, http.StatusInternalServerError, "GOOGLE_CALLBACK_FAILED", err.Error())
+		}
 		return
 	}
 
