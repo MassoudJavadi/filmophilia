@@ -119,21 +119,52 @@ LIMIT 20;
 
 The existing index `(user_id, is_read, created_at DESC)` supports efficient queries with partition pruning.
 
-## Automation Options
+## Automated Partition Management
 
-### Option 1: Cron Job
+The API server includes an **automatic partition manager** that runs as a background job. It ensures partitions are always available for upcoming months.
 
-Add to your server's crontab:
+### How It Works
 
-```bash
-# Create next year's partitions every December 1st
-0 0 1 12 * /path/to/filmophilia/db/scripts/create-monthly-partitions.sh $(date -d "+1 year" +\%Y)-01
-# ... repeat for all 12 months
+1. **On Startup**: The partition manager checks for missing partitions and creates them
+2. **Daily Check**: Every 24 hours, it verifies partitions exist for the next 3 months
+3. **Automatic Creation**: Missing partitions are created automatically with proper date ranges
+
+### Configuration
+
+The partition manager uses sensible defaults:
+
+```go
+partition.Config{
+    MonthsAhead:   3,              // Create partitions 3 months ahead
+    CheckInterval: 24 * time.Hour, // Check daily
+}
 ```
 
-### Option 2: pg_partman Extension
+### Logs
 
-For fully automated partition management, consider [pg_partman](https://github.com/pgpartman/pg_partman):
+The partition manager logs its activity:
+
+```
+Partition manager started
+Partition manager: created notifications_2028_01
+Partition manager: created activities_2028_01
+```
+
+### Manual Scripts (Optional)
+
+For manual partition management or disaster recovery, scripts are still available:
+
+```bash
+# Create partitions for a specific month
+./db/scripts/create-monthly-partitions.sh 2028-01
+
+# Drop old partitions (permanently deletes data!)
+./db/scripts/drop-old-partitions.sh 2024-01
+```
+
+### Alternative: pg_partman Extension
+
+For environments preferring database-level automation, consider [pg_partman](https://github.com/pgpartman/pg_partman):
 
 ```sql
 CREATE EXTENSION pg_partman;

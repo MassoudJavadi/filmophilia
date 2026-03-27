@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/MassoudJavadi/filmophilia/api/internal/api"
+	"github.com/MassoudJavadi/filmophilia/api/internal/partition"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
@@ -60,6 +61,12 @@ func main() {
 		log.Fatalf("Database unreachable: %v", err)
 	}
 	fmt.Println("Connected to PostgreSQL")
+
+	// Start partition manager for automatic partition creation
+	partitionMgr := partition.NewManager(dbPool, partition.DefaultConfig())
+	partitionMgr.Start(context.Background())
+	defer partitionMgr.Stop()
+	fmt.Println("Partition manager started")
 
 	server := api.InitializeServer(dbPool)
 
