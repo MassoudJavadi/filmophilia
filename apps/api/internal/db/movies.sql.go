@@ -366,13 +366,13 @@ WITH scored_movies AS (
             ELSE NULL
         END AS community_rating,
         CASE
-            WHEN m.user_rating_count > 0
+            WHEN m.user_avg_rating IS NOT NULL
                  AND (
                     m.imdb_rating IS NOT NULL OR
                     m.rotten_tomatoes IS NOT NULL OR
                     m.metacritic_score IS NOT NULL
                  )
-                THEN (m.user_avg_rating::NUMERIC * 0.7) + (
+                THEN (m.user_avg_rating::NUMERIC * 0.9) + (
                     (
                         COALESCE(m.imdb_rating::NUMERIC, 0) +
                         COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
@@ -382,8 +382,8 @@ WITH scored_movies AS (
                         (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
                         (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
                     )::NUMERIC
-                ) * 0.3
-            WHEN m.user_rating_count > 0
+                ) * 0.1
+            WHEN m.user_avg_rating IS NOT NULL
                 THEN m.user_avg_rating::NUMERIC
             WHEN
                 m.imdb_rating IS NOT NULL OR
@@ -455,13 +455,13 @@ GROUP BY
     pm.created_at
 ORDER BY
     CASE
-        WHEN pm.user_rating_count > 0
+        WHEN pm.user_avg_rating IS NOT NULL
              AND (
                 pm.imdb_rating IS NOT NULL OR
                 pm.rotten_tomatoes IS NOT NULL OR
                 pm.metacritic_score IS NOT NULL
              )
-            THEN (pm.user_avg_rating::NUMERIC * 0.7) + (
+            THEN (pm.user_avg_rating::NUMERIC * 0.9) + (
                 (
                     COALESCE(pm.imdb_rating::NUMERIC, 0) +
                     COALESCE((pm.rotten_tomatoes::NUMERIC / 10.0), 0) +
@@ -471,8 +471,8 @@ ORDER BY
                     (CASE WHEN pm.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
                     (CASE WHEN pm.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
                 )::NUMERIC
-            ) * 0.3
-        WHEN pm.user_rating_count > 0
+            ) * 0.1
+        WHEN pm.user_avg_rating IS NOT NULL
             THEN pm.user_avg_rating::NUMERIC
         WHEN
             pm.imdb_rating IS NOT NULL OR
