@@ -119,7 +119,7 @@ func (q *Queries) GetGenresForMovie(ctx context.Context, movieID int32) ([]Genre
 
 const getMoviesByGenre = `-- name: GetMoviesByGenre :many
 SELECT
-    m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum
+    m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum, m.landing_sort_score
 FROM movies m
 JOIN movie_genres mg ON mg.movie_id = m.id
 WHERE mg.genre_id = $1
@@ -166,6 +166,7 @@ func (q *Queries) GetMoviesByGenre(ctx context.Context, arg GetMoviesByGenrePara
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
 			&i.RatingSum,
+			&i.LandingSortScore,
 		); err != nil {
 			return nil, err
 		}
@@ -179,7 +180,7 @@ func (q *Queries) GetMoviesByGenre(ctx context.Context, arg GetMoviesByGenrePara
 
 const getMoviesByGenreSlug = `-- name: GetMoviesByGenreSlug :many
 SELECT
-    m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum
+    m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum, m.landing_sort_score
 FROM movies m
 JOIN movie_genres mg ON mg.movie_id = m.id
 JOIN genres g ON g.id = mg.genre_id
@@ -227,6 +228,7 @@ func (q *Queries) GetMoviesByGenreSlug(ctx context.Context, arg GetMoviesByGenre
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
 			&i.RatingSum,
+			&i.LandingSortScore,
 		); err != nil {
 			return nil, err
 		}

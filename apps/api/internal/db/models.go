@@ -612,6 +612,7 @@ type Movie struct {
 	MetacriticScore  pgtype.Int4        `json:"metacritic_score"`
 	LetterboxdRating pgtype.Numeric     `json:"letterboxd_rating"`
 	RatingSum        pgtype.Int8        `json:"rating_sum"`
+	LandingSortScore pgtype.Numeric     `json:"landing_sort_score"`
 }
 
 type MovieGenre struct {

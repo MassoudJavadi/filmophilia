@@ -27,7 +27,7 @@ func (q *Queries) DeleteRating(ctx context.Context, arg DeleteRatingParams) erro
 }
 
 const getMovieByID = `-- name: GetMovieByID :one
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies WHERE id = $1
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum, landing_sort_score FROM movies WHERE id = $1
 `
 
 func (q *Queries) GetMovieByID(ctx context.Context, id int32) (Movie, error) {
@@ -57,6 +57,7 @@ func (q *Queries) GetMovieByID(ctx context.Context, id int32) (Movie, error) {
 		&i.MetacriticScore,
 		&i.LetterboxdRating,
 		&i.RatingSum,
+		&i.LandingSortScore,
 	)
 	return i, err
 }

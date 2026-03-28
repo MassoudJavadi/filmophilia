@@ -12,7 +12,7 @@ import (
 )
 
 const advancedSearchMovies = `-- name: AdvancedSearchMovies :many
-SELECT DISTINCT m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum
+SELECT DISTINCT m.id, m.title, m.slug, m.overview, m.poster_url, m.backdrop_url, m.trailer_url, m.release_date, m.runtime, m.content_rating, m.original_language, m.country, m.imdb_id, m.tmdb_id, m.user_avg_rating, m.user_rating_count, m.created_at, m.updated_at, m.imdb_rating, m.rotten_tomatoes, m.metacritic_score, m.letterboxd_rating, m.rating_sum, m.landing_sort_score
 FROM movies m
 LEFT JOIN movie_genres mg ON mg.movie_id = m.id
 WHERE
@@ -121,6 +121,7 @@ func (q *Queries) AdvancedSearchMovies(ctx context.Context, arg AdvancedSearchMo
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
 			&i.RatingSum,
+			&i.LandingSortScore,
 		); err != nil {
 			return nil, err
 		}
@@ -263,7 +264,7 @@ func (q *Queries) CreateMovie(ctx context.Context, arg CreateMovieParams) (int32
 }
 
 const getMovieBySlug = `-- name: GetMovieBySlug :one
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum, landing_sort_score FROM movies
 WHERE slug = $1 LIMIT 1
 `
 
@@ -295,12 +296,13 @@ func (q *Queries) GetMovieBySlug(ctx context.Context, slug string) (Movie, error
 		&i.MetacriticScore,
 		&i.LetterboxdRating,
 		&i.RatingSum,
+		&i.LandingSortScore,
 	)
 	return i, err
 }
 
 const getMovieByTmdbID = `-- name: GetMovieByTmdbID :one
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies WHERE tmdb_id = $1 LIMIT 1
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum, landing_sort_score FROM movies WHERE tmdb_id = $1 LIMIT 1
 `
 
 // Get a movie by its TMDB ID
@@ -331,165 +333,34 @@ func (q *Queries) GetMovieByTmdbID(ctx context.Context, tmdbID pgtype.Int4) (Mov
 		&i.MetacriticScore,
 		&i.LetterboxdRating,
 		&i.RatingSum,
+		&i.LandingSortScore,
 	)
 	return i, err
 }
 
 const listMovies = `-- name: ListMovies :many
-WITH scored_movies AS (
-    SELECT
-        m.id,
-        m.title,
-        m.slug,
-        m.poster_url,
-        m.release_date,
-        m.user_avg_rating,
-        m.user_rating_count,
-        m.imdb_rating,
-        m.rotten_tomatoes,
-        m.metacritic_score,
-        m.created_at,
-        CASE
-            WHEN
-                (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
-                (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
-                (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END) > 0
-            THEN (
-                COALESCE(m.imdb_rating::NUMERIC, 0) +
-                COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
-                COALESCE((m.metacritic_score::NUMERIC / 10.0), 0)
-            ) / (
-                (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
-                (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
-                (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
-            )::NUMERIC
-            ELSE NULL
-        END AS community_rating,
-        CASE
-            WHEN m.user_avg_rating IS NOT NULL
-                 AND (
-                    m.imdb_rating IS NOT NULL OR
-                    m.rotten_tomatoes IS NOT NULL OR
-                    m.metacritic_score IS NOT NULL
-                 )
-                THEN (m.user_avg_rating::NUMERIC * 0.9) + (
-                    (
-                        COALESCE(m.imdb_rating::NUMERIC, 0) +
-                        COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
-                        COALESCE((m.metacritic_score::NUMERIC / 10.0), 0)
-                    ) / (
-                        (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
-                        (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
-                        (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
-                    )::NUMERIC
-                ) * 0.1
-            WHEN m.user_avg_rating IS NOT NULL
-                THEN m.user_avg_rating::NUMERIC
-            WHEN
-                m.imdb_rating IS NOT NULL OR
-                m.rotten_tomatoes IS NOT NULL OR
-                m.metacritic_score IS NOT NULL
-                THEN (
-                    COALESCE(m.imdb_rating::NUMERIC, 0) +
-                    COALESCE((m.rotten_tomatoes::NUMERIC / 10.0), 0) +
-                    COALESCE((m.metacritic_score::NUMERIC / 10.0), 0)
-                ) / (
-                    (CASE WHEN m.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
-                    (CASE WHEN m.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
-                    (CASE WHEN m.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
-                )::NUMERIC
-            ELSE 0
-        END AS landing_sort_score
-    FROM movies m
-), paged_movies AS (
-    SELECT
-        sm.id,
-        sm.title,
-        sm.slug,
-        sm.poster_url,
-        sm.release_date,
-        sm.user_avg_rating,
-        sm.user_rating_count,
-        sm.imdb_rating,
-        sm.rotten_tomatoes,
-        sm.metacritic_score,
-        sm.created_at
-    FROM scored_movies sm
-    ORDER BY sm.landing_sort_score DESC, sm.created_at DESC
-    LIMIT $1 OFFSET $2
-)
 SELECT
-    pm.id,
-    pm.title,
-    pm.slug,
-    pm.poster_url,
-    pm.release_date,
-    pm.user_avg_rating,
-    pm.user_rating_count,
-    pm.imdb_rating,
-    pm.rotten_tomatoes,
-    pm.metacritic_score,
-    COALESCE(
-        (
-            ARRAY_AGG(DISTINCT p.name ORDER BY p.name)
-            FILTER (WHERE p.name IS NOT NULL)
-        )::TEXT[],
-        ARRAY[]::TEXT[]
-    )::TEXT[] AS directors
-FROM paged_movies pm
-LEFT JOIN credits c
-    ON c.movie_id = pm.id
-    AND c.department = 'DIRECTING'
-LEFT JOIN persons p ON p.id = c.person_id
-GROUP BY
-    pm.id,
-    pm.title,
-    pm.slug,
-    pm.poster_url,
-    pm.release_date,
-    pm.user_avg_rating,
-    pm.user_rating_count,
-    pm.imdb_rating,
-    pm.rotten_tomatoes,
-    pm.metacritic_score,
-    pm.created_at
-ORDER BY
-    CASE
-        WHEN pm.user_avg_rating IS NOT NULL
-             AND (
-                pm.imdb_rating IS NOT NULL OR
-                pm.rotten_tomatoes IS NOT NULL OR
-                pm.metacritic_score IS NOT NULL
-             )
-            THEN (pm.user_avg_rating::NUMERIC * 0.9) + (
-                (
-                    COALESCE(pm.imdb_rating::NUMERIC, 0) +
-                    COALESCE((pm.rotten_tomatoes::NUMERIC / 10.0), 0) +
-                    COALESCE((pm.metacritic_score::NUMERIC / 10.0), 0)
-                ) / (
-                    (CASE WHEN pm.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
-                    (CASE WHEN pm.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
-                    (CASE WHEN pm.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
-                )::NUMERIC
-            ) * 0.1
-        WHEN pm.user_avg_rating IS NOT NULL
-            THEN pm.user_avg_rating::NUMERIC
-        WHEN
-            pm.imdb_rating IS NOT NULL OR
-            pm.rotten_tomatoes IS NOT NULL OR
-            pm.metacritic_score IS NOT NULL
-            THEN (
-                COALESCE(pm.imdb_rating::NUMERIC, 0) +
-                COALESCE((pm.rotten_tomatoes::NUMERIC / 10.0), 0) +
-                COALESCE((pm.metacritic_score::NUMERIC / 10.0), 0)
-            ) / (
-                (CASE WHEN pm.imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
-                (CASE WHEN pm.rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
-                (CASE WHEN pm.metacritic_score IS NOT NULL THEN 1 ELSE 0 END)
-            )::NUMERIC
-        ELSE 0
-    END DESC,
-    pm.created_at DESC
+    m.id,
+    m.title,
+    m.slug,
+    m.poster_url,
+    m.release_date,
+    m.user_avg_rating,
+    m.user_rating_count,
+    m.imdb_rating,
+    m.rotten_tomatoes,
+    m.metacritic_score,
+    m.landing_sort_score,
+    COALESCE(d.directors, ARRAY[]::TEXT[]) AS directors
+FROM movies m
+LEFT JOIN LATERAL (
+    SELECT ARRAY_AGG(DISTINCT p.name ORDER BY p.name) AS directors
+    FROM credits c
+    JOIN persons p ON p.id = c.person_id
+    WHERE c.movie_id = m.id AND c.department = 'DIRECTING'
+) d ON true
+ORDER BY m.landing_sort_score DESC NULLS LAST, m.created_at DESC
+LIMIT $1 OFFSET $2
 `
 
 type ListMoviesParams struct {
@@ -498,20 +369,21 @@ type ListMoviesParams struct {
 }
 
 type ListMoviesRow struct {
-	ID              int32          `json:"id"`
-	Title           string         `json:"title"`
-	Slug            string         `json:"slug"`
-	PosterUrl       pgtype.Text    `json:"poster_url"`
-	ReleaseDate     pgtype.Date    `json:"release_date"`
-	UserAvgRating   pgtype.Float4  `json:"user_avg_rating"`
-	UserRatingCount pgtype.Int4    `json:"user_rating_count"`
-	ImdbRating      pgtype.Numeric `json:"imdb_rating"`
-	RottenTomatoes  pgtype.Int4    `json:"rotten_tomatoes"`
-	MetacriticScore pgtype.Int4    `json:"metacritic_score"`
-	Directors       []string       `json:"directors"`
+	ID               int32          `json:"id"`
+	Title            string         `json:"title"`
+	Slug             string         `json:"slug"`
+	PosterUrl        pgtype.Text    `json:"poster_url"`
+	ReleaseDate      pgtype.Date    `json:"release_date"`
+	UserAvgRating    pgtype.Float4  `json:"user_avg_rating"`
+	UserRatingCount  pgtype.Int4    `json:"user_rating_count"`
+	ImdbRating       pgtype.Numeric `json:"imdb_rating"`
+	RottenTomatoes   pgtype.Int4    `json:"rotten_tomatoes"`
+	MetacriticScore  pgtype.Int4    `json:"metacritic_score"`
+	LandingSortScore pgtype.Numeric `json:"landing_sort_score"`
+	Directors        interface{}    `json:"directors"`
 }
 
-// Get a paginated list of movies for landing-page cards, ordered by weighted rating
+// Get a paginated list of movies for landing-page cards, ordered by pre-computed weighted rating
 func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]ListMoviesRow, error) {
 	rows, err := q.db.Query(ctx, listMovies, arg.Limit, arg.Offset)
 	if err != nil {
@@ -532,6 +404,7 @@ func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]ListM
 			&i.ImdbRating,
 			&i.RottenTomatoes,
 			&i.MetacriticScore,
+			&i.LandingSortScore,
 			&i.Directors,
 		); err != nil {
 			return nil, err
@@ -545,7 +418,7 @@ func (q *Queries) ListMovies(ctx context.Context, arg ListMoviesParams) ([]ListM
 }
 
 const searchMovies = `-- name: SearchMovies :many
-SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum FROM movies
+SELECT id, title, slug, overview, poster_url, backdrop_url, trailer_url, release_date, runtime, content_rating, original_language, country, imdb_id, tmdb_id, user_avg_rating, user_rating_count, created_at, updated_at, imdb_rating, rotten_tomatoes, metacritic_score, letterboxd_rating, rating_sum, landing_sort_score FROM movies
 WHERE title ILIKE '%' || $1 || '%' OR slug ILIKE '%' || $1 || '%'
 ORDER BY imdb_rating DESC
 LIMIT $2 OFFSET $3
@@ -591,6 +464,7 @@ func (q *Queries) SearchMovies(ctx context.Context, arg SearchMoviesParams) ([]M
 			&i.MetacriticScore,
 			&i.LetterboxdRating,
 			&i.RatingSum,
+			&i.LandingSortScore,
 		); err != nil {
 			return nil, err
 		}

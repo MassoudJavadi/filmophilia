@@ -77,10 +77,16 @@ func ToMovieResponse(m db.Movie) dto.MovieResponse {
 
 func ToMovieCardResponse(m db.ListMoviesRow) dto.MovieCardResponse {
 	resp := dto.MovieCardResponse{
-		ID:        m.ID,
-		Title:     m.Title,
-		Slug:      m.Slug,
-		Directors: m.Directors,
+		ID:    m.ID,
+		Title: m.Title,
+		Slug:  m.Slug,
+	}
+
+	// Handle directors from lateral join (interface{} -> []string)
+	if directors, ok := m.Directors.([]string); ok {
+		resp.Directors = directors
+	} else if m.Directors != nil {
+		resp.Directors = []string{}
 	}
 
 	if m.PosterUrl.Valid {

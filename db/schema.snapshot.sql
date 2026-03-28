@@ -245,6 +245,61 @@ $$;
 
 
 --
+-- Name: calculate_landing_sort_score(real, numeric, integer, integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.calculate_landing_sort_score(p_user_avg_rating real, p_imdb_rating numeric, p_rotten_tomatoes integer, p_metacritic_score integer) RETURNS numeric
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+DECLARE
+    community_rating NUMERIC;
+    rating_count INT;
+BEGIN
+    rating_count := (CASE WHEN p_imdb_rating IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN p_rotten_tomatoes IS NOT NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN p_metacritic_score IS NOT NULL THEN 1 ELSE 0 END);
+
+    IF rating_count > 0 THEN
+        community_rating := (
+            COALESCE(p_imdb_rating, 0) +
+            COALESCE(p_rotten_tomatoes::NUMERIC / 10.0, 0) +
+            COALESCE(p_metacritic_score::NUMERIC / 10.0, 0)
+        ) / rating_count;
+    END IF;
+
+    IF p_user_avg_rating IS NOT NULL AND rating_count > 0 THEN
+        RETURN (p_user_avg_rating::NUMERIC * 0.9) + (community_rating * 0.1);
+    ELSIF p_user_avg_rating IS NOT NULL THEN
+        RETURN p_user_avg_rating::NUMERIC;
+    ELSIF rating_count > 0 THEN
+        RETURN community_rating;
+    ELSE
+        RETURN 0;
+    END IF;
+END;
+$$;
+
+
+--
+-- Name: update_movie_landing_sort_score(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_movie_landing_sort_score() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.landing_sort_score := calculate_landing_sort_score(
+        NEW.user_avg_rating,
+        NEW.imdb_rating,
+        NEW.rotten_tomatoes,
+        NEW.metacritic_score
+    );
+    RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: update_movie_rating_stats(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1038,7 +1093,8 @@ CREATE TABLE public.movies (
     rotten_tomatoes integer,
     metacritic_score integer,
     letterboxd_rating numeric(3,1),
-    rating_sum bigint DEFAULT 0
+    rating_sum bigint DEFAULT 0,
+    landing_sort_score numeric
 );
 
 
@@ -3265,6 +3321,13 @@ CREATE INDEX movies_average_rating_idx ON public.movies USING btree (user_avg_ra
 
 
 --
+-- Name: movies_landing_sort_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX movies_landing_sort_idx ON public.movies USING btree (landing_sort_score DESC NULLS LAST, created_at DESC);
+
+
+--
 -- Name: movies_release_date_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4501,6 +4564,13 @@ CREATE TRIGGER follows_user_counts_insert AFTER INSERT ON public.follows FOR EAC
 --
 
 CREATE TRIGGER movies_updated_at BEFORE UPDATE ON public.movies FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+
+--
+-- Name: movies trg_movies_landing_sort_score; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trg_movies_landing_sort_score BEFORE INSERT OR UPDATE OF user_avg_rating, imdb_rating, rotten_tomatoes, metacritic_score ON public.movies FOR EACH ROW EXECUTE FUNCTION public.update_movie_landing_sort_score();
 
 
 --
