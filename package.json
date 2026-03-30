@@ -10,5 +10,8 @@
     "@nx/workspace": "22.4.5",
     "lefthook": "^2.1.0",
     "nx": "22.4.5"
+  },
+  "dependencies": {
+    "@nx/react": "^22.6.3"
   }
 }
