@@ -4581,24 +4581,10 @@ CREATE TRIGGER persons_updated_at BEFORE UPDATE ON public.persons FOR EACH ROW E
 
 
 --
--- Name: ratings ratings_stats_delete; Type: TRIGGER; Schema: public; Owner: -
+-- Name: ratings ratings_stats_after_change; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER ratings_stats_delete AFTER DELETE ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_movie_rating_stats();
-
-
---
--- Name: ratings ratings_stats_insert; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER ratings_stats_insert AFTER INSERT ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_movie_rating_stats();
-
-
---
--- Name: ratings ratings_stats_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER ratings_stats_update AFTER UPDATE ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_movie_rating_stats();
+CREATE TRIGGER ratings_stats_after_change AFTER INSERT OR UPDATE OR DELETE ON public.ratings FOR EACH ROW EXECUTE FUNCTION public.update_movie_rating_stats();
 
 
 --
